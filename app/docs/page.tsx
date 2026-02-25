@@ -297,34 +297,6 @@ const API_ENDPOINTS = [
 }`,
     },
     {
-        method: "POST",
-        path: "/api/aa/consent",
-        desc: "Initiate Account Aggregator consent flow for data linking. Integrates with Setu/OneMoney/Finvu in production.",
-        body: `{
-  "userId": "user_123",
-  "phone": "9876543210"
-}`,
-        response: `{
-  "success": true,
-  "consentId": "aa_1708367520_xyz",
-  "status": "PENDING",
-  "redirectUrl": "https://aa.exitdebt.com/consent/...",
-  "dataTypes": ["DEPOSIT", "CREDIT_CARD", "LOAN"]
-}`,
-    },
-    {
-        method: "GET",
-        path: "/api/aa/fetch",
-        desc: "Fetch latest data from Account Aggregator after consent is approved.",
-        body: null,
-        response: `{
-  "success": true,
-  "status": "NO_CONSENT",
-  "data": null,
-  "message": "Initiate consent via POST /api/aa/consent first."
-}`,
-    },
-    {
         method: "GET",
         path: "/api/dashboard/:userId",
         desc: "Get full dashboard data — Freedom GPS, Interest Leak, Payment Prioritizer, Cash Flow, Health Score, accounts, and subscription status.",
@@ -496,70 +468,6 @@ const API_ENDPOINTS = [
         response: `{
   "success": true,
   "message": "Your data deletion request has been processed. Personal data has been removed."
-}`,
-    },
-    {
-        method: "POST",
-        path: "/aa/consent",
-        desc: "Create an Account Aggregator consent request. Returns a redirect URL for user to approve data sharing.",
-        body: `{
-  "phone": "9876543210",
-  "fi_types": ["DEPOSIT", "CREDIT_CARD", "TERM_DEPOSIT"]
-}`,
-        response: `{
-  "id": "consent_abc123",
-  "url": "https://anumati.setu.co/consent/...",
-  "status": "PENDING"
-}`,
-    },
-    {
-        method: "GET",
-        path: "/aa/consent/:consentId",
-        desc: "Check the current status of an Account Aggregator consent request.",
-        body: null,
-        response: `{
-  "id": "consent_abc123",
-  "status": "APPROVED",
-  "fi_types": ["DEPOSIT", "CREDIT_CARD"],
-  "created_at": "2026-02-21T12:00:00Z"
-}`,
-    },
-    {
-        method: "POST",
-        path: "/aa/consent/:consentId/approve",
-        desc: "Mock-approve a consent (development only). In production, users approve via Setu's consent screens.",
-        body: null,
-        response: `{
-  "message": "Consent approved",
-  "consent": { "id": "consent_abc123", "status": "APPROVED" }
-}`,
-    },
-    {
-        method: "GET",
-        path: "/aa/data/:consentId",
-        desc: "Fetch financial data from Account Aggregator after consent approval. Returns parsed debt accounts from bank statements.",
-        body: null,
-        response: `{
-  "consent_id": "consent_abc123",
-  "status": "COMPLETED",
-  "accounts": [
-    { "type": "CREDIT_CARD", "issuer": "HDFC", "balance": 182000, "limit": 300000 }
-  ],
-  "raw_fi_count": 3
-}`,
-    },
-    {
-        method: "POST",
-        path: "/aa/webhook",
-        desc: "Receive Setu AA notifications (consent status updates, FI data ready). Webhook signature is verified in production.",
-        body: `{
-  "type": "CONSENT_STATUS_UPDATE",
-  "consentId": "consent_abc123",
-  "data": { "status": "APPROVED" }
-}`,
-        response: `{
-  "success": true,
-  "message": "Webhook received"
 }`,
     },
 ];
