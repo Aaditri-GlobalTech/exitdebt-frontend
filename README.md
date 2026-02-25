@@ -168,7 +168,7 @@ Implemented via `calculateTotalAnnualSavings()` — replaces hardcoded values.
 
 ## API Endpoints
 
-All 12 core endpoints with input validation. Full docs at `/docs`.
+Core endpoints with input validation. Full docs at `/docs`.
 
 | Method | Endpoint | Description |
 |---|---|---|
@@ -177,10 +177,10 @@ All 12 core endpoints with input validation. Full docs at `/docs`.
 | `POST` | `/api/health-check` | PAN+phone+consent → full report |
 | `GET` | `/api/health-check/:id` | Retrieve by ID (30-day expiry) |
 | `POST` | `/api/callback` | Book callback with time slot |
-| `POST` | `/api/subscription/purchase` | Initiate UPI payment ₹999/yr |
-| `GET` | `/api/subscription/status` | Check trial/active/expired |
-| `POST` | `/api/aa/consent` | Initiate AA consent flow |
-| `GET` | `/api/aa/fetch` | Fetch AA data |
+| `GET` | `/api/subscription/plans` | List subscription plans + pricing |
+| `GET` | `/api/subscription/status/:id` | Check trial/active/expired |
+| `POST` | `/api/subscription/upgrade` | Upgrade subscription tier |
+| `POST` | `/api/subscription/shield-consent` | Record Shield consent |
 | `GET` | `/api/dashboard/:userId` | Full dashboard data |
 | `GET` | `/api/dashboard/sales/:userId` | Sales view + trends + offers |
 | `POST` | `/api/prioritizer/calculate` | Payment allocation (avalanche) |
@@ -234,7 +234,6 @@ src/
 │       ├── health-check/       # CIBIL pull + results
 │       ├── callback/           # Callback booking
 │       ├── subscription/       # Purchase + status
-│       ├── aa/                 # Account Aggregator
 │       ├── dashboard/          # User + sales dashboard
 │       └── prioritizer/        # Payment allocation
 ├── components/
