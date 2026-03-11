@@ -46,7 +46,7 @@ export default function CallbackModal({ isOpen, onClose, reason, userName }: Cal
         const slot = TIME_SLOTS.find((s) => s.id === selectedSlot);
         setBookedSlot(slot ? `${slot.label} (${slot.time})` : selectedSlot);
         setBooked(true);
-        console.log(`[ExitDebt CRM] Callback booked for ${userName}: ${selectedSlot} — Reason: ${reason}`);
+        // In production: POST to /api/callback to schedule with CRM
     }
 
     return (
@@ -101,7 +101,7 @@ export default function CallbackModal({ isOpen, onClose, reason, userName }: Cal
                                     className="relative flex flex-col items-center p-4 rounded-xl border-2 cursor-pointer transition-all duration-200"
                                     style={{
                                         borderColor: selectedSlot === slot.id
-                                            ? "var(--color-purple)"
+                                            ? "var(--color-teal)"
                                             : "var(--color-border)",
                                         backgroundColor: selectedSlot === slot.id
                                             ? "rgba(115,0,190,0.04)"
@@ -129,7 +129,7 @@ export default function CallbackModal({ isOpen, onClose, reason, userName }: Cal
                                     {selectedSlot === slot.id && (
                                         <div
                                             className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center"
-                                            style={{ backgroundColor: "var(--color-purple)" }}
+                                            style={{ backgroundColor: "var(--color-teal)" }}
                                         >
                                             <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -144,7 +144,7 @@ export default function CallbackModal({ isOpen, onClose, reason, userName }: Cal
                             onClick={handleBook}
                             disabled={!selectedSlot}
                             className="w-full py-3.5 rounded-xl text-sm font-bold text-white transition-all cursor-pointer hover:opacity-90 hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed"
-                            style={{ backgroundColor: "var(--color-purple)" }}
+                            style={{ backgroundColor: "var(--color-teal)" }}
                         >
                             Confirm Callback
                         </button>

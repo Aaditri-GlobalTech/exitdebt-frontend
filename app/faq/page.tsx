@@ -12,8 +12,8 @@ const trustFaqs = [
         answer: "ExitDebt is a registered debt advisory platform. We don't ask for your bank password. We don't move your money. We only read your credit report to show you where you're overpaying.",
     },
     {
-        question: "Will this hurt my CIBIL score?",
-        answer: "No. We perform a soft credit check. This has zero impact on your CIBIL score. Only hard inquiries from loan applications affect your score.",
+        question: "Will this hurt my Equifax score?",
+        answer: "No. We perform a soft credit check. This has zero impact on your Equifax score. Only hard inquiries from loan applications affect your score.",
     },
     {
         question: "Is my PAN safe?",
@@ -61,7 +61,7 @@ export default function FAQPage() {
                 <div className="text-center mb-12">
                     <span
                         className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-4"
-                        style={{ backgroundColor: "rgba(115,0,190,0.08)", color: "var(--color-purple)" }}
+                        style={{ backgroundColor: "rgba(115,0,190,0.08)", color: "var(--color-teal)" }}
                     >
                         ❓ Help & FAQ
                     </span>
@@ -104,7 +104,7 @@ export default function FAQPage() {
                         <Link
                             href="/schedule"
                             className="px-6 py-2.5 rounded-xl text-white font-semibold text-sm hover:opacity-90 transition-opacity"
-                            style={{ backgroundColor: "var(--color-purple)" }}
+                            style={{ backgroundColor: "var(--color-teal)" }}
                         >
                             📞 Schedule a Free Call
                         </Link>

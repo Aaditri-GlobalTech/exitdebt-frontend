@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from "react";
 import { TierKey } from "@/lib/mockPlans";
+import { useAuth } from "@/lib/AuthContext";
 
 /* ─── Types ──────────────────────────────────────────────────────────────── */
 
@@ -64,8 +65,8 @@ function defaultTrialEnd(): Date {
 /* ─── Context ────────────────────────────────────────────────────────────── */
 
 const SubscriptionContext = createContext<SubscriptionContextType>({
-    tier: null,
-    status: "trial",
+    tier: "lite",
+    status: "active",
     trialEndsAt: defaultTrialEnd(),
     billingPeriod: "monthly",
     daysRemaining: 90,
@@ -78,20 +79,42 @@ const SubscriptionContext = createContext<SubscriptionContextType>({
 /* ─── Provider ───────────────────────────────────────────────────────────── */
 
 export function SubscriptionProvider({ children }: { children: ReactNode }) {
-    const [tier, setTier] = useState<TierKey | null>(null);
-    const [status, setStatus] = useState<SubscriptionStatus>("trial");
+    const { consent } = useAuth();
+    const [tier, setTier] = useState<TierKey | null>("lite");
+    const [status, setStatus] = useState<SubscriptionStatus>("active");
     const [trialEndsAt, setTrialEndsAt] = useState<Date>(defaultTrialEnd());
     const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>("monthly");
     const [isReady, setIsReady] = useState(false);
+
+    // Sync trial end with profile creation date (consent timestamp)
+    useEffect(() => {
+        if (!isReady) return;
+        
+        // Only override if we are in Lite plan (which is the 3-month free plan)
+        if (tier === "lite" && consent?.timestamp) {
+            const creationDate = new Date(consent.timestamp);
+            const ninetyDaysOut = new Date(creationDate.getTime() + 90 * 24 * 60 * 60 * 1000);
+            
+            // Only update if it's significantly different (to avoid loop or unnecessary jitter)
+            if (Math.abs(ninetyDaysOut.getTime() - trialEndsAt.getTime()) > 1000 * 60 * 60) {
+                setTrialEndsAt(ninetyDaysOut);
+            }
+        }
+    }, [isReady, tier, consent, trialEndsAt]);
 
     // Hydrate from cookie on mount
     useEffect(() => {
         const data = getCookie();
         if (data) {
-            if (data.tier) setTier(data.tier as TierKey);
-            if (data.status) setStatus(data.status as SubscriptionStatus);
+            // Hydrate tier from cookie — no force-reset
+            setTier((data.tier as TierKey) || "lite");
+            setStatus((data.status as SubscriptionStatus) || "active");
             if (data.trialEndsAt) setTrialEndsAt(new Date(data.trialEndsAt as string));
             if (data.billingPeriod) setBillingPeriod(data.billingPeriod as BillingPeriod);
+        } else {
+            // First time or no cookie: ensure Lite is active
+            setTier("lite");
+            setStatus("active");
         }
         setIsReady(true);
     }, []);
@@ -122,22 +145,18 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
             setTier(newTier);
             setStatus("active");
             setBillingPeriod(period);
-            console.log(
-                `[ExitDebt] Subscribed to ${newTier} (${period}). Mock payment successful.`
-            );
         },
         []
     );
 
     const bookSettlementCall = useCallback(() => {
-        console.log("[ExitDebt] Settlement call booked. Reason: Settlement inquiry.");
+        // In production: call backend to schedule settlement
     }, []);
 
     const expireTrial = useCallback(() => {
         setTrialEndsAt(new Date(Date.now() - 1000));
         setStatus("expired");
         setTier(null);
-        console.log("[ExitDebt] Trial manually expired (dev mode).");
     }, []);
 
     const resetTrial = useCallback(() => {
@@ -146,7 +165,6 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
         setTrialEndsAt(defaultTrialEnd());
         setBillingPeriod("monthly");
         deleteCookie();
-        console.log("[ExitDebt] Subscription state reset to trial (dev mode).");
     }, []);
 
     return (

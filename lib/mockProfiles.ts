@@ -28,7 +28,7 @@ export interface MockProfile {
   currentTimeline: string;
   optimizedTimeline: string;
   timelineSaved: string;
-  creditScore: number; // CIBIL score
+  creditScore: number; // Equifax score
 }
 
 export const mockProfiles: MockProfile[] = [

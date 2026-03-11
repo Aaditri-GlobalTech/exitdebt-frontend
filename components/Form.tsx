@@ -63,7 +63,7 @@ export default function DebtForm({ onResult, isLoading, setIsLoading, submitted 
         setIsLoading(true);
 
         try {
-            // Step 1: Verify PAN via Setu API
+            // Step 1: Verify PAN
             const panResp = await fetch("/api/pan/verify", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -183,7 +183,7 @@ export default function DebtForm({ onResult, isLoading, setIsLoading, submitted 
             </button>
 
             <p className="text-center text-xs text-gray-400">
-                Takes 30 seconds · No impact on your CIBIL score
+                Takes 30 seconds · No impact on your Equifax score
             </p>
         </form>
     );

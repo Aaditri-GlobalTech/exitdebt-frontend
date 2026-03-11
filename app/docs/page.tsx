@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 /* ───── Sections Data ───── */
 
 const USER_FLOW = [
-    { step: "01", title: "Landing Page", route: "/", desc: "User enters PAN card number and phone. The app validates inputs and selects a mock CIBIL profile." },
+    { step: "01", title: "Landing Page", route: "/", desc: "User enters PAN card number and phone. The app validates inputs and selects a mock Equifax profile." },
     { step: "02", title: "Income Details", route: "/income", desc: "User provides monthly salary, salary date, and optional other income. Data is stored in AuthContext." },
     { step: "03", title: "Dashboard", route: "/dashboard", desc: "Full Debt Intelligence Dashboard with 9 interactive sections powered by the calculations engine." },
 ];
@@ -102,7 +102,7 @@ const API_ENDPOINTS = [
     {
         method: "POST",
         path: "/api/health-check",
-        desc: "Submit PAN + phone → trigger CIBIL pull → return parsed debt health results with score breakdown, savings, interest leak, and cash flow.",
+        desc: "Submit PAN + phone → trigger Equifax pull → return parsed debt health results with score breakdown, savings, interest leak, and cash flow.",
         body: `{
   "pan": "ABCDE1234F",
   "phone": "9876543210",
@@ -350,7 +350,6 @@ const API_ENDPOINTS = [
     {
         method: "POST",
         path: "/api/pan/verify",
-        desc: "Verify a PAN card number using Setu PAN API. In mock mode, returns synthetic data. Sandbox values: ABCDE1234A (valid), ABCDE1234B (invalid).",
         body: `{
   "pan": "ABCDE1234F",
   "consent": "Y",
@@ -369,7 +368,6 @@ const API_ENDPOINTS = [
     {
         method: "POST",
         path: "/api/payment/create-link",
-        desc: "Create a UPI payment link for subscription upgrade. In mock mode, returns a simulated link. In production, calls Setu UPI API.",
         body: `{
   "user_id": "user_123",
   "tier": "shield",
@@ -383,7 +381,7 @@ const API_ENDPOINTS = [
   "amount": 14999,
   "currency": "INR",
   "status": "CREATED",
-  "payment_link": "https://pay.setu.co/...",
+  "payment_link": "https://pay.example.com/...",
   "upi_link": "upi://pay?pa=exitdebt@ybl&am=14999",
   "created_at": "2026-02-21T12:00:00Z"
 }`,
@@ -403,7 +401,6 @@ const API_ENDPOINTS = [
     {
         method: "POST",
         path: "/api/payment/confirm/:paymentId",
-        desc: "Mock-confirm a payment (development only). In production, payments are confirmed via Setu webhooks.",
         body: null,
         response: `{
   "message": "Payment confirmed",
@@ -413,7 +410,6 @@ const API_ENDPOINTS = [
     {
         method: "POST",
         path: "/api/payment/webhook",
-        desc: "Receive Setu UPI payment notifications. In production, webhook signature is verified before processing.",
         body: `{
   "type": "PAYMENT_SUCCESSFUL",
   "paymentLinkId": "pay_abc123"
@@ -481,11 +477,11 @@ export default function DocsPage() {
             <nav style={{ borderBottom: "1px solid var(--color-border)" }}>
                 <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-bold" style={{ backgroundColor: "var(--color-purple)" }}>E</div>
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-bold" style={{ backgroundColor: "var(--color-teal)" }}>E</div>
                         <span className="text-lg font-bold tracking-tight" style={{ color: "var(--color-text-primary)" }}>ExitDebt</span>
                     </Link>
                     <div className="flex items-center gap-4">
-                        <span className="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full" style={{ backgroundColor: "rgba(115,0,190,0.08)", color: "var(--color-purple)" }}>Docs</span>
+                        <span className="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full" style={{ backgroundColor: "rgba(115,0,190,0.08)", color: "var(--color-teal)" }}>Docs</span>
                         <Link href="/" className="text-sm font-medium transition-colors" style={{ color: "var(--color-text-secondary)" }}>← Back to app</Link>
                     </div>
                 </div>
@@ -503,7 +499,7 @@ export default function DocsPage() {
                     <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: "var(--color-text-muted)" }}>On this page</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                         {["User Flow", "API Endpoints", "Design System", "Components", "Calculations", "Data Models", "Tech Stack"].map((s) => (
-                            <a key={s} href={`#${s.toLowerCase().replace(/ /g, "-")}`} className="text-sm font-medium px-3 py-2 rounded-lg transition-colors" style={{ color: "var(--color-purple)" }}>
+                            <a key={s} href={`#${s.toLowerCase().replace(/ /g, "-")}`} className="text-sm font-medium px-3 py-2 rounded-lg transition-colors" style={{ color: "var(--color-teal)" }}>
                                 {s}
                             </a>
                         ))}
@@ -520,7 +516,7 @@ export default function DocsPage() {
                                 <div>
                                     <div className="flex items-center gap-2 mb-1">
                                         <h3 className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>{item.title}</h3>
-                                        <code className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-purple)" }}>{item.route}</code>
+                                        <code className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-teal)" }}>{item.route}</code>
                                     </div>
                                     <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>{item.desc}</p>
                                 </div>
@@ -532,7 +528,7 @@ export default function DocsPage() {
                 {/* ── Design System ── */}
                 <section id="design-system" className="mb-16">
                     <h2 className="text-2xl font-bold mb-2" style={{ color: "var(--color-text-primary)" }}>Design System</h2>
-                    <p className="text-sm mb-6" style={{ color: "var(--color-text-secondary)" }}>Built on Tailwind CSS v4 <code className="text-xs px-1.5 py-0.5 rounded" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-purple)" }}>@theme</code> directive. All tokens are CSS custom properties.</p>
+                    <p className="text-sm mb-6" style={{ color: "var(--color-text-secondary)" }}>Built on Tailwind CSS v4 <code className="text-xs px-1.5 py-0.5 rounded" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-teal)" }}>@theme</code> directive. All tokens are CSS custom properties.</p>
 
                     <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid var(--color-border)" }}>
                         <div className="grid grid-cols-12 gap-4 px-5 py-3 text-xs font-semibold uppercase tracking-wider" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-text-muted)" }}>
@@ -580,13 +576,13 @@ export default function DocsPage() {
                 <section id="calculations" className="mb-16">
                     <h2 className="text-2xl font-bold mb-2" style={{ color: "var(--color-text-primary)" }}>Calculations Engine</h2>
                     <p className="text-sm mb-6" style={{ color: "var(--color-text-secondary)" }}>
-                        Located in <code className="text-xs px-1.5 py-0.5 rounded" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-purple)" }}>lib/calculations.ts</code>. Pure functions with no side effects.
+                        Located in <code className="text-xs px-1.5 py-0.5 rounded" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-teal)" }}>lib/calculations.ts</code>. Pure functions with no side effects.
                     </p>
 
                     <div className="space-y-4">
                         {CALCULATIONS.map((fn) => (
                             <div key={fn.name} className="rounded-xl p-5" style={{ backgroundColor: "var(--color-bg-card)", border: "1px solid var(--color-border)" }}>
-                                <code className="text-sm font-bold" style={{ color: "var(--color-purple)" }}>{fn.name}</code>
+                                <code className="text-sm font-bold" style={{ color: "var(--color-teal)" }}>{fn.name}</code>
                                 <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     <div>
                                         <p className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: "var(--color-text-muted)" }}>Parameters</p>
@@ -606,18 +602,18 @@ export default function DocsPage() {
                 {/* ── Data Models ── */}
                 <section id="data-models" className="mb-16">
                     <h2 className="text-2xl font-bold mb-2" style={{ color: "var(--color-text-primary)" }}>Data Models</h2>
-                    <p className="text-sm mb-6" style={{ color: "var(--color-text-secondary)" }}>TypeScript interfaces from <code className="text-xs px-1.5 py-0.5 rounded" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-purple)" }}>lib/mockProfiles.ts</code></p>
+                    <p className="text-sm mb-6" style={{ color: "var(--color-text-secondary)" }}>TypeScript interfaces from <code className="text-xs px-1.5 py-0.5 rounded" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-teal)" }}>lib/mockProfiles.ts</code></p>
 
                     <div className="space-y-4">
                         {DATA_MODELS.map((model) => (
                             <div key={model.name} className="rounded-xl overflow-hidden" style={{ border: "1px solid var(--color-border)" }}>
                                 <div className="px-5 py-3" style={{ backgroundColor: "var(--color-bg-soft)" }}>
-                                    <code className="text-sm font-bold" style={{ color: "var(--color-purple)" }}>interface {model.name}</code>
+                                    <code className="text-sm font-bold" style={{ color: "var(--color-teal)" }}>interface {model.name}</code>
                                 </div>
                                 <div className="px-5 py-3 space-y-1" style={{ backgroundColor: "var(--color-bg-card)" }}>
                                     {model.fields.map((f) => (
                                         <div key={f} className="flex items-start gap-2">
-                                            <span className="text-xs mt-0.5" style={{ color: "var(--color-purple)" }}>•</span>
+                                            <span className="text-xs mt-0.5" style={{ color: "var(--color-teal)" }}>•</span>
                                             <code className="text-xs" style={{ color: "var(--color-text-secondary)" }}>{f}</code>
                                         </div>
                                     ))}
@@ -631,7 +627,7 @@ export default function DocsPage() {
                 <section id="api-endpoints" className="mb-16">
                     <h2 className="text-2xl font-bold mb-2" style={{ color: "var(--color-text-primary)" }}>API Endpoints</h2>
                     <p className="text-sm mb-6" style={{ color: "var(--color-text-secondary)" }}>
-                        Next.js Route Handlers at <code className="text-xs px-1.5 py-0.5 rounded" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-purple)" }}>app/api/</code>. All responses are JSON.
+                        Next.js Route Handlers at <code className="text-xs px-1.5 py-0.5 rounded" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-teal)" }}>app/api/</code>. All responses are JSON.
                     </p>
 
                     <div className="space-y-4">
@@ -640,7 +636,7 @@ export default function DocsPage() {
                                 <div className="flex items-center gap-3 px-5 py-3" style={{ backgroundColor: "var(--color-bg-soft)" }}>
                                     <span
                                         className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded text-white"
-                                        style={{ backgroundColor: ep.method === "GET" ? "var(--color-blue)" : ep.method === "DELETE" ? "var(--color-danger)" : "var(--color-purple)" }}
+                                        style={{ backgroundColor: ep.method === "GET" ? "var(--color-blue)" : ep.method === "DELETE" ? "var(--color-danger)" : "var(--color-teal)" }}
                                     >
                                         {ep.method}
                                     </span>
@@ -691,10 +687,10 @@ export default function DocsPage() {
 
                 {/* Mock Data Note */}
                 <section className="rounded-xl p-6 mb-12" style={{ backgroundColor: "rgba(115,0,190,0.04)", border: "1px solid rgba(115,0,190,0.15)" }}>
-                    <h3 className="text-sm font-bold mb-2" style={{ color: "var(--color-purple)" }}>Testing with Mock Data</h3>
+                    <h3 className="text-sm font-bold mb-2" style={{ color: "var(--color-teal)" }}>Testing with Mock Data</h3>
                     <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-                        The app includes 4 predefined profiles. Use PAN <code className="text-xs px-1.5 py-0.5 rounded" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-purple)" }}>ABCDE1234F</code> with
-                        phone <code className="text-xs px-1.5 py-0.5 rounded" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-purple)" }}>9876543210</code> to
+                        The app includes 4 predefined profiles. Use PAN <code className="text-xs px-1.5 py-0.5 rounded" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-teal)" }}>ABCDE1234F</code> with
+                        phone <code className="text-xs px-1.5 py-0.5 rounded" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-teal)" }}>9876543210</code> to
                         load Saurabh&apos;s critical debt profile (score: 38). Any other valid PAN gets a deterministic profile.
                     </p>
                 </section>

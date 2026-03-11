@@ -52,18 +52,18 @@ export default function SchedulePage() {
                                         className="w-full text-left px-4 py-3 rounded-lg transition-all flex items-center justify-between cursor-pointer"
                                         style={{
                                             border: selectedSlot === slot
-                                                ? "1px solid var(--color-purple)"
+                                                ? "1px solid var(--color-teal)"
                                                 : "1px solid var(--color-border)",
                                             backgroundColor: selectedSlot === slot ? "rgba(115,0,190,0.05)" : "transparent",
-                                            color: selectedSlot === slot ? "var(--color-purple)" : "var(--color-text-secondary)",
-                                            ...(selectedSlot === slot ? { boxShadow: "0 0 0 1px var(--color-purple)" } : {}),
+                                            color: selectedSlot === slot ? "var(--color-teal)" : "var(--color-text-secondary)",
+                                            ...(selectedSlot === slot ? { boxShadow: "0 0 0 1px var(--color-teal)" } : {}),
                                         }}
                                     >
                                         <span className="flex items-center gap-2 text-sm">
                                             🕐 {slot}
                                         </span>
                                         {selectedSlot === slot && (
-                                            <span className="font-bold" style={{ color: "var(--color-purple)" }}>✓</span>
+                                            <span className="font-bold" style={{ color: "var(--color-teal)" }}>✓</span>
                                         )}
                                     </button>
                                 ))}
@@ -99,7 +99,7 @@ export default function SchedulePage() {
                             <p className="text-sm mb-2" style={{ color: "var(--color-text-secondary)" }}>
                                 We&apos;ll call you during:
                             </p>
-                            <p className="text-base font-semibold mb-6" style={{ color: "var(--color-purple)" }}>
+                            <p className="text-base font-semibold mb-6" style={{ color: "var(--color-teal)" }}>
                                 {selectedSlot}
                             </p>
                             <p className="text-sm mb-6" style={{ color: "var(--color-text-secondary)" }}>

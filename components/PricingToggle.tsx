@@ -7,39 +7,20 @@ interface PricingToggleProps {
 
 export default function PricingToggle({ isAnnual, onChange }: PricingToggleProps) {
     return (
-        <div
-            className="inline-flex items-center rounded-full p-1 mx-auto"
-            style={{ backgroundColor: "var(--color-bg-soft)", border: "1px solid var(--color-border)" }}
-        >
+        <div className="bg-[#F8FAFC] border border-gray-100 p-1.5 rounded-2xl inline-flex gap-1.5 shadow-inner">
             <button
                 onClick={() => onChange(false)}
-                className="px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 cursor-pointer"
-                style={{
-                    backgroundColor: !isAnnual ? "var(--color-purple)" : "transparent",
-                    color: !isAnnual ? "#fff" : "var(--color-text-secondary)",
-                    boxShadow: !isAnnual ? "0 2px 8px rgba(115,0,190,0.25)" : "none",
-                }}
+                className={`px-10 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${!isAnnual ? 'bg-white text-[#0F172A] shadow-md' : 'text-gray-400 hover:text-gray-600'}`}
             >
                 Monthly
             </button>
             <button
                 onClick={() => onChange(true)}
-                className="px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 cursor-pointer flex items-center gap-2"
-                style={{
-                    backgroundColor: isAnnual ? "var(--color-purple)" : "transparent",
-                    color: isAnnual ? "#fff" : "var(--color-text-secondary)",
-                    boxShadow: isAnnual ? "0 2px 8px rgba(115,0,190,0.25)" : "none",
-                }}
+                className={`px-10 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 ${isAnnual ? 'bg-white text-[#0F172A] shadow-md' : 'text-gray-400 hover:text-gray-600'}`}
             >
                 Annual
-                <span
-                    className="text-xs px-2 py-0.5 rounded-full font-bold"
-                    style={{
-                        backgroundColor: isAnnual ? "rgba(255,255,255,0.2)" : "rgba(115,0,190,0.1)",
-                        color: isAnnual ? "#fff" : "var(--color-purple)",
-                    }}
-                >
-                    Save up to 37%
+                <span className="text-[10px] font-extrabold text-[#14B8A6] uppercase tracking-wider bg-[#F0FDFA] px-2 py-0.5 rounded ml-1">
+                    Save 20%
                 </span>
             </button>
         </div>

@@ -22,7 +22,7 @@ export default function CallbackBooking({ userName }: CallbackBookingProps) {
         const slot = TIME_SLOTS.find((s) => s.id === selectedSlot);
         setBookedSlot(slot ? `${slot.label} (${slot.time})` : selectedSlot);
         setBooked(true);
-        console.log(`[ExitDebt CRM] Callback booked for ${userName}: ${selectedSlot}`);
+        // In production: POST to /api/callback to schedule with CRM
     }
 
     if (booked) {

@@ -25,7 +25,7 @@ export default function PrimaryButton({
             onClick={onClick}
             disabled={disabled || loading}
             className={`font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer px-6 py-3 text-base text-white hover:opacity-90 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed ${className}`}
-            style={{ backgroundColor: "var(--color-purple)" }}
+            style={{ backgroundColor: "var(--color-teal)" }}
         >
             {loading && (
                 <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">

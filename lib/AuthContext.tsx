@@ -86,20 +86,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         const data = getCookie();
         if (data && data.panHash && data.phone) {
-            // We have a hashed PAN in cookie — need raw PAN to select profile
-            // If rawPan was stored temporarily for session, use it
-            const rawPan = (data.rawPanForSession as string) || "";
-            if (rawPan) {
-                const profile = selectProfile(rawPan);
-                // Restore income if saved
-                if (data.salary) {
-                    profile.salary = data.salary as number;
-                    profile.salaryDate = (data.salaryDate as number) || 1;
-                    profile.otherIncome = (data.otherIncome as number) || 0;
-                }
-                setUser(profile);
-                setPan(rawPan);
+            // Match profile by panHash — never store or recover raw PAN
+            const { mockProfiles } = require("./mockProfiles");
+            const profile = mockProfiles.find(
+                (p: { panHash: string }) => p.panHash === data.panHash
+            ) || mockProfiles[0];
+            // Restore income if saved
+            if (data.salary) {
+                profile.salary = data.salary as number;
+                profile.salaryDate = (data.salaryDate as number) || 1;
+                profile.otherIncome = (data.otherIncome as number) || 0;
             }
+            setUser(profile);
             setPanHash(data.panHash as string);
             setPhone(data.phone as string);
             if (data.consent) {
@@ -114,8 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!isReady) return;
         if (user && panHash) {
             setCookie({
-                panHash,             // SHA-256 hash only
-                rawPanForSession: pan, // Needed for profile selection on reload
+                panHash,             // SHA-256 hash only — NEVER store raw PAN
                 phone,
                 salary: user.salary,
                 salaryDate: user.salaryDate,
@@ -129,6 +126,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const login = useCallback((panValue: string, phoneValue: string) => {
         const normalizedPan = panValue.toUpperCase();
+        // For existing users logging in, we use their stored data if found
+        // or a profile selected by whatever ID we have. 
+        // In this mock setup, PAN remains the primary key.
         const profile = selectProfile(normalizedPan);
         setUser(profile);
         setPan(normalizedPan);
@@ -140,10 +140,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             version: CONSENT_VERSION,
         });
 
-        // Hash PAN asynchronously for storage
-        hashPAN(normalizedPan).then((hash) => {
-            setPanHash(hash);
-        });
+        // Hash PAN for storage
+        if (normalizedPan !== "LOGGEDIN_USER") {
+            hashPAN(normalizedPan).then((hash) => {
+                setPanHash(hash);
+            });
+        } else {
+            // Placeholder for users where we don't have the PAN in the login form immediately
+            setPanHash("session_hash_" + phoneValue);
+        }
     }, []);
 
     const updateIncome = useCallback(

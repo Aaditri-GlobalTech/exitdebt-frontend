@@ -261,7 +261,7 @@ export default function IncomePage() {
                         type="submit"
                         disabled={!formValid}
                         className="w-full py-3.5 rounded-xl text-sm font-bold text-white transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90"
-                        style={{ backgroundColor: "var(--color-purple)" }}
+                        style={{ backgroundColor: "var(--color-teal)" }}
                     >
                         Continue to Dashboard →
                     </button>
@@ -318,7 +318,7 @@ export default function IncomePage() {
                     <Link
                         href="/upgrade"
                         className="inline-flex items-center gap-1 text-sm font-semibold mt-4 transition-all hover:opacity-80"
-                        style={{ color: "var(--color-purple)" }}
+                        style={{ color: "var(--color-teal)" }}
                     >
                         Learn about our services
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

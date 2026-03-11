@@ -36,7 +36,7 @@ export default function SettingsPage() {
     if (!isReady) {
         return (
             <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "var(--color-bg)" }}>
-                <div className="w-8 h-8 border-2 rounded-full animate-spin" style={{ borderColor: "var(--color-border)", borderTopColor: "var(--color-purple)" }} />
+                <div className="w-8 h-8 border-2 rounded-full animate-spin" style={{ borderColor: "var(--color-border)", borderTopColor: "var(--color-teal)" }} />
             </div>
         );
     }
@@ -82,7 +82,7 @@ export default function SettingsPage() {
                     <Link
                         href="/dashboard"
                         className="text-sm font-medium transition-colors hover:opacity-80"
-                        style={{ color: "var(--color-purple)" }}
+                        style={{ color: "var(--color-teal)" }}
                     >
                         ← Back to Dashboard
                     </Link>
@@ -102,7 +102,7 @@ export default function SettingsPage() {
                                 className="inline-block w-2.5 h-2.5 rounded-full"
                                 style={{
                                     backgroundColor: status === "active" ? "var(--color-success)"
-                                        : status === "trial" ? "var(--color-purple)"
+                                        : status === "trial" ? "var(--color-teal)"
                                             : "var(--color-danger)",
                                 }}
                             />
@@ -125,7 +125,7 @@ export default function SettingsPage() {
                                 className="text-xs font-bold px-4 py-2 rounded-full transition-all hover:opacity-80"
                                 style={{
                                     backgroundColor: "rgba(115,0,190,0.08)",
-                                    color: "var(--color-purple)",
+                                    color: "var(--color-teal)",
                                     border: "1px solid rgba(115,0,190,0.15)",
                                 }}
                             >
@@ -220,7 +220,7 @@ export default function SettingsPage() {
                         <button
                             onClick={handleSave}
                             className="w-full py-3 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90 cursor-pointer"
-                            style={{ backgroundColor: "var(--color-purple)" }}
+                            style={{ backgroundColor: "var(--color-teal)" }}
                         >
                             {saved ? "✓ Saved Successfully" : "Save Changes"}
                         </button>
@@ -248,7 +248,7 @@ export default function SettingsPage() {
                             <Link
                                 href="/profile"
                                 className="text-xs font-medium transition-colors hover:opacity-80"
-                                style={{ color: "var(--color-purple)" }}
+                                style={{ color: "var(--color-teal)" }}
                             >
                                 View Profile →
                             </Link>

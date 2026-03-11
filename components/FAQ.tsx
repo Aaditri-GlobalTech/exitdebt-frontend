@@ -19,9 +19,9 @@ const FAQ_ITEMS = [
             "Absolutely. We use bank-grade 256-bit encryption. Your PAN is used solely to fetch your credit report and is never stored on our servers or shared with third parties without your explicit consent.",
     },
     {
-        question: "Will this affect my CIBIL score?",
+        question: "Will this affect my Equifax score?",
         answer:
-            "No. We perform a 'soft pull' of your credit report, which does not impact your CIBIL score in any way. Only hard inquiries (like applying for a loan) can affect your score.",
+            "No. We perform a 'soft pull' of your credit report, which does not impact your Equifax score in any way. Only hard inquiries (like applying for a loan) can affect your score.",
     },
     {
         question: "What happens during the callback?",

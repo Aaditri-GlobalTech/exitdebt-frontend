@@ -1,60 +1,94 @@
 "use client";
 
+import { useState } from "react";
 import { CashFlowResult } from "@/lib/calculations";
 import { formatCurrency } from "@/lib/utils";
 
 interface SalaryCashFlowProps { cashFlow: CashFlowResult; }
 
-function ordinalDay(day: number): string {
-    const suffix = day === 1 || day === 21 || day === 31 ? "st" : day === 2 || day === 22 ? "nd" : day === 3 || day === 23 ? "rd" : "th";
-    return `${day}${suffix}`;
-}
-
 export default function SalaryCashFlow({ cashFlow }: SalaryCashFlowProps) {
-    const ratioPct = cashFlow.ratio;
-    const isWarning = ratioPct > 50;
+    const [rentUtility, setRentUtility] = useState<number>(22000);
+    
+    // Monthly calculation
+    const remainingAfterEMIs = cashFlow.remaining;
+    const finalSavings = Math.max(0, remainingAfterEMIs - rentUtility);
+
+    const events = [
+        { day: cashFlow.salaryDay, label: "SALARY IN", amount: `+${formatCurrency(cashFlow.salary)}`, color: "#14B8A6", text: "#14B8A6", bg: "#F0FDFA" },
+        ...cashFlow.emis.map((emi) => ({
+            day: emi.day,
+            label: emi.lender.split(' ')[0] + " EMI",
+            amount: `-${formatCurrency(emi.amount)}`,
+            color: "#F97316",
+            text: "#F97316",
+            bg: "#FFF7ED"
+        })),
+        { day: 15, label: "Rent/Utility", amount: `-${formatCurrency(rentUtility)}`, color: "#9CA3AF", text: "#6B7280", bg: "#F9FAFB" },
+        { day: 30, label: "Savings", amount: formatCurrency(finalSavings), color: "#22D3EE", text: "#0891B2", bg: "#ECFEFF" }
+    ].sort((a, b) => a.day - b.day);
 
     return (
-        <div className="rounded-2xl p-6 sm:p-8 animate-slideUp" style={{ backgroundColor: "var(--color-bg-card)", boxShadow: "0 2px 24px rgba(0,0,0,0.05)", border: "1px solid var(--color-border)" }}>
-            <div className="flex items-center gap-2 mb-6">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: "var(--color-purple)" }}>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-                </svg>
-                <h3 className="text-lg font-semibold" style={{ color: "var(--color-text-primary)" }}>Salary Day Cash Flow</h3>
-            </div>
-
-            <div className="rounded-xl px-4 py-3 flex items-center justify-between mb-3" style={{ backgroundColor: "rgba(115,0,190,0.04)", border: "1px solid rgba(115,0,190,0.15)" }}>
-                <div className="flex items-center gap-2">
-                    <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--color-purple)" }}>Salary Credit</span>
-                    <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{ordinalDay(cashFlow.salaryDay)} of month</span>
-                </div>
-                <span className="text-base font-bold tabular-nums" style={{ color: "var(--color-purple)" }}>+{formatCurrency(cashFlow.salary)}</span>
-            </div>
-
-            <div className="space-y-2 mb-4">
-                {cashFlow.emis.map((emi) => (
-                    <div key={emi.lender} className="rounded-xl px-4 py-3 flex items-center justify-between" style={{ backgroundColor: "var(--color-bg-soft)", border: "1px solid var(--color-border)" }}>
-                        <div>
-                            <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>{emi.lender}</p>
-                            <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>{ordinalDay(emi.day)} of month</p>
-                        </div>
-                        <span className="text-sm font-semibold tabular-nums" style={{ color: "var(--color-danger)" }}>-{formatCurrency(emi.amount)}</span>
+        <div 
+            className="rounded-xl p-6 lg:p-7 animate-slideUp border border-gray-100" 
+            style={{ backgroundColor: "var(--color-bg-card)", boxShadow: "0 10px 40px rgba(0,0,0,0.03)" }}
+        >
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                <div className="flex items-center gap-3">
+                    <div className="text-teal-500 bg-teal-50 p-2 rounded-lg">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v12a2 2 0 002 2z" />
+                        </svg>
                     </div>
-                ))}
+                    <h3 className="text-lg font-bold text-gray-800">Salary Day Cash Flow</h3>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                    <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-400">₹</span>
+                        <input 
+                            type="number" 
+                            value={rentUtility} 
+                            onChange={(e) => setRentUtility(Number(e.target.value))}
+                            className="bg-gray-50 border border-gray-100 rounded-lg py-1.5 pl-6 pr-3 text-xs font-bold text-gray-700 w-32 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                            placeholder="Rent/Utility"
+                        />
+                        <label className="absolute -top-5 left-0 text-[9px] font-bold text-gray-400 uppercase tracking-widest">Rent & Utilities</label>
+                    </div>
+                    <div className="px-3 py-1.5 rounded-lg border border-teal-100 bg-teal-50 text-teal-600 text-[9px] font-bold uppercase tracking-widest">
+                        Day {cashFlow.salaryDay}
+                    </div>
+                </div>
             </div>
 
-            <div className="pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3" style={{ borderTop: "1px solid var(--color-border)" }}>
-                <div>
-                    <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>Remaining after EMIs</p>
-                    <p className="text-xl font-bold tabular-nums" style={{ color: "var(--color-text-primary)" }}>{formatCurrency(cashFlow.remaining)}</p>
+            <div className="relative pt-4 pb-8">
+                {/* Connecting Line */}
+                <div className="absolute top-12 left-0 right-0 h-0.5 bg-gray-50 bg-repeat-x" style={{ backgroundImage: "linear-gradient(to right, #F3F4FB 50%, transparent 50%)", backgroundSize: "10px 2px" }} />
+
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-4 relative z-10">
+                    {events.map((ev, i) => (
+                        <div key={i} className="flex flex-col items-center text-center group">
+                            <div 
+                                className="w-16 h-16 rounded-full flex flex-col items-center justify-center mb-6 border-2 transition-all group-hover:scale-110 shadow-sm"
+                                style={{ 
+                                    backgroundColor: "white", 
+                                    borderColor: ev.bg,
+                                    boxShadow: `0 4px 14px ${ev.bg}` 
+                                }}
+                            >
+                                <span className="text-xl font-bold tabular-nums" style={{ color: ev.color }}>{ev.day.toString().padStart(2, '0')}</span>
+                            </div>
+                            <div className="space-y-1">
+                                <p className="text-[10px] font-bold text-gray-800 uppercase tracking-wider">{ev.label}</p>
+                                <p className="text-[11px] font-bold tabular-nums" style={{ color: ev.text }}>{ev.amount}</p>
+                            </div>
+                        </div>
+                    ))}
                 </div>
-                <div className="px-4 py-2 rounded-lg text-sm font-semibold" style={{
-                    backgroundColor: isWarning ? "rgba(217,119,6,0.08)" : "rgba(5,150,105,0.08)",
-                    color: isWarning ? "var(--color-warning)" : "var(--color-success)",
-                    border: `1px solid ${isWarning ? "rgba(217,119,6,0.15)" : "rgba(5,150,105,0.15)"}`,
-                }}>
-                    EMI-to-Salary Ratio: <span className="tabular-nums">{ratioPct}%</span>{isWarning && " ⚠️"}
-                </div>
+            </div>
+            
+            <div className="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between">
+               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Net Monthly Savings</p>
+               <p className="text-lg font-bold text-teal-600 tabular-nums">{formatCurrency(finalSavings)}</p>
             </div>
         </div>
     );

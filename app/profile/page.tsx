@@ -21,7 +21,7 @@ export default function ProfilePage() {
     if (!isReady) {
         return (
             <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "var(--color-bg)" }}>
-                <div className="w-8 h-8 border-2 rounded-full animate-spin" style={{ borderColor: "var(--color-border)", borderTopColor: "var(--color-purple)" }} />
+                <div className="w-8 h-8 border-2 rounded-full animate-spin" style={{ borderColor: "var(--color-border)", borderTopColor: "var(--color-teal)" }} />
             </div>
         );
     }
@@ -50,7 +50,7 @@ export default function ProfilePage() {
                     <div className="p-6 flex items-center gap-4" style={{ borderBottom: "1px solid var(--color-border)" }}>
                         <div
                             className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold"
-                            style={{ backgroundColor: "rgba(115,0,190,0.1)", color: "var(--color-purple)" }}
+                            style={{ backgroundColor: "rgba(115,0,190,0.1)", color: "var(--color-teal)" }}
                         >
                             {user?.name?.charAt(0) || "U"}
                         </div>
@@ -71,7 +71,7 @@ export default function ProfilePage() {
                             <h3 className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--color-text-muted)" }}>Personal</h3>
 
                             <div className="flex items-start gap-3">
-                                <div className="mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-purple)" }}>📱</div>
+                                <div className="mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-teal)" }}>📱</div>
                                 <div>
                                     <p className="text-xs mb-0.5" style={{ color: "var(--color-text-muted)" }}>Phone</p>
                                     <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>{maskedPhone}</p>
@@ -79,7 +79,7 @@ export default function ProfilePage() {
                             </div>
 
                             <div className="flex items-start gap-3">
-                                <div className="mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-purple)" }}>💳</div>
+                                <div className="mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-teal)" }}>💳</div>
                                 <div>
                                     <p className="text-xs mb-0.5" style={{ color: "var(--color-text-muted)" }}>PAN</p>
                                     <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>{maskedPan}</p>
@@ -91,7 +91,7 @@ export default function ProfilePage() {
                             <h3 className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--color-text-muted)" }}>Financial</h3>
 
                             <div className="flex items-start gap-3">
-                                <div className="mt-0.5 w-8 h,8 rounded-lg flex items-center justify-center text-sm" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-purple)" }}>💰</div>
+                                <div className="mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-teal)" }}>💰</div>
                                 <div>
                                     <p className="text-xs mb-0.5" style={{ color: "var(--color-text-muted)" }}>Monthly Salary</p>
                                     <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
@@ -101,7 +101,7 @@ export default function ProfilePage() {
                             </div>
 
                             <div className="flex items-start gap-3">
-                                <div className="mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-purple)" }}>📅</div>
+                                <div className="mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-teal)" }}>📅</div>
                                 <div>
                                     <p className="text-xs mb-0.5" style={{ color: "var(--color-text-muted)" }}>Salary Credit Date</p>
                                     <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
@@ -111,7 +111,7 @@ export default function ProfilePage() {
                             </div>
 
                             <div className="flex items-start gap-3">
-                                <div className="mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-purple)" }}>📊</div>
+                                <div className="mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-teal)" }}>📊</div>
                                 <div>
                                     <p className="text-xs mb-0.5" style={{ color: "var(--color-text-muted)" }}>Debt Health Score</p>
                                     <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
@@ -127,14 +127,14 @@ export default function ProfilePage() {
                         <Link
                             href="/dashboard"
                             className="flex-1 text-center py-2.5 px-4 rounded-lg text-white font-semibold text-sm hover:opacity-90 transition-opacity"
-                            style={{ backgroundColor: "var(--color-purple)" }}
+                            style={{ backgroundColor: "var(--color-teal)" }}
                         >
                             ← Back to Dashboard
                         </Link>
                         <Link
                             href="/settings"
                             className="flex-1 text-center py-2.5 px-4 rounded-lg font-medium text-sm transition-colors hover:bg-gray-50"
-                            style={{ border: "1px solid var(--color-border)", color: "var(--color-purple)" }}
+                            style={{ border: "1px solid var(--color-border)", color: "var(--color-teal)" }}
                         >
                             ⚙ Settings
                         </Link>

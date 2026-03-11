@@ -111,7 +111,7 @@ export default async function ArticlePage({ params }: PageProps) {
                     <Link href="/" className="flex items-center gap-2">
                         <div
                             className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-bold"
-                            style={{ backgroundColor: "var(--color-purple)" }}
+                            style={{ backgroundColor: "var(--color-teal)" }}
                         >
                             E
                         </div>
@@ -133,7 +133,7 @@ export default async function ArticlePage({ params }: PageProps) {
                 <div className="mb-8">
                     <span
                         className="inline-block px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider text-white"
-                        style={{ backgroundColor: "var(--color-purple)" }}
+                        style={{ backgroundColor: "var(--color-teal)" }}
                     >
                         {article.category}
                     </span>
@@ -163,7 +163,7 @@ export default async function ArticlePage({ params }: PageProps) {
                     <Link
                         href="/"
                         className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white text-sm font-bold hover:opacity-90 transition-all"
-                        style={{ backgroundColor: "var(--color-purple)" }}
+                        style={{ backgroundColor: "var(--color-teal)" }}
                     >
                         Check your debt health
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

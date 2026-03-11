@@ -5,8 +5,9 @@
   --color-bg: #FCFCFC;
   --color-bg-soft: #F5F5F7;
   --color-bg-card: #FFFFFF;
-  --color-purple: #7300BE;
-  --color-purple-light: #9333EA;
+  --color-teal: #14B8A6;
+  --color-teal-dark: #0D9488;
+  --color-teal-light: #F0FDFA;
   --color-blue: #00B1FF;
   --color-cyan: #00FCFE;
   --color-danger: #DC2626;
@@ -16,7 +17,7 @@
   --color-text-secondary: #6B7280;
   --color-text-muted: #9CA3AF;
   --color-border: #E5E7EB;
-  --color-border-focus: #7300BE;
+  --color-border-focus: #14B8A6;
   --font-family-sans: 'Inter', system-ui, -apple-system, sans-serif;
 }
 

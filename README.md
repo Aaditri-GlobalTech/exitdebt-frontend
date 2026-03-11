@@ -2,18 +2,18 @@
 
 **See your debt clearly. Solve it smartly.**
 
-ExitDebt is a full-spectrum debt platform for salaried Indians. Users enter their PAN and phone number, get an instant CIBIL-powered debt health score with unique intelligence tools, and get 3 months of free access — all in 30 seconds.
+ExitDebt is a full-spectrum debt platform for salaried Indians. Users enter their PAN and phone number, get an instant Equifax-powered debt health score with unique intelligence tools, and get 3 months of free access — all in 30 seconds.
 
 ---
 
 ## 💡 How It Works
 
 ```
-PAN + Phone  →  CIBIL Pull  →  Full Dashboard (3mo free)  →  Lite/Shield Subscribe
+PAN + Phone  →  Equifax Pull  →  Full Dashboard (3mo free)  →  Lite/Shield Subscribe
 ```
 
 1. **Enter PAN + Phone** — Verified via OTP
-2. **Instant CIBIL Pull** — All loans and credit cards auto-populated
+2. **Instant Equifax Pull** — All loans and credit cards auto-populated
 3. **Debt Health Score** — Proprietary 0–100 score (based on DTI, rates, utilization, history)
 4. **Intelligence Tools** — Debt Freedom GPS, Interest Leak Report, Smart Payment Prioritizer, Salary Day Cash Flow, Credit Score Impact Predictor
 5. **3-Month Free Trial** — Full Lite dashboard access, then tiered subscriptions
@@ -86,10 +86,10 @@ npx vercel
 Landing Page → PAN + Phone → OTP Verify → Income Details → Debt Intelligence Dashboard
 ```
 
-1. **Landing Page** (`/`) — Enter PAN + phone, verify via OTP, pull mock CIBIL report
+1. **Landing Page** (`/`) — Enter PAN + phone, verify via OTP, pull mock Equifax report
 2. **Income Details** (`/income`) — Provide monthly salary, salary date, and optional other income
 3. **Dashboard** (`/dashboard`) — Full debt intelligence overview with 9 interactive sections
-4. **Profile** (`/profile`) — View masked PAN/phone, salary, CIBIL score, logout
+4. **Profile** (`/profile`) — View masked PAN/phone, salary, Equifax score, logout
 5. **Schedule** (`/schedule`) — Book a callback with a debt expert
 6. **FAQ** (`/faq`) — Trust & security questions, about ExitDebt
 
@@ -100,7 +100,7 @@ Landing Page → PAN + Phone → OTP Verify → Income Details → Debt Intellig
 - **3-Step OTP Flow** — Details → OTP verification → Processing animation → Income
 - **Testimonials** — Priya (₹62K saved), Rahul (38→14% rate), Sneha (debt-free in 18mo)
 - **FAQ Preview** — Accordion with top questions linking to `/faq`
-- **Trust Signals** — "No CIBIL impact", "256-bit encrypted", "Free forever"
+- **Trust Signals** — "No Equifax impact", "256-bit encrypted", "Free forever"
 - **How It Works** — 3-step process explainer
 - **Blog Section** — Financial articles with category badges
 - **SEO** — Meta tags, OG tags, Twitter cards, FAQ structured data (JSON-LD)
@@ -123,7 +123,7 @@ Landing Page → PAN + Phone → OTP Verify → Income Details → Debt Intellig
 
 ### Profile Page (`/profile`)
 - Masked PAN and phone number
-- Salary, salary date, and CIBIL score
+- Salary, salary date, and Equifax score
 - Logout and back-to-dashboard actions
 
 ### Schedule a Call (`/schedule`)
@@ -135,15 +135,59 @@ Landing Page → PAN + Phone → OTP Verify → Income Details → Debt Intellig
 - Reusable accordion component
 - CTA to schedule a call
 
-## Authentication & Data Rules
+## Authentication & Security
+
+### How Auth Works
+
+```
+User enters PAN + Phone → OTP sent → OTP verified → JWT issued → JWT sent with every API request
+```
+
+1. **OTP Login** — User provides phone number, receives a 6-digit OTP, and verifies it.
+2. **JWT Token** — On successful OTP verification, the backend returns a JWT token (valid for 60 min).
+3. **Bearer Auth** — The frontend includes this token in every API request as `Authorization: Bearer <token>`.
+4. **Cookie Persistence** — Session state (panHash, phone, tier) is persisted in a 30-day cookie. **Raw PAN is never stored.**
+
+### Security Rules
 
 | Rule | Implementation |
 |---|---|
+| **PAN Storage** | SHA-256 hashed with server-side pepper — raw PAN is **never** stored in cookies or state |
 | **Session Persistence** | Cookie-based, 30-day auto-expire |
-| **PAN Storage** | SHA-256 hashed via `hashPAN()` — raw PAN never stored |
 | **Consent Tracking** | Timestamp + version stored for DPDP compliance |
 | **Hydration Guard** | `isReady` flag prevents flash-of-redirect |
-| **OTP Verification** | 6-digit code verification on landing page |
+| **Error Handling** | All `catch` blocks use `unknown` type (never `any`) |
+| **No Console Logs** | All `console.log` statements removed for production |
+| **API Calls** | All API calls use relative paths (`/api/...`) — no hardcoded backend URLs |
+
+### API Proxy Configuration
+
+The frontend uses Next.js URL rewrites to proxy API calls to the backend. This means:
+- Frontend calls `/api/otp/send` → Next.js rewrites to `BACKEND_URL/api/otp/send`
+- No CORS issues in development
+- Backend URL is never exposed to the browser
+
+Configure the backend URL via environment variable:
+
+```bash
+# .env or .env.local
+BACKEND_URL=http://localhost:8000    # Local development (default)
+BACKEND_URL=https://api.exitdebt.in  # Production
+```
+
+### Who Can Access What?
+
+| Resource | Public (no login) | Logged-in User | Admin |
+|----------|-------------------|----------------|-------|
+| Landing page, FAQ, articles | ✅ | ✅ | ✅ |
+| OTP send/verify | ✅ (rate-limited) | ✅ | ✅ |
+| Plan pricing | ✅ | ✅ | ✅ |
+| Dashboard (own data) | ❌ | ✅ | — |
+| Profile (own data) | ❌ | ✅ | — |
+| Settlement (own data) | ❌ | ✅ | — |
+| Schedule callback | ❌ | ✅ | — |
+| API documentation (`/docs`) | ❌ | ❌ | Only with `DEBUG=True` |
+| Internal admin panel | ❌ | ❌ | `X-API-Key` required |
 
 ## Scoring Model (0–100, higher = healthier)
 
@@ -168,7 +212,23 @@ Implemented via `calculateTotalAnnualSavings()` — replaces hardcoded values.
 
 ## API Endpoints
 
-Core endpoints with input validation. Full docs at `/docs`.
+All API calls go through the Next.js proxy at `/api/*`. Auth is handled by the backend.
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/otp/send` | Public (5/min) | Send OTP to phone |
+| `POST` | `/api/otp/verify` | Public (10/min) | Verify OTP, get JWT |
+| `POST` | `/api/health-check` | Public | PAN+phone+consent → full report |
+| `GET` | `/api/health-check/:id` | 🔒 JWT | Retrieve by ID |
+| `POST` | `/api/callback` | 🔒 JWT | Book callback with time slot |
+| `GET` | `/api/subscription/plans` | Public | List plans + pricing |
+| `GET` | `/api/subscription/status/:id` | 🔒 JWT | Check trial/active/expired |
+| `POST` | `/api/subscription/upgrade` | 🔒 JWT | Upgrade subscription tier |
+| `POST` | `/api/settlement/intake` | 🔒 JWT | Start settlement case |
+| `GET` | `/api/settlement/:userId` | 🔒 JWT | Get settlement case |
+| `DELETE` | `/api/user/delete-request` | 🔒 JWT | GDPR/DPDPA data deletion |
+
+> 🔒 = Requires `Authorization: Bearer <token>` (obtained from `/api/otp/verify`)
 
 | Method | Endpoint | Description |
 |---|---|---|
@@ -212,7 +272,20 @@ Built on Tailwind CSS v4 `@theme` directive:
 | Font | Inter (via next/font) |
 | State | React Context (`AuthContext`) |
 | Auth | Cookie-based sessions + SHA-256 PAN hashing |
-| Data | Mock profiles (4 predefined CIBIL profiles) |
+| Data | Mock profiles (4 predefined Equifax profiles) |
+| Testing | Jest, React Testing Library, jsdom |
+
+## Running Tests
+
+Automated tests verify core component logic, UI element routing, and conditionally rendered banners logic:
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+```
 
 ## Project Structure
 
@@ -224,14 +297,14 @@ src/
 │   ├── globals.css             # @theme tokens, animations
 │   ├── income/page.tsx         # Income collection screen
 │   ├── dashboard/page.tsx      # Debt Intelligence Dashboard
-│   ├── profile/page.tsx        # User profile (masked PAN, CIBIL score)
+│   ├── profile/page.tsx        # User profile (masked PAN, Equifax score)
 │   ├── schedule/page.tsx       # Book a callback
 │   ├── faq/page.tsx            # FAQ with accordion sections
 │   ├── docs/page.tsx           # API documentation
 │   ├── articles/[slug]/        # Blog article pages (SSG)
 │   └── api/
 │       ├── otp/                # OTP send + verify
-│       ├── health-check/       # CIBIL pull + results
+│       ├── health-check/       # Equifax pull + results
 │       ├── callback/           # Callback booking
 │       ├── subscription/       # Purchase + status
 │       ├── dashboard/          # User + sales dashboard

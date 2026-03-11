@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   title: "ExitDebt – Check Your Debt Health in 30 Seconds",
   description:
     "See exactly how much interest you're overpaying and get a personalized plan to become debt-free faster. Trusted by 10,000+ Indians.",
-  keywords: ["debt", "credit card", "personal loan", "debt restructuring", "CIBIL", "India", "financial health"],
+  keywords: ["debt", "credit card", "personal loan", "debt restructuring", "Equifax", "India", "financial health"],
   openGraph: {
     title: "ExitDebt – Check Your Debt Health in 30 Seconds",
     description:
@@ -60,10 +60,10 @@ const faqSchema = {
     },
     {
       "@type": "Question",
-      name: "Will this affect my CIBIL score?",
+      name: "Will this affect my Equifax score?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "No. We perform a soft pull of your credit report, which does not impact your CIBIL score in any way.",
+        text: "No. We perform a soft pull of your credit report, which does not impact your Equifax score in any way.",
       },
     },
   ],
