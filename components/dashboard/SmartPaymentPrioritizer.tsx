@@ -69,17 +69,17 @@ export default function SmartPaymentPrioritizer({ accounts, optimalRate }: Smart
                         </div>
                     ))}
 
-                    <div className="flex items-center justify-between px-4 py-3 rounded-xl mt-2" style={{ backgroundColor: "rgba(115,0,190,0.04)", border: "1px solid rgba(115,0,190,0.15)" }}>
-                        <span className="text-sm font-medium" style={{ color: "var(--color-purple)" }}>Total Annual Savings</span>
-                        <span className="text-lg font-bold tabular-nums" style={{ color: "var(--color-purple)" }}>{formatCurrency(totalSavings)}/yr</span>
+                    <div className="flex items-center justify-between px-4 py-4 rounded-xl mt-3" style={{ backgroundColor: "rgba(115,0,190,0.06)", border: "1px solid rgba(115,0,190,0.2)" }}>
+                        <span className="text-sm font-semibold" style={{ color: "var(--color-purple)" }}>Total Annual Savings</span>
+                        <span className="text-2xl font-bold tabular-nums tracking-tight" style={{ color: "var(--color-purple)" }}>{formatCurrency(totalSavings)}/yr</span>
                     </div>
 
-                    {excessAmount > 0 && <p className="text-xs text-center mt-2" style={{ color: "var(--color-success)" }}>🎉 You could pay off all debt! Remaining: {formatCurrency(excessAmount)}</p>}
+                    {excessAmount > 0 && <p className="text-xs text-center mt-3" style={{ color: "var(--color-success)" }}>🎉 You could pay off all debt! Remaining: {formatCurrency(excessAmount)}</p>}
                 </div>
             )}
 
-            {!allocations.length && !extraAmount && <p className="text-xs text-center py-4" style={{ color: "var(--color-text-muted)" }}>Enter an amount above to see how to optimally allocate your extra payment.</p>}
-            {extraAmount && !allocations.length && <p className="text-xs text-center py-4" style={{ color: "var(--color-text-muted)" }}>Enter a valid amount greater than 0 to see recommendations.</p>}
+            {!allocations.length && !extraAmount && <p className="text-sm font-medium text-center py-6" style={{ color: "var(--color-text-muted)" }}>Enter an amount above to see how to optimally allocate your extra payment.</p>}
+            {extraAmount && !allocations.length && <p className="text-sm font-medium text-center py-6" style={{ color: "var(--color-text-muted)" }}>Enter a valid amount greater than 0 to see recommendations.</p>}
         </div>
     );
 }

@@ -114,7 +114,7 @@ export default function UpgradePage() {
                     </div>
                     <div className="animate-fadeIn stagger-3">
                         <PricingCard
-                            tier="settlement"
+                            tier="shield-plus"
                             isAnnual={isAnnual}
                             onBookCall={handleBookCall}
                         />

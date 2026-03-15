@@ -61,21 +61,43 @@ export default function DashboardScoreGauge({ score, label, color }: DashboardSc
             <div className="flex justify-center mb-4">
                 <div className="relative w-52 h-52">
                     <svg viewBox="0 0 180 180" className="w-full h-full -rotate-90">
-                        <circle cx="90" cy="90" r={radius} fill="none" stroke="var(--color-border)" strokeWidth="10" strokeLinecap="round" />
-                        <circle cx="90" cy="90" r={radius} fill="none" stroke={arcColor} strokeWidth="10" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={dashOffset} style={{ transition: "stroke-dashoffset 0.03s linear" }} />
+                        <circle cx="90" cy="90" r={radius} fill="none" stroke="var(--color-border)" strokeWidth="12" strokeLinecap="round" />
+                        <circle cx="90" cy="90" r={radius} fill="none" stroke={arcColor} strokeWidth="12" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={dashOffset} style={{ transition: "stroke-dashoffset 0.03s linear" }} />
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-5xl font-bold tabular-nums" style={{ color: "var(--color-text-primary)" }}>{animatedScore}</span>
-                        <span className="text-sm font-medium" style={{ color: "var(--color-text-muted)" }}>/100</span>
+                        <span className="text-7xl font-bold tabular-nums tracking-tight" style={{ color: "var(--color-text-primary)" }}>{animatedScore}</span>
+                        <span className="text-base font-medium mt-1" style={{ color: "var(--color-text-muted)" }}>/100</span>
                     </div>
                 </div>
             </div>
             <span className="inline-block px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-3" style={{ backgroundColor: `${arcColor}15`, color: arcColor }}>
                 {label}
             </span>
-            <p className="text-sm max-w-xs mx-auto" style={{ color: "var(--color-text-secondary)" }}>
+            <p className="text-sm max-w-xs mx-auto mb-4" style={{ color: "var(--color-text-secondary)" }}>
                 {SCORE_MESSAGES[label] || ""}
             </p>
+            <div className="pt-4 border-t" style={{ borderColor: "var(--color-border)" }}>
+                <p className="text-[10px] uppercase tracking-wider font-semibold mb-2" style={{ color: "var(--color-text-muted)" }}>
+                    Calculated Based On:
+                </p>
+                <div className="flex flex-wrap justify-center gap-2">
+                    {["Debt-to-Income", "Avg Interest", "Credit Utilization"].map(factor => (
+                        <span key={factor} className="px-2 py-1 rounded-md text-[10px]" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-text-secondary)" }}>
+                            {factor}
+                        </span>
+                    ))}
+                </div>
+            </div>
+
+            <div className="mt-8">
+                <button 
+                    onClick={() => document.getElementById('prioritizer')?.scrollIntoView({ behavior: 'smooth' })}
+                    className="w-full py-3.5 px-6 rounded-xl text-white font-semibold text-sm transition-all shadow-sm hover:shadow-md active:scale-[0.98]"
+                    style={{ backgroundColor: "var(--color-purple)" }}
+                >
+                    Optimize My Payments →
+                </button>
+            </div>
         </div>
     );
 }

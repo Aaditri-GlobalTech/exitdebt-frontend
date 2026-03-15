@@ -21,6 +21,8 @@ import SubscriptionGate from "@/components/SubscriptionGate";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
+import ErrorBoundary from "@/components/ErrorBoundary";
+
 export default function DashboardPage() {
     const { user, isLoggedIn, isReady } = useAuth();
     const { expireTrial, resetTrial, status } = useSubscription();
@@ -72,36 +74,51 @@ export default function DashboardPage() {
                         </p>
                     </div>
 
-                    <DashboardBanner lastUpdated={lastUpdated} />
+                    <ErrorBoundary section="Dashboard Banner">
+                        <DashboardBanner lastUpdated={lastUpdated} />
+                    </ErrorBoundary>
 
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                        <div className="lg:col-span-5">
-                            <DashboardScoreGauge score={user.score} label={user.scoreLabel} color={user.color} />
+                        <div className="lg:col-span-5 flex flex-col gap-6">
+                            <ErrorBoundary section="Debt Health Score">
+                                <DashboardScoreGauge score={user.score} label={user.scoreLabel} color={user.color} />
+                            </ErrorBoundary>
                         </div>
-                        <div className="lg:col-span-7 flex flex-col justify-center">
-                            <DebtSummaryCards
-                                totalOutstanding={user.totalOutstanding}
-                                monthlyEmi={user.monthlyEmi}
-                                activeAccounts={user.activeAccounts}
-                                avgInterestRate={user.avgInterestRate}
-                            />
+                        <div className="lg:col-span-7 flex flex-col gap-6">
+                            <ErrorBoundary section="Debt Summary">
+                                <DebtSummaryCards
+                                    totalOutstanding={user.totalOutstanding}
+                                    monthlyEmi={user.monthlyEmi}
+                                    activeAccounts={user.activeAccounts}
+                                    avgInterestRate={user.avgInterestRate}
+                                />
+                            </ErrorBoundary>
+                            <ErrorBoundary section="Account List">
+                                <DashboardAccountList accounts={user.accounts} />
+                            </ErrorBoundary>
                         </div>
                     </div>
 
-                    <DashboardAccountList accounts={user.accounts} />
-
-                    <DebtFreedomGPS
-                        currentTimeline={user.currentTimeline}
-                        optimizedTimeline={user.optimizedTimeline}
-                        timelineSaved={user.timelineSaved}
-                    />
+                    <ErrorBoundary section="Debt Freedom GPS">
+                        <DebtFreedomGPS
+                            currentTimeline={user.currentTimeline}
+                            optimizedTimeline={user.optimizedTimeline}
+                            timelineSaved={user.timelineSaved}
+                        />
+                    </ErrorBoundary>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <InterestLeakReport leak={interestLeak} />
-                        <SmartPaymentPrioritizer accounts={user.accounts} optimalRate={user.optimalRate} />
+                        <ErrorBoundary section="Interest Leak Report">
+                            <InterestLeakReport leak={interestLeak} />
+                        </ErrorBoundary>
+                        <ErrorBoundary section="Smart Payment Prioritizer">
+                            <SmartPaymentPrioritizer accounts={user.accounts} optimalRate={user.optimalRate} />
+                        </ErrorBoundary>
                     </div>
 
-                    <SalaryCashFlow cashFlow={cashFlow} />
+                    <ErrorBoundary section="Salary Cash Flow">
+                        <SalaryCashFlow cashFlow={cashFlow} />
+                    </ErrorBoundary>
                     <RefreshShare onRefresh={handleRefresh} />
                 </main>
             </SubscriptionGate>

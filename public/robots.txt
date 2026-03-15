@@ -1,0 +1,36 @@
+# https://www.robotstxt.org/robotstxt.html
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /income/
+Disallow: /profile/
+Disallow: /settings/
+Disallow: /schedule/
+
+# Sitemap
+Sitemap: https://exitdebt.com/sitemap.xml
+
+# AI & LLM crawlers — allow for AEO (Answer Engine Optimization)
+User-agent: GPTBot
+Allow: /
+Allow: /faq
+Allow: /articles/
+Allow: /docs/
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+Allow: /faq
+Allow: /articles/
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+Allow: /faq
+Allow: /articles/

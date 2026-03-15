@@ -3,13 +3,13 @@
 import { litePlan, shieldPlan, settlementPlan, type SubscriptionPlan, type SettlementPlan } from "@/lib/mockPlans";
 
 interface PricingCardProps {
-    tier: "lite" | "shield" | "settlement";
+    tier: "lite" | "shield" | "shield-plus";
     isAnnual: boolean;
     onSubscribe?: (tier: "lite" | "shield", period: "monthly" | "annual") => void;
     onBookCall?: () => void;
 }
 
-function getPlanData(tier: "lite" | "shield" | "settlement"): SubscriptionPlan | SettlementPlan {
+function getPlanData(tier: "lite" | "shield" | "shield-plus"): SubscriptionPlan | SettlementPlan {
     if (tier === "lite") return litePlan;
     if (tier === "shield") return shieldPlan;
     return settlementPlan;
@@ -21,7 +21,7 @@ function formatINR(amount: number): string {
 
 export default function PricingCard({ tier, isAnnual, onSubscribe, onBookCall }: PricingCardProps) {
     const plan = getPlanData(tier);
-    const isSettlement = tier === "settlement";
+    const isSettlement = tier === "shield-plus";
     const isSubscription = !isSettlement;
     const isRecommended = plan.isRecommended;
 
@@ -130,7 +130,7 @@ export default function PricingCard({ tier, isAnnual, onSubscribe, onBookCall }:
 
             {/* Features */}
             <ul className="space-y-2.5 mb-8 flex-1">
-                {plan.features.map((feature, i) => (
+                {plan.features.map((feature: string, i: number) => (
                     <li key={i} className="flex items-start gap-2 text-sm">
                         <span
                             className="mt-0.5 flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center text-[10px]"

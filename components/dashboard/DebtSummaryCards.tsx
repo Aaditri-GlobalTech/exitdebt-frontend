@@ -54,13 +54,28 @@ export default function DebtSummaryCards({ totalOutstanding, monthlyEmi, activeA
                 >
                     <div className="flex items-center gap-2 mb-3">
                         <span style={{ color: card.accent }}>{card.icon}</span>
-                        <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--color-text-muted)" }}>
+                        <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: "var(--color-text-muted)" }}>
                             {card.label}
                         </span>
                     </div>
-                    <p className="text-2xl font-bold tabular-nums" style={{ color: "var(--color-text-primary)" }}>
+                    <p className="text-3xl font-bold tabular-nums tracking-tight" style={{ color: "var(--color-text-primary)" }}>
                         {card.value}
                     </p>
+                    {card.label === "Avg Interest Rate" && (
+                        <p className="text-[10px] mt-1.5" style={{ color: "var(--color-text-muted)" }}>
+                            {avgInterestRate > 18 ? "High cost (Avg is ~14%)" : "Healthy rate"}
+                        </p>
+                    )}
+                    {card.label === "Active Accounts" && activeAccounts > 3 && (
+                        <p className="text-[10px] mt-1.5" style={{ color: "var(--color-text-warning)", opacity: 0.8 }}>
+                            Ideal is 1-2 accounts
+                        </p>
+                    )}
+                    {card.label === "Monthly EMI Outgo" && (
+                        <p className="text-[10px] mt-1.5" style={{ color: "var(--color-text-muted)" }}>
+                            Total fixed monthly debt obligations
+                        </p>
+                    )}
                 </div>
             ))}
         </div>

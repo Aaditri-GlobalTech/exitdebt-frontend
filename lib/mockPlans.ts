@@ -1,6 +1,6 @@
 /* ─── Mock Subscription Plans (PRD3) ─────────────────────────────────────── */
 
-export type TierKey = "lite" | "shield" | "settlement";
+export type TierKey = "lite" | "shield" | "shield-plus";
 
 export interface SubscriptionPlan {
     key: TierKey;
@@ -15,7 +15,7 @@ export interface SubscriptionPlan {
 }
 
 export interface SettlementPlan {
-    key: "settlement";
+    key: "shield-plus";
     name: string;
     tagline: string;
     icon: string;
@@ -37,7 +37,7 @@ export const litePlan: SubscriptionPlan = {
     features: [
         "Full debt health dashboard",
         "7 intelligence tools",
-        "AA data refresh",
+        "Credit bureau quarterly refresh",
         "Interest leak analysis",
         "Smart payment prioritizer",
         "Salary cash-flow mapping",
@@ -65,8 +65,8 @@ export const shieldPlan: SubscriptionPlan = {
 };
 
 export const settlementPlan: SettlementPlan = {
-    key: "settlement",
-    name: "Settlement",
+    key: "shield-plus",
+    name: "Shield Plus",
     tagline: "We negotiate for you",
     icon: "💰",
     fee: "10% + GST",

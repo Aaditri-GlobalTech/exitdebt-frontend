@@ -43,10 +43,10 @@ export default function SalaryCashFlow({ cashFlow }: SalaryCashFlowProps) {
                 ))}
             </div>
 
-            <div className="pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3" style={{ borderTop: "1px solid var(--color-border)" }}>
+        <div className="pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3" style={{ borderTop: "1px solid var(--color-border)" }}>
                 <div>
                     <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>Remaining after EMIs</p>
-                    <p className="text-xl font-bold tabular-nums" style={{ color: "var(--color-text-primary)" }}>{formatCurrency(cashFlow.remaining)}</p>
+                    <p className="text-3xl font-bold tabular-nums tracking-tight mt-1" style={{ color: "var(--color-text-primary)" }}>{formatCurrency(cashFlow.remaining)}</p>
                 </div>
                 <div className="px-4 py-2 rounded-lg text-sm font-semibold" style={{
                     backgroundColor: isWarning ? "rgba(217,119,6,0.08)" : "rgba(5,150,105,0.08)",

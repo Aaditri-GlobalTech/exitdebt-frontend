@@ -141,14 +141,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
 
         // Hash PAN asynchronously for storage
-        hashPAN(normalizedPan).then((hash) => {
+        hashPAN(normalizedPan).then((hash: string) => {
             setPanHash(hash);
         });
     }, []);
 
     const updateIncome = useCallback(
         (salary: number, salaryDate: number, otherIncome?: number) => {
-            setUser((prev) =>
+            setUser((prev: MockProfile | null) =>
                 prev ? { ...prev, salary, salaryDate, otherIncome: otherIncome ?? 0 } : prev
             );
         },
@@ -158,7 +158,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const refreshData = useCallback(() => {
         if (pan) {
             const profile = selectProfile(pan);
-            setUser((prev) =>
+            setUser((prev: MockProfile | null) =>
                 prev ? { ...profile, salary: prev.salary, salaryDate: prev.salaryDate, otherIncome: prev.otherIncome } : profile
             );
         }

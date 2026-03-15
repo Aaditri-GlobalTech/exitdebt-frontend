@@ -64,6 +64,7 @@ export default function Home() {
   const [pan, setPan] = useState("");
   const [phone, setPhone] = useState("");
   const [consent, setConsent] = useState(false);
+  const [partnerConsent, setPartnerConsent] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [otpCode, setOtpCode] = useState("");
@@ -293,6 +294,19 @@ export default function Home() {
                         <span className="text-xs leading-relaxed" style={{ color: "var(--color-text-muted)" }}>
                           I consent to ExitDebt accessing my credit report for debt analysis. Data is encrypted
                           and auto-deleted after 30 days. <Link href="#" className="underline" style={{ color: "var(--color-purple)" }}>Privacy Policy</Link>.
+                        </span>
+                      </label>
+                      <label className="flex items-start gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={partnerConsent}
+                          onChange={(e) => setPartnerConsent(e.target.checked)}
+                          className="mt-0.5 w-4 h-4"
+                          style={{ accentColor: "var(--color-purple)" }}
+                        />
+                        <span className="text-xs leading-relaxed" style={{ color: "var(--color-text-muted)" }}>
+                          I agree to share my anonymized insights with financial partners for better offers
+                          <span style={{ color: "var(--color-purple)", fontWeight: 500 }}> (optional)</span>
                         </span>
                       </label>
                       <PrimaryButton

@@ -1,23 +1,41 @@
 @import "tailwindcss";
 
-/* ─── Design Tokens ─── */
+/* ─── Design Tokens (PRD Section 6 — Design System Guidelines) ─── */
 @theme {
-  --color-bg: #FCFCFC;
-  --color-bg-soft: #F5F5F7;
-  --color-bg-card: #FFFFFF;
-  --color-purple: #7300BE;
-  --color-purple-light: #9333EA;
-  --color-blue: #00B1FF;
-  --color-cyan: #00FCFE;
-  --color-danger: #DC2626;
-  --color-warning: #D97706;
-  --color-success: #059669;
-  --color-text-primary: #1A1A2E;
-  --color-text-secondary: #6B7280;
-  --color-text-muted: #9CA3AF;
-  --color-border: #E5E7EB;
-  --color-border-focus: #7300BE;
-  --font-family-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  /* Backgrounds — dark navy theme */
+  --color-bg: #0f1729;
+  --color-bg-soft: #1a2332;
+  --color-bg-card: #1a2332;
+  --color-bg-surface: #ffffff;
+
+  /* Accent — teal (PRD: CTAs, positive indicators) */
+  --color-accent: #14b8a6;
+  --color-accent-light: #2dd4bf;
+  --color-accent-glow: rgba(20, 184, 166, 0.15);
+
+  /* Legacy aliases — keeping for components that still reference these */
+  --color-purple: #14b8a6;
+  --color-purple-light: #2dd4bf;
+
+  /* Semantic colors */
+  --color-blue: #3b82f6;
+  --color-cyan: #06b6d4;
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+  --color-success: #22c55e;
+
+  /* Typography — white/slate on dark bg */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #64748b;
+  --color-text-dark: #0f172a;
+
+  /* Borders */
+  --color-border: #2a3447;
+  --color-border-focus: #14b8a6;
+
+  /* Font */
+  --font-family-sans: "Inter", system-ui, -apple-system, sans-serif;
 }
 
 /* ─── Base ─── */
@@ -69,7 +87,6 @@ body {
 }
 
 @keyframes pulse-soft {
-
   0%,
   100% {
     opacity: 1;
@@ -103,11 +120,15 @@ body {
   }
 
   30% {
-    box-shadow: 0 0 0 4px rgba(115, 0, 190, 0.15), 0 4px 32px rgba(115, 0, 190, 0.1);
+    box-shadow:
+      0 0 0 4px rgba(20, 184, 166, 0.2),
+      0 4px 32px rgba(20, 184, 166, 0.12);
   }
 
   60% {
-    box-shadow: 0 0 0 4px rgba(115, 0, 190, 0.15), 0 4px 32px rgba(115, 0, 190, 0.1);
+    box-shadow:
+      0 0 0 4px rgba(20, 184, 166, 0.2),
+      0 4px 32px rgba(20, 184, 166, 0.12);
   }
 
   100% {
@@ -137,12 +158,14 @@ body {
 }
 
 .stagger-5 {
-  animation-delay: 0.40s;
+  animation-delay: 0.4s;
 }
 
 /* ─── Hover Lift ─── */
 .hover-lift {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .hover-lift:hover {

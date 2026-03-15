@@ -4,25 +4,22 @@ export default function Footer() {
     return (
         <footer
             style={{
-                backgroundColor: "rgba(252,252,252,0.9)",
+                backgroundColor: "var(--color-bg-soft)",
                 borderTop: "1px solid var(--color-border)",
             }}
         >
-            <div className="max-w-6xl mx-auto px-8 py-14">
+            <div className="max-w-6xl mx-auto px-4 sm:px-8 py-14">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-10">
                     {/* Brand */}
                     <div>
                         <div className="flex items-center gap-2 mb-3">
                             <div
                                 className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold text-white"
-                                style={{ backgroundColor: "var(--color-purple)" }}
+                                style={{ backgroundColor: "var(--color-accent)" }}
                             >
                                 E
                             </div>
-                            <span
-                                className="text-base font-bold tracking-tight"
-                                style={{ color: "var(--color-text-primary)" }}
-                            >
+                            <span className="text-base font-bold tracking-tight text-white">
                                 ExitDebt
                             </span>
                         </div>
@@ -45,21 +42,21 @@ export default function Footer() {
                         <div className="space-y-2.5">
                             <a
                                 href="#"
-                                className="block text-sm transition-colors"
+                                className="block text-sm transition-colors hover:text-white"
                                 style={{ color: "var(--color-text-muted)" }}
                             >
                                 About us
                             </a>
                             <a
                                 href="#"
-                                className="block text-sm transition-colors"
+                                className="block text-sm transition-colors hover:text-white"
                                 style={{ color: "var(--color-text-muted)" }}
                             >
                                 Privacy Policy
                             </a>
                             <a
                                 href="#"
-                                className="block text-sm transition-colors"
+                                className="block text-sm transition-colors hover:text-white"
                                 style={{ color: "var(--color-text-muted)" }}
                             >
                                 Terms of Service
