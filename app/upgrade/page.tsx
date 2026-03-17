@@ -8,22 +8,22 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PricingToggle from "@/components/PricingToggle";
 import PricingCard from "@/components/PricingCard";
-import CallbackModal from "@/components/CallbackModal";
 
 export default function UpgradePage() {
     const { user } = useAuth();
-    const { status, upgradeToTier, bookSettlementCall } = useSubscription();
+    const { upgradeToTier, bookSettlementCall } = useSubscription();
     const router = useRouter();
 
     const [isAnnual, setIsAnnual] = useState(true);
-    const [callbackOpen, setCallbackOpen] = useState(false);
-    const [callbackReason, setCallbackReason] = useState("General consultation");
     const [showSuccess, setShowSuccess] = useState(false);
     const [subscribedTier, setSubscribedTier] = useState("");
 
-    function handleSubscribe(tier: "lite" | "shield", period: "monthly" | "annual") {
-        upgradeToTier(tier, period);
-        setSubscribedTier(tier.charAt(0).toUpperCase() + tier.slice(1));
+    function handleSubscribe(tier: "lite" | "shield" | "shield_plus", period: "monthly" | "annual") {
+        // For now, upgradeToTier only supports lite/shield — shield_plus maps to shield
+        const backendTier = tier === "shield_plus" ? "shield" : tier;
+        upgradeToTier(backendTier as "lite" | "shield", period);
+        const displayName = tier === "shield_plus" ? "Shield+" : tier.charAt(0).toUpperCase() + tier.slice(1);
+        setSubscribedTier(displayName);
         setShowSuccess(true);
         setTimeout(() => {
             router.push("/dashboard");
@@ -31,14 +31,8 @@ export default function UpgradePage() {
     }
 
     function handleBookCall() {
-        setCallbackReason("Settlement inquiry");
         bookSettlementCall();
-        setCallbackOpen(true);
-    }
-
-    function handleFreeCall() {
-        setCallbackReason("General consultation — help me choose a plan");
-        setCallbackOpen(true);
+        router.push("/schedule");
     }
 
     return (
@@ -62,8 +56,8 @@ export default function UpgradePage() {
                     <PricingToggle isAnnual={isAnnual} onChange={setIsAnnual} />
                 </div>
 
-                {/* Pricing Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20 items-stretch">
+                {/* Pricing Grid — 4 cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20 items-stretch">
                     <PricingCard
                         tier="lite"
                         isAnnual={isAnnual}
@@ -73,7 +67,12 @@ export default function UpgradePage() {
                         tier="shield"
                         isAnnual={isAnnual}
                         onSubscribe={handleSubscribe}
-                        isRecommended={true}
+                        isRecommended
+                    />
+                    <PricingCard
+                        tier="shield_plus"
+                        isAnnual={isAnnual}
+                        onSubscribe={handleSubscribe}
                     />
                     <PricingCard
                         tier="settlement"
@@ -86,8 +85,8 @@ export default function UpgradePage() {
                 <div className="text-center mb-24 animate-fadeIn">
                     <p className="text-gray-600 mb-6 font-medium">Not sure which plan is right for you?</p>
                     <button 
-                        onClick={handleFreeCall}
-                        className="inline-flex items-center gap-3 px-8 py-4 rounded-full border border-teal-100 bg-white text-teal-600 font-bold text-sm hover:bg-teal-50 transition-all shadow-sm group"
+                        onClick={() => router.push("/schedule")}
+                        className="inline-flex items-center gap-3 px-8 py-4 rounded-full border border-teal-100 bg-white text-teal-600 font-bold text-sm hover:bg-teal-50 transition-all shadow-sm group cursor-pointer"
                     >
                         <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h2.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -143,13 +142,6 @@ export default function UpgradePage() {
                     </div>
                 </div>
             )}
-
-            <CallbackModal
-                isOpen={callbackOpen}
-                onClose={() => setCallbackOpen(false)}
-                reason={callbackReason}
-                userName={user?.name || "User"}
-            />
         </div>
     );
 }

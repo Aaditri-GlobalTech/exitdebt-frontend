@@ -17,12 +17,14 @@ interface AuthState {
     pan: string;          // Raw PAN — in memory only, NEVER stored
     panHash: string;      // SHA-256 hash — stored in cookie
     phone: string;
+    userId: string;       // Backend UUID — persisted in cookie
     isReady: boolean;
     consent: ConsentRecord | null;
 }
 
 interface AuthContextType extends AuthState {
-    login: (pan: string, phone: string) => void;
+    login: (pan: string, phone: string, backendData?: Record<string, any>) => void;
+    onboardUser: (userId: string, name: string, phone: string) => void;
     updateIncome: (salary: number, salaryDate: number, otherIncome?: number) => void;
     refreshData: () => void;
     logout: () => void;
@@ -64,9 +66,11 @@ const AuthContext = createContext<AuthContextType>({
     pan: "",
     panHash: "",
     phone: "",
+    userId: "",
     isReady: false,
     consent: null,
     login: () => { },
+    onboardUser: () => { },
     updateIncome: () => { },
     refreshData: () => { },
     logout: () => { },
@@ -79,6 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [pan, setPan] = useState("");         // Raw PAN — memory only
     const [panHash, setPanHash] = useState("");  // SHA-256 — persisted
     const [phone, setPhone] = useState("");
+    const [userId, setUserId] = useState("");   // Backend UUID — persisted
     const [consent, setConsent] = useState<ConsentRecord | null>(null);
     const [isReady, setIsReady] = useState(false);
 
@@ -86,18 +91,53 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         const data = getCookie();
         if (data && data.panHash && data.phone) {
-            // Match profile by panHash — never store or recover raw PAN
+            // Match profile by panHash
             const { mockProfiles } = require("./mockProfiles");
             const profile = mockProfiles.find(
                 (p: { panHash: string }) => p.panHash === data.panHash
-            ) || mockProfiles[0];
-            // Restore income if saved
-            if (data.salary) {
-                profile.salary = data.salary as number;
-                profile.salaryDate = (data.salaryDate as number) || 1;
-                profile.otherIncome = (data.otherIncome as number) || 0;
+            );
+            
+            if (profile) {
+                // Restore values if saved
+                if (data.salary !== undefined) {
+                    profile.salary = data.salary as number;
+                    profile.salaryDate = (data.salaryDate as number) || 1;
+                    profile.otherIncome = (data.otherIncome as number) || 0;
+                }
+                if (data.isEmailVerified !== undefined) {
+                    profile.isEmailVerified = data.isEmailVerified as boolean;
+                }
+                setUser(profile);
+            } else if (data.name) {
+                // Create a temporary profile for newly onboarded user
+                setUser({
+                    name: data.name as string,
+                    panHash: data.panHash as string,
+                    score: 0,
+                    scoreLabel: "Pending Analysis",
+                    color: "yellow",
+                    totalOutstanding: 0,
+                    monthlyEmi: 0,
+                    activeAccounts: 0,
+                    avgInterestRate: 0,
+                    creditUtilization: 0,
+                    missedPayments: 0,
+                    accounts: [],
+                    overpayment: 0,
+                    optimalRate: 0,
+                    salary: (data.salary !== undefined ? data.salary : 0) as number,
+                    salaryDate: (data.salaryDate as number) || 1,
+                    otherIncome: (data.otherIncome as number) || 0,
+                    isEmailVerified: (data.isEmailVerified as boolean) || false,
+                    currentTimeline: "Pending",
+                    optimizedTimeline: "Pending",
+                    timelineSaved: "Pending",
+                    creditScore: 0
+                });
+            } else {
+                setUser(mockProfiles[0]); // fallback
             }
-            setUser(profile);
+
             setPanHash(data.panHash as string);
             setPhone(data.phone as string);
             if (data.consent) {
@@ -114,25 +154,59 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setCookie({
                 panHash,             // SHA-256 hash only — NEVER store raw PAN
                 phone,
+                userId,              // Backend UUID for API calls
+                name: user.name,     // Persist name for onboarding flow
                 salary: user.salary,
                 salaryDate: user.salaryDate,
                 otherIncome: user.otherIncome,
+                isEmailVerified: user.isEmailVerified,
                 consent,
             });
         } else {
             deleteCookie();
         }
-    }, [user, pan, panHash, phone, consent, isReady]);
+    }, [user, pan, panHash, phone, userId, consent, isReady]);
 
-    const login = useCallback((panValue: string, phoneValue: string) => {
+    const login = useCallback((panValue: string, phoneValue: string, backendData?: Record<string, any>) => {
         const normalizedPan = panValue.toUpperCase();
-        // For existing users logging in, we use their stored data if found
-        // or a profile selected by whatever ID we have. 
-        // In this mock setup, PAN remains the primary key.
-        const profile = selectProfile(normalizedPan);
+        
+        let profile: MockProfile;
+        
+        if (backendData?.name) {
+            // Real backend login — create profile with the user's actual data
+            profile = {
+                name: backendData.name,
+                panHash: "",  // Will be set via hashPAN below
+                isEmailVerified: backendData.is_email_verified || false,
+                score: 0,
+                scoreLabel: "Loading...",
+                color: "yellow",
+                totalOutstanding: 0,
+                monthlyEmi: 0,
+                activeAccounts: 0,
+                avgInterestRate: 0,
+                creditUtilization: 0,
+                missedPayments: 0,
+                accounts: [],
+                overpayment: 0,
+                optimalRate: 0,
+                salary: backendData.salary || 0,
+                salaryDate: backendData.salary_date || 1,
+                otherIncome: backendData.other_income || 0,
+                currentTimeline: "Pending",
+                optimizedTimeline: "Pending",
+                timelineSaved: "Pending",
+                creditScore: 0,
+            };
+        } else {
+            // Fallback: mock profile selection (legacy flow)
+            profile = selectProfile(normalizedPan);
+        }
         setUser(profile);
         setPan(normalizedPan);
         setPhone(phoneValue);
+        if (backendData?.user_id) setUserId(backendData.user_id);
+
 
         // Record consent
         setConsent({
@@ -141,14 +215,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
 
         // Hash PAN for storage
-        if (normalizedPan !== "LOGGEDIN_USER") {
-            hashPAN(normalizedPan).then((hash) => {
-                setPanHash(hash);
-            });
-        } else {
-            // Placeholder for users where we don't have the PAN in the login form immediately
-            setPanHash("session_hash_" + phoneValue);
-        }
+        hashPAN(normalizedPan).then((hash) => {
+            setPanHash(hash);
+        });
+    }, []);
+
+    const onboardUser = useCallback((userId: string, name: string, phoneValue: string) => {
+        setUser({
+            name,
+            panHash: userId,
+            isEmailVerified: false,
+            score: 0,
+            scoreLabel: "Welcome!",
+            color: "yellow",
+            totalOutstanding: 0,
+            monthlyEmi: 0,
+            activeAccounts: 0,
+            avgInterestRate: 0,
+            creditUtilization: 0,
+            missedPayments: 0,
+            accounts: [],
+            overpayment: 0,
+            optimalRate: 0,
+            salary: 0,
+            salaryDate: 1,
+            otherIncome: 0,
+            currentTimeline: "Pending",
+            optimizedTimeline: "Pending",
+            timelineSaved: "Pending",
+            creditScore: 0
+        });
+        setPan("ONBOARDING");
+        setPanHash(userId);
+        setPhone(phoneValue);
+        setUserId(userId);
+        
+        setConsent({
+            timestamp: new Date().toISOString(),
+            version: CONSENT_VERSION,
+        });
     }, []);
 
     const updateIncome = useCallback(
@@ -174,6 +279,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setPan("");
         setPanHash("");
         setPhone("");
+        setUserId("");
         setConsent(null);
         deleteCookie();
     }, []);
@@ -186,9 +292,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 pan,
                 panHash,
                 phone,
+                userId,
                 isReady,
                 consent,
                 login,
+                onboardUser,
                 updateIncome,
                 refreshData,
                 logout,

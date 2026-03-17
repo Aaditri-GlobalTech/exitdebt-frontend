@@ -13,6 +13,8 @@ import InterestLeakReport from "@/components/dashboard/InterestLeakReport";
 import SmartPaymentPrioritizer from "@/components/dashboard/SmartPaymentPrioritizer";
 import SalaryCashFlow from "@/components/dashboard/SalaryCashFlow";
 import DashboardBanner from "@/components/dashboard/DashboardBanner";
+import UpcomingBookings from "@/components/dashboard/UpcomingBookings";
+import IncomeDetailsForm from "@/components/dashboard/IncomeDetailsForm";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -44,6 +46,26 @@ export default function LiteDashboard({ lastUpdated }: { lastUpdated: Date }) {
 
             <main className="max-w-6xl mx-auto px-6 py-10 lg:py-12 space-y-10">
                 
+                {/* Verification Nudge */}
+                {!user.isEmailVerified && (
+                    <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 flex items-center justify-between gap-4 animate-fadeIn">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 shrink-0">
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 className="text-sm font-bold text-orange-900">Email Verification Required</h4>
+                                <p className="text-xs font-medium text-orange-700">Please verify your email address to unlock all dashboard features and receive important legal notices.</p>
+                            </div>
+                        </div>
+                        <button className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold rounded-lg transition-colors whitespace-nowrap shadow-sm shadow-orange-600/20">
+                            Verify Now
+                        </button>
+                    </div>
+                )}
+
                 {/* Status Banner */}
                 <DashboardBanner lastUpdated={lastUpdated} />
 
@@ -99,8 +121,14 @@ export default function LiteDashboard({ lastUpdated }: { lastUpdated: Date }) {
                     <SmartPaymentPrioritizer accounts={user.accounts} optimalRate={user.optimalRate} />
                 </div>
 
-                {/* Timeline Section */}
-                <SalaryCashFlow cashFlow={cashFlow} />
+                {/* Timeline and Income Section */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                    <SalaryCashFlow cashFlow={cashFlow} />
+                    <IncomeDetailsForm />
+                </div>
+
+                {/* Upcoming Call Bookings */}
+                <UpcomingBookings />
 
                 {/* Conditional Tier Banners */}
                 {tier === "lite" ? (

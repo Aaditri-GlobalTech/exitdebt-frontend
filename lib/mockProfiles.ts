@@ -10,6 +10,7 @@ export interface Account {
 export interface MockProfile {
   name: string;
   panHash: string;
+  isEmailVerified: boolean;
   score: number;
   scoreLabel: string;
   color: "red" | "orange" | "yellow" | "green";
@@ -35,6 +36,7 @@ export const mockProfiles: MockProfile[] = [
   {
     name: "Saurabh",
     panHash: "abcde1234f",
+    isEmailVerified: false,
     score: 0, // calculated dynamically
     scoreLabel: "",
     color: "red",
@@ -63,6 +65,7 @@ export const mockProfiles: MockProfile[] = [
   {
     name: "Priya",
     panHash: "fghij5678k",
+    isEmailVerified: false,
     score: 0,
     scoreLabel: "",
     color: "yellow",
@@ -89,6 +92,7 @@ export const mockProfiles: MockProfile[] = [
   {
     name: "Rahul",
     panHash: "klmno9012p",
+    isEmailVerified: false,
     score: 0,
     scoreLabel: "",
     color: "orange",
@@ -116,6 +120,7 @@ export const mockProfiles: MockProfile[] = [
   {
     name: "Meera",
     panHash: "qrstu3456v",
+    isEmailVerified: false,
     score: 0,
     scoreLabel: "",
     color: "green",

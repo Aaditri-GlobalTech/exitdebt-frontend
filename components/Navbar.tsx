@@ -81,23 +81,28 @@ export default function Navbar() {
                             >
                                 Plans
                             </Link>
-                            <div className="relative">
-                                <Link
-                                    href="/profile"
-                                    className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white transition-opacity hover:opacity-80"
-                                    style={{ backgroundColor: "var(--color-teal)" }}
-                                    title="Profile"
-                                >
-                                    {user?.name?.charAt(0) || "U"}
-                                </Link>
-                                {isActive && tier && (
-                                    <span
-                                        className="absolute -bottom-1 -right-1 text-[8px] font-bold px-1.5 py-0.5 rounded-full text-white leading-none"
-                                        style={{ backgroundColor: "var(--color-success)" }}
+                            <div className="flex items-center gap-3">
+                                <span className="text-sm font-bold truncate max-w-[120px]" style={{ color: "var(--color-text-primary)" }}>
+                                    Hi, {user?.name?.split(' ')[0] || "User"}
+                                </span>
+                                <div className="relative">
+                                    <Link
+                                        href="/profile"
+                                        className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white transition-opacity hover:opacity-80"
+                                        style={{ backgroundColor: "var(--color-teal)" }}
+                                        title="Profile"
                                     >
-                                        {tier === "lite" ? "L" : "S"}
-                                    </span>
-                                )}
+                                        {user?.name?.charAt(0).toUpperCase() || "U"}
+                                    </Link>
+                                    {isActive && tier && (
+                                        <span
+                                            className="absolute -bottom-1 -right-1 text-[8px] font-bold px-1.5 py-0.5 rounded-full text-white leading-none"
+                                            style={{ backgroundColor: "var(--color-success)" }}
+                                        >
+                                            {tier === "lite" ? "L" : "S"}
+                                        </span>
+                                    )}
+                                </div>
                             </div>
                             <button
                                 onClick={handleSignOut}

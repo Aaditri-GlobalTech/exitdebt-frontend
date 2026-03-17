@@ -8,7 +8,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PrimaryButton from "@/components/PrimaryButton";
 import FAQAccordion from "@/components/FAQAccordion";
-import OTPInput from "@/components/OTPInput";
+import PricingToggle from "@/components/PricingToggle";
+import PricingCard from "@/components/PricingCard";
 
 /* ───── Data ───── */
 
@@ -31,27 +32,36 @@ const LANDING_FAQS = [
   { question: "Is ExitDebt a bank or a lender?", answer: "ExitDebt is a financial wellness platform. We analyze your debt and suggest the best strategies or products from our partner lenders to help you save money." },
 ];
 
-type FormStep = "details" | "otp" | "processing";
+/* ───── Indian States ───── */
+const INDIAN_STATES = [
+  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
+  "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka",
+  "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya",
+  "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim",
+  "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand",
+  "West Bengal", "Andaman and Nicobar Islands", "Chandigarh",
+  "Dadra and Nagar Haveli and Daman and Diu", "Delhi", "Jammu and Kashmir",
+  "Ladakh", "Lakshadweep", "Puducherry",
+];
 
 /* ───── Component ───── */
 
-export default function Home() {
-  const { isLoggedIn, user, login, isReady } = useAuth();
+export default function LandingPage() {
+  const { isLoggedIn, phone, user, isReady, onboardUser } = useAuth();
   const router = useRouter();
+  const [isAnnual, setIsAnnual] = useState(true);
   const formCardRef = useRef<HTMLDivElement>(null);
 
-  // Form state
-  const [step, setStep] = useState<FormStep>("details");
-  const [pan, setPan] = useState("");
-  const [phone, setPhone] = useState("");
-  const [consent, setConsent] = useState(false);
+  // Step 1 form state
+  const [fullName, setFullName] = useState("");
+  const [mobile, setMobile] = useState("");
+  const [email, setEmail] = useState("");
+  const [city, setCity] = useState("");
+  const [userState, setUserState] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]$/;
-  const phoneRegex = /^[6-9]\d{9}$/;
-
-  // Glow effect legacy - kept for smooth transitions but simplified
+  // Glow effect
   useEffect(() => {
     function triggerGlow() {
       if (formCardRef.current) {
@@ -66,79 +76,37 @@ export default function Home() {
     return () => document.removeEventListener("click", handleClick);
   }, []);
 
-  // Validation
-  const validateDetails = (): boolean => {
-    if (!panRegex.test(pan.toUpperCase())) {
-      setError("Invalid PAN format. Expected: ABCDE1234F");
-      return false;
-    }
-    if (!phoneRegex.test(phone)) {
-      setError("Invalid phone number. Enter a 10-digit Indian mobile number.");
-      return false;
-    }
-    if (!consent) {
-      setError("Please provide consent to proceed.");
-      return false;
-    }
-    return true;
-  };
-
-  // OTP flow
-  const handleSendOTP = async () => {
+  // Step 1 submit
+  const handleStep1Submit = async () => {
     setError("");
-    if (!validateDetails()) return;
-    setLoading(true);
+    if (!fullName.trim()) { setError("Full name is required."); return; }
+    if (!/^[6-9]\d{9}$/.test(mobile)) { setError("Enter a valid 10-digit mobile number."); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError("Enter a valid email address."); return; }
+    if (!city.trim()) { setError("City is required."); return; }
+    if (!userState) { setError("Please select your state."); return; }
 
+    setLoading(true);
     try {
-      const response = await fetch("/api/otp/send", {
+      const res = await fetch("/api/onboarding/step-1", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone }),
+        body: JSON.stringify({ full_name: fullName, mobile, email, city, state: userState }),
       });
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || data.detail || "Failed to send OTP");
-      }
-      
-      setStep("otp");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Something went wrong.");
+
+      // Set user session in context
+      onboardUser(data.user_id, fullName, mobile);
+
+      router.push(`/onboarding?step=2&userId=${data.user_id}`);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to connect to the server.");
+      setError(err instanceof Error ? err.message : "Failed to connect.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleVerifyOTP = async (code: string) => {
-    setError("");
-    if (code.length !== 6) {
-      setError("Please enter a 6-digit code.");
-      return;
-    }
-    setStep("processing");
-
-    try {
-      const response = await fetch("/api/otp/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, otp_code: code }),
-      });
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || data.detail || "Invalid OTP");
-      }
-
-      login(pan.toUpperCase(), phone);
-      router.push("/income");
-    } catch (err: unknown) {
-      setStep("otp");
-      setError(err instanceof Error ? err.message : "Invalid OTP. Please try again.");
-    }
-  };
-
-  const auth = useAuth();
-  const authPhone = auth.phone;
+  const authPhone = phone || "";
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "var(--color-bg)" }}>
@@ -194,42 +162,49 @@ export default function Home() {
                 {isReady && isLoggedIn && user ? (
                   <div className="text-center space-y-6 py-8">
                     <div className="w-20 h-20 rounded-full mx-auto flex items-center justify-center text-3xl font-bold text-white shadow-lg" style={{ backgroundColor: "var(--color-teal)" }}>
-                      {user.name.charAt(0)}
+                      {user.name.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold mb-1">Welcome back, {user.name.split(' ')[0]}</h3>
-                      <p className="text-sm text-gray-500">You are logged in via +91 {authPhone}</p>
+                      <h3 className="text-xl font-bold mb-1">Welcome back, {user.name.split(' ')[0]}!</h3>
+                      <p className="text-sm text-gray-500">You are logged in.</p>
                     </div>
-                    <Link
-                      href="/dashboard"
-                      className="w-full py-4 rounded-lg flex items-center justify-center gap-2 text-sm font-bold text-white transition-all hover:shadow-lg active:scale-95 bg-[var(--color-teal)]"
-                    >
-                      Go to Dashboard →
-                    </Link>
+                    {user.scoreLabel === "Pending Analysis" ? (
+                      <Link
+                        href={`/onboarding?step=2&userId=${user.panHash}`}
+                        className="w-full py-4 rounded-lg flex items-center justify-center gap-2 text-sm font-bold text-white transition-all hover:shadow-lg active:scale-95 bg-[var(--color-teal)]"
+                      >
+                        Continue Onboarding →
+                      </Link>
+                    ) : (
+                      <Link
+                        href="/dashboard"
+                        className="w-full py-4 rounded-lg flex items-center justify-center gap-2 text-sm font-bold text-white transition-all hover:shadow-lg active:scale-95 bg-[var(--color-teal)]"
+                      >
+                        Go to Dashboard →
+                      </Link>
+                    )}
                   </div>
-                ) : step === "details" ? (
+                ) : (
                   <>
                     <h2 className="text-xl font-bold mb-8 text-left" style={{ color: "var(--color-text-primary)" }}>
                       Start Your Debt Analysis
                     </h2>
 
-                    <div className="space-y-6">
+                    <div className="space-y-5">
+                      {/* Full Name */}
                       <div className="space-y-2 text-left">
-                        <label className="block text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>PAN Card Number</label>
+                        <label className="block text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>Full Name</label>
                         <input
                           type="text"
-                          value={pan}
-                          onChange={(e) => setPan(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 10))}
-                          placeholder="ABCDE1234F"
-                          maxLength={10}
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                          placeholder="Saurabh Kumar"
                           className="w-full px-4 py-3.5 rounded-lg text-sm transition-all focus:outline-none focus:ring-1 focus:ring-teal-500 border border-transparent font-medium"
-                          style={{
-                            backgroundColor: "var(--color-teal-light)",
-                            color: "var(--color-text-primary)",
-                          }}
+                          style={{ backgroundColor: "var(--color-teal-light)", color: "var(--color-text-primary)" }}
                         />
                       </div>
 
+                      {/* Mobile Number */}
                       <div className="space-y-2 text-left">
                         <label className="block text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>Mobile Number</label>
                         <div className="flex gap-2">
@@ -241,37 +216,56 @@ export default function Home() {
                           </div>
                           <input
                             type="tel"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                            placeholder="98765 43210"
+                            value={mobile}
+                            onChange={(e) => setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                            placeholder="9876543210"
                             maxLength={10}
                             className="w-full px-4 py-3.5 rounded-lg text-sm transition-all focus:outline-none focus:ring-1 focus:ring-teal-500 border border-transparent font-medium"
-                            style={{
-                              backgroundColor: "var(--color-teal-light)",
-                              color: "var(--color-text-primary)",
-                            }}
+                            style={{ backgroundColor: "var(--color-teal-light)", color: "var(--color-text-primary)" }}
                           />
                         </div>
                       </div>
 
-                      <div className="space-y-4 pt-2 text-left">
-                        <label className="flex items-start gap-3 cursor-pointer group">
+                      {/* Email */}
+                      <div className="space-y-2 text-left">
+                        <label className="block text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>Email Address</label>
+                        <input
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="you@example.com"
+                          className="w-full px-4 py-3.5 rounded-lg text-sm transition-all focus:outline-none focus:ring-1 focus:ring-teal-500 border border-transparent font-medium"
+                          style={{ backgroundColor: "var(--color-teal-light)", color: "var(--color-text-primary)" }}
+                        />
+                      </div>
+
+                      {/* City + State row */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-2 text-left">
+                          <label className="block text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>City</label>
                           <input
-                            type="checkbox"
-                            checked={consent}
-                            onChange={(e) => setConsent(e.target.checked)}
-                            className="mt-0.5 w-4 h-4 rounded border-teal-200 text-teal-600 focus:ring-teal-500 cursor-pointer"
+                            type="text"
+                            value={city}
+                            onChange={(e) => setCity(e.target.value)}
+                            placeholder="Mumbai"
+                            className="w-full px-4 py-3.5 rounded-lg text-sm transition-all focus:outline-none focus:ring-1 focus:ring-teal-500 border border-transparent font-medium"
+                            style={{ backgroundColor: "var(--color-teal-light)", color: "var(--color-text-primary)" }}
                           />
-                          <span className="text-[10px] leading-relaxed select-none" style={{ color: "var(--color-text-secondary)" }}>
-                            I authorize ExitDebt to fetch my credit information from bureaus. This will **not impact my credit score**.
-                          </span>
-                        </label>
-                        <label className="flex items-start gap-3 cursor-pointer group">
-                          <input type="checkbox" className="mt-0.5 w-4 h-4 rounded border-teal-200 text-teal-600 focus:ring-teal-500 cursor-pointer" />
-                          <span className="text-[10px] leading-relaxed select-none" style={{ color: "var(--color-text-secondary)" }}>
-                            (Optional) I agree to share my details with financial partners for debt consolidation offers.
-                          </span>
-                        </label>
+                        </div>
+                        <div className="space-y-2 text-left">
+                          <label className="block text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>State</label>
+                          <select
+                            value={userState}
+                            onChange={(e) => setUserState(e.target.value)}
+                            className="w-full px-4 py-3.5 rounded-lg text-sm transition-all focus:outline-none focus:ring-1 focus:ring-teal-500 border border-transparent font-medium appearance-none cursor-pointer"
+                            style={{ backgroundColor: "var(--color-teal-light)", color: userState ? "var(--color-text-primary)" : "var(--color-text-muted)" }}
+                          >
+                            <option value="">Select...</option>
+                            {INDIAN_STATES.map((s) => (
+                              <option key={s} value={s}>{s}</option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
 
                       {error && (
@@ -279,15 +273,15 @@ export default function Home() {
                       )}
 
                       <button
-                        onClick={handleSendOTP}
-                        disabled={loading || !pan || !phone || !consent}
-                        className="w-full py-4 rounded-lg flex items-center justify-center gap-3 text-sm font-bold text-white transition-all hover:shadow-lg active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={handleStep1Submit}
+                        disabled={loading}
+                        className="w-full py-4 rounded-lg flex items-center justify-center gap-3 text-sm font-bold text-white transition-all hover:shadow-lg active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                         style={{ backgroundColor: "var(--color-teal)" }}
                       >
                         {loading ? (
                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                         ) : (
-                          <>Check My Debt Health <span className="text-lg leading-none">›</span></>
+                          <>Get Started <span className="text-lg leading-none">›</span></>
                         )}
                       </button>
 
@@ -296,30 +290,6 @@ export default function Home() {
                       </p>
                     </div>
                   </>
-                ) : step === "otp" ? (
-                  <div className="animate-fadeIn text-left">
-                    <h2 className="text-xl font-bold mb-2">Verify OTP</h2>
-                    <p className="text-sm text-gray-500 mb-8">Sent to +91 {phone}</p>
-                    <OTPInput onComplete={handleVerifyOTP} disabled={loading} />
-                    {error && <p className="text-xs text-center mt-6 font-medium" style={{ color: "var(--color-danger)" }}>{error}</p>}
-                    <button
-                      onClick={() => setStep("details")}
-                      className="w-full mt-8 py-2 text-xs font-bold uppercase tracking-widest text-teal-600 hover:text-teal-700 transition-colors"
-                    >
-                      ← Back to Details
-                    </button>
-                  </div>
-                ) : (
-                  <div className="py-12 text-center space-y-6">
-                    <div className="relative w-24 h-24 mx-auto">
-                      <div className="absolute inset-0 border-4 border-teal-50 rounded-full"></div>
-                      <div className="absolute inset-0 border-4 border-t-teal-600 rounded-full animate-spin"></div>
-                    </div>
-                    <div className="space-y-2">
-                      <h2 className="text-lg font-bold">Analyzing Your Debt...</h2>
-                      <p className="text-sm text-gray-500 leading-relaxed">Fetching credit report from bureaus<br/>& calculating potential savings</p>
-                    </div>
-                  </div>
                 )}
               </div>
             </div>
@@ -397,76 +367,32 @@ export default function Home() {
           <p className="text-sm text-gray-500 max-w-xl mx-auto">Flexible plans designed to support you at every stage of your debt recovery journey.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 items-stretch">
-          {/* Lite Plan */}
-          <div className="rounded-3xl p-8 border border-gray-100 shadow-xl shadow-gray-100/50 flex flex-col bg-white">
-            <span className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-4">LITE</span>
-            <div className="flex items-baseline gap-1 mb-6">
-              <span className="text-3xl font-extrabold text-[#0F172A]">₹499</span>
-              <span className="text-gray-400 font-medium font-bold">/mo</span>
-            </div>
-            <p className="text-sm text-gray-400 font-medium leading-relaxed mb-8 flex-1">
-              Essential tools for independent debt management and tracking.
-            </p>
-            <ul className="space-y-4 mb-10">
-              {["Dashboard access", "7 Pro debt tools", "Quarterly bureau refresh"].map((f, i) => (
-                <li key={i} className="flex items-start gap-3 text-sm font-bold text-[#1E293B]">
-                  <svg className="w-5 h-5 text-teal-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                  {f}
-                </li>
-              ))}
-            </ul>
-            <Link href="/#start" className="w-full py-4 rounded-xl text-sm font-bold border border-teal-500 text-teal-600 text-center hover:bg-teal-50 transition-all">
-              Get Started
-            </Link>
-          </div>
+        <div className="flex justify-center mb-16">
+          <PricingToggle isAnnual={isAnnual} onChange={setIsAnnual} />
+        </div>
 
-          {/* Shield Plan */}
-          <div className="relative rounded-3xl p-8 border-2 border-teal-500 scale-[1.05] shadow-2xl shadow-teal-100 z-10 flex flex-col bg-white">
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-5 py-1.5 rounded-full bg-teal-500 text-white text-[10px] font-bold tracking-[0.2em] uppercase">Recommended</div>
-            <span className="text-[10px] font-bold tracking-widest text-teal-600 uppercase mb-4">SHIELD</span>
-            <div className="flex items-baseline gap-1 mb-6">
-              <span className="text-3xl font-extrabold text-[#0F172A]">₹1,999</span>
-              <span className="text-gray-400 font-medium font-bold">/mo</span>
-            </div>
-            <p className="text-sm text-gray-400 font-medium leading-relaxed mb-8 flex-1">
-              Active protection against harassment and direct bank coordination.
-            </p>
-            <ul className="space-y-4 mb-10">
-              {["Everything in LITE", "Harassment protection", "Creditor communications", "Priority 24/7 support"].map((f, i) => (
-                <li key={i} className="flex items-start gap-3 text-sm font-bold text-[#1E293B]">
-                  <svg className="w-5 h-5 text-teal-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                  {f}
-                </li>
-              ))}
-            </ul>
-            <Link href="/#start" className="w-full py-4 rounded-xl text-sm font-bold bg-teal-500 text-white text-center hover:bg-teal-600 transition-all shadow-lg shadow-teal-100">
-              Protect Me Now
-            </Link>
-          </div>
-
-          {/* Settlement Plan */}
-          <div className="rounded-3xl p-8 border border-gray-100 shadow-xl shadow-gray-100/50 flex flex-col bg-white">
-            <span className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-4">SETTLEMENT</span>
-            <div className="flex items-baseline gap-1 mb-6">
-              <span className="text-3xl font-extrabold text-[#0F172A]">10%</span>
-              <span className="text-gray-400 font-medium font-bold ml-1">+ GST</span>
-            </div>
-            <p className="text-sm text-gray-400 font-medium leading-relaxed mb-8 flex-1">
-              End-to-end legal and negotiation support for closing your debts.
-            </p>
-            <ul className="space-y-4 mb-10">
-              {["Full debt negotiation", "Legal notice handling", "Dedicated Case Manager"].map((f, i) => (
-                <li key={i} className="flex items-start gap-3 text-sm font-bold text-[#1E293B]">
-                  <svg className="w-5 h-5 text-teal-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                  {f}
-                </li>
-              ))}
-            </ul>
-            <Link href="/#start" className="w-full py-4 rounded-xl text-sm font-bold border border-black text-black text-center hover:bg-gray-50 transition-all">
-              Check My Health First
-            </Link>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16 items-stretch">
+          <PricingCard
+            tier="lite"
+            isAnnual={isAnnual}
+            onSubscribe={() => router.push("/schedule")}
+          />
+          <PricingCard
+            tier="shield"
+            isAnnual={isAnnual}
+            onSubscribe={() => router.push("/schedule")}
+            isRecommended
+          />
+          <PricingCard
+            tier="shield_plus"
+            isAnnual={isAnnual}
+            onSubscribe={() => router.push("/schedule")}
+          />
+          <PricingCard
+            tier="settlement"
+            isAnnual={isAnnual}
+            onBookCall={() => router.push("/schedule")}
+          />
         </div>
       </section>
 
@@ -482,7 +408,7 @@ export default function Home() {
           <div className="text-center mt-12 p-8 rounded-2xl bg-teal-50 border border-teal-100">
             <h4 className="font-bold mb-2">Still have questions?</h4>
             <p className="text-sm text-gray-600 mb-6">Our team is here to help you navigate your financial journey.</p>
-            <Link href="/contact" className="px-6 py-2.5 rounded-lg text-sm font-bold text-white bg-[var(--color-teal)] hover:shadow-lg transition-all">
+            <Link href="/schedule" className="px-6 py-2.5 rounded-lg text-sm font-bold text-white bg-[var(--color-teal)] hover:shadow-lg transition-all">
                Contact Support
             </Link>
           </div>
