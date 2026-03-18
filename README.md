@@ -101,6 +101,9 @@ Landing Page → PAN + Phone → OTP Verify → Income Details → Debt Intellig
 - **Testimonials** — Priya (₹62K saved), Rahul (38→14% rate), Sneha (debt-free in 18mo)
 - **FAQ Preview** — Accordion with top questions linking to `/faq`
 - **Trust Signals** — "No Equifax impact", "256-bit encrypted", "Free forever"
+- **Rich Media & Animations** — Engaging `.gif` and `.lottie` animations throughout the onboarding flow
+- **DPDP Cookie Consent** — Built-in cookie consent manager for compliance
+- **Resilient UI** — React Error Boundaries and Skeleton Loaders for graceful state handling
 - **How It Works** — 3-step process explainer
 - **Blog Section** — Financial articles with category badges
 - **SEO** — Meta tags, OG tags, Twitter cards, FAQ structured data (JSON-LD)
@@ -368,7 +371,7 @@ Enter PAN `ABCDE1234F` with phone `9876543210` to load Saurabh's profile. Any va
 
 ## License
 
-© 2026 ExitDebt Technologies Pvt. Ltd.
+Copyright © 2026 Aaditri GlobalTech Pvt. Ltd.
 
 ---
 
