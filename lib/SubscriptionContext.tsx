@@ -32,7 +32,7 @@ const COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
 function setCookie(data: Record<string, unknown>) {
     if (typeof document === "undefined") return;
     const value = encodeURIComponent(JSON.stringify(data));
-    document.cookie = `${COOKIE_NAME}=${value}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Strict`;
+    document.cookie = `${COOKIE_NAME}=${value}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Strict; Secure`;
 }
 
 function getCookie(): Record<string, unknown> | null {
@@ -154,12 +154,14 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const expireTrial = useCallback(() => {
+        if (process.env.NODE_ENV === "production") return;
         setTrialEndsAt(new Date(Date.now() - 1000));
         setStatus("expired");
         setTier(null);
     }, []);
 
     const resetTrial = useCallback(() => {
+        if (process.env.NODE_ENV === "production") return;
         setTier(null);
         setStatus("trial");
         setTrialEndsAt(defaultTrialEnd());

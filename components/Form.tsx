@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import { validatePAN, validatePhone, selectProfile } from "@/lib/utils";
+import { validatePAN, validatePhone, selectProfile, hashPAN } from "@/lib/utils";
 import { MockProfile } from "@/lib/mockProfiles";
 import LoadingSpinner from "./LoadingSpinner";
 
@@ -63,12 +63,13 @@ export default function DebtForm({ onResult, isLoading, setIsLoading, submitted 
         setIsLoading(true);
 
         try {
-            // Step 1: Verify PAN
+            // Step 1: Verify PAN (send hash instead of raw PAN)
+            const panHash = await hashPAN(pan.toUpperCase());
             const panResp = await fetch("/api/pan/verify", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    pan: pan.toUpperCase(),
+                    pan: panHash,
                     consent: "Y",
                     reason: "Debt health check for ExitDebt user",
                 }),

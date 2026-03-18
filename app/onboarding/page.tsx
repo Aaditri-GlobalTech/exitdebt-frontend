@@ -27,6 +27,7 @@ function OnboardingContent() {
 
   const [currentStep, setCurrentStep] = useState<OnboardingStep>(initialStep as OnboardingStep);
   const [userId, setUserId] = useState<string>(initialUserId);
+  const [accessToken, setAccessToken] = useState<string>("");
 
   useEffect(() => {
     const stepParam = searchParams.get("step");
@@ -39,8 +40,9 @@ function OnboardingContent() {
     }
   }, [searchParams]);
 
-  const handleStep1Complete = (newUserId: string) => {
+  const handleStep1Complete = (newUserId: string, token: string) => {
     setUserId(newUserId);
+    setAccessToken(token);
     setCurrentStep(2);
   };
 
@@ -126,10 +128,10 @@ function OnboardingContent() {
               <Step1BasicDetails onComplete={handleStep1Complete} />
             )}
             {currentStep === 2 && (
-              <Step2Verification userId={userId} onComplete={handleStep2Complete} />
+              <Step2Verification userId={userId} token={accessToken} onComplete={handleStep2Complete} />
             )}
             {currentStep === 3 && (
-              <Step3BookCall userId={userId} onComplete={handleStep3Complete} />
+              <Step3BookCall userId={userId} token={accessToken} onComplete={handleStep3Complete} />
             )}
             {currentStep === "complete" && (
               <div className="text-center py-12 animate-fadeIn">

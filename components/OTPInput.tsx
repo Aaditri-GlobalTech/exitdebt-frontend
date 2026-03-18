@@ -3,12 +3,13 @@
 import React, { useState, useRef, useEffect } from "react";
 
 interface OTPInputProps {
-  onComplete: (code: string) => void;
+  length?: number;
+  onComplete: (code: string) => void | Promise<void>;
   disabled?: boolean;
 }
 
-export default function OTPInput({ onComplete, disabled }: OTPInputProps) {
-  const [digits, setDigits] = useState<string[]>(new Array(6).fill(""));
+export default function OTPInput({ length = 6, onComplete, disabled }: OTPInputProps) {
+  const [digits, setDigits] = useState<string[]>(new Array(length).fill(""));
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const handleChange = (index: number, value: string) => {
@@ -18,7 +19,7 @@ export default function OTPInput({ onComplete, disabled }: OTPInputProps) {
     newDigits[index] = val;
     setDigits(newDigits);
 
-    if (val && index < 5) {
+    if (val && index < length - 1) {
       inputRefs.current[index + 1]?.focus();
     }
 

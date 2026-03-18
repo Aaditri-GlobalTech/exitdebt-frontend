@@ -5,6 +5,7 @@ import OTPInput from "@/components/OTPInput";
 
 interface Step2Props {
   userId: string;
+  token: string;
   onComplete: () => void;
 }
 
@@ -12,7 +13,7 @@ type VerifyPhase = "pan" | "mobile_otp" | "aadhar_otp" | "fetching";
 
 const OTP_COUNTDOWN_SECONDS = 60;
 
-export default function Step2Verification({ userId, onComplete }: Step2Props) {
+export default function Step2Verification({ userId, token, onComplete }: Step2Props) {
   const [phase, setPhase] = useState<VerifyPhase>("pan");
   const [pan, setPan] = useState("");
   const [phone, setPhone] = useState("");
@@ -84,7 +85,7 @@ export default function Step2Verification({ userId, onComplete }: Step2Props) {
       // Verify PAN
       const panRes = await fetch("/api/onboarding/verify-pan", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
         body: JSON.stringify({ user_id: userId, pan: pan.toUpperCase() }),
       });
       const panData = await panRes.json();
@@ -133,7 +134,7 @@ export default function Step2Verification({ userId, onComplete }: Step2Props) {
       // Auto-trigger Aadhar OTP (mocked in dev)
       const aadharRes = await fetch("/api/onboarding/aadhar/init", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
         body: JSON.stringify({ user_id: userId, aadhar_number: "XXXX" }),
       });
       await aadharRes.json();
@@ -152,7 +153,7 @@ export default function Step2Verification({ userId, onComplete }: Step2Props) {
     try {
       const res = await fetch("/api/onboarding/aadhar/verify", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
         body: JSON.stringify({ user_id: userId, otp_code: code }),
       });
       const data = await res.json();

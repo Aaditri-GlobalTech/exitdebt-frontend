@@ -39,7 +39,7 @@ const CONSENT_VERSION = "1.0";             // Bump when consent text changes
 function setCookie(data: Record<string, unknown>) {
     if (typeof document === "undefined") return;
     const value = encodeURIComponent(JSON.stringify(data));
-    document.cookie = `${COOKIE_NAME}=${value}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Strict`;
+    document.cookie = `${COOKIE_NAME}=${value}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Strict; Secure`;
 }
 
 function getCookie(): Record<string, unknown> | null {

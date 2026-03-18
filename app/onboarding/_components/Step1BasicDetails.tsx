@@ -15,7 +15,7 @@ const INDIAN_STATES = [
 ];
 
 interface Step1Props {
-  onComplete: (userId: string) => void;
+  onComplete: (userId: string, token: string) => void;
 }
 
 export default function Step1BasicDetails({ onComplete }: Step1Props) {
@@ -51,7 +51,7 @@ export default function Step1BasicDetails({ onComplete }: Step1Props) {
         throw new Error(data.detail || "Something went wrong.");
       }
 
-      onComplete(data.user_id);
+      onComplete(data.user_id, data.access_token);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to connect.");
     } finally {

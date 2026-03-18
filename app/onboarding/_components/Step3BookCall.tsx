@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 
 interface Step3Props {
   userId: string;
+  token: string;
   onComplete: () => void;
 }
 
@@ -23,7 +24,7 @@ const CRITICALITY_OPTIONS = [
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-export default function Step3BookCall({ userId, onComplete }: Step3Props) {
+export default function Step3BookCall({ userId, token, onComplete }: Step3Props) {
   const [slots, setSlots] = useState<Slot[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [selectedTime, setSelectedTime] = useState<string>("");
@@ -78,7 +79,7 @@ export default function Step3BookCall({ userId, onComplete }: Step3Props) {
       const scheduledAt = `${selectedDate}T${selectedTime}:00`;
       const res = await fetch("/api/onboarding/consultation/book", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
         body: JSON.stringify({
           user_id: userId,
           scheduled_at: scheduledAt,
