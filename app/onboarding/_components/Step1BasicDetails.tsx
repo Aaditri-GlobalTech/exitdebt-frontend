@@ -15,7 +15,7 @@ const INDIAN_STATES = [
 ];
 
 interface Step1Props {
-  onComplete: (userId: string, token: string) => void;
+  onComplete: (userId: string, token: string, mobile: string) => void;
 }
 
 export default function Step1BasicDetails({ onComplete }: Step1Props) {
@@ -33,7 +33,7 @@ export default function Step1BasicDetails({ onComplete }: Step1Props) {
 
     // Validation
     if (!fullName.trim()) { setError("Full name is required."); return; }
-    if (!/^[6-9]\d{9}$/.test(mobile)) { setError("Enter a valid 10-digit mobile number."); return; }
+    if (!/^\d{10}$/.test(mobile)) { setError("Enter a valid 10-digit mobile number."); return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError("Enter a valid email address."); return; }
     if (!city.trim()) { setError("City is required."); return; }
     if (!state) { setError("Please select your state."); return; }
@@ -48,10 +48,11 @@ export default function Step1BasicDetails({ onComplete }: Step1Props) {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.detail || "Something went wrong.");
+        const msg = typeof data.detail === "string" ? data.detail : Array.isArray(data.detail) ? data.detail.map((e: { msg?: string }) => e.msg || JSON.stringify(e)).join(", ") : "Something went wrong.";
+        throw new Error(msg);
       }
 
-      onComplete(data.user_id, data.access_token);
+      onComplete(data.user_id, data.access_token, mobile);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to connect.");
     } finally {

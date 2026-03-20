@@ -30,6 +30,7 @@ export interface MockProfile {
   optimizedTimeline: string;
   timelineSaved: string;
   creditScore: number; // Equifax score
+  role?: "user" | "admin";
 }
 
 export const mockProfiles: MockProfile[] = [
@@ -37,6 +38,7 @@ export const mockProfiles: MockProfile[] = [
     name: "Saurabh",
     panHash: "abcde1234f",
     isEmailVerified: false,
+    role: "admin",
     score: 0, // calculated dynamically
     scoreLabel: "",
     color: "red",

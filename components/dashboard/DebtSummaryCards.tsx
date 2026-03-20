@@ -32,7 +32,7 @@ function getStatusInfo(acc: Account) {
     return { label: "STABLE", bg: "#EFF6FF", text: "#2563EB" };
 }
 
-const ICON_BGS = ["#FEF2F2", "#EFF6FF", "#FFF7ED", "#F0FDFA"];
+const ICON_BGS = ["#FEF2F2", "#EFF6FF", "#FFF7ED", "var(--color-teal-light)"];
 
 export default function DebtSummaryCards({ totalOutstanding, accounts }: DebtSummaryCardsProps) {
     return (

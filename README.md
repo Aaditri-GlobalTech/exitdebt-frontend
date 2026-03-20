@@ -23,7 +23,7 @@ PAN + Phone  →  Equifax Pull  →  Full Dashboard (3mo free)  →  Lite/Shield
 Tiered subscriptions + debt services:
 - **Lite:** ₹499/month or ₹4,999/year (dashboard + 7 tools + monitoring)
 - **Shield:** ₹1,999/month or ₹14,999/year (+ harassment protection + creditor negotiation)
-- **Settlement:** 10% + GST on settled debt (₹1L+ minimum)
+- **Shield+:** 10% + GST on settled debt (₹1L+ minimum)
 - **Lender Commissions** (Phase 2 — 0.5–3% on consolidation loans via DSA partnerships)
 
 ## 🛠️ Tech Stack
@@ -89,9 +89,13 @@ Landing Page → PAN + Phone → OTP Verify → Income Details → Debt Intellig
 1. **Landing Page** (`/`) — Enter PAN + phone, verify via OTP, pull mock Equifax report
 2. **Income Details** (`/income`) — Provide monthly salary, salary date, and optional other income
 3. **Dashboard** (`/dashboard`) — Full debt intelligence overview with 9 interactive sections
-4. **Profile** (`/profile`) — View masked PAN/phone, salary, Equifax score, logout
-5. **Schedule** (`/schedule`) — Book a callback with a debt expert
-6. **FAQ** (`/faq`) — Trust & security questions, about ExitDebt
+4. **Welcome** (`/welcome`) — Post-signup engagement screen highlighting free/paid features
+5. **Checkout** (`/checkout`) — Subscription payment flow for Lite/Shield
+6. **Profile** (`/profile`) — View masked PAN/phone, salary, Equifax score, logout
+7. **Schedule** (`/schedule`) — Book a callback with a debt expert
+8. **Upgrade** (`/upgrade`) — Tier selection with plan comparison
+9. **Admin Panel** (`/admin`) — Lead management, pipeline, ops dashboard
+10. **FAQ** (`/faq`) — Trust & security questions, about ExitDebt
 
 ## Features
 
@@ -138,6 +142,30 @@ Landing Page → PAN + Phone → OTP Verify → Income Details → Debt Intellig
 - Reusable accordion component
 - CTA to schedule a call
 
+### Welcome Page (`/welcome`) — *NEW*
+- **PS-01**: Welcome message with user's first name
+- **PS-02**: Feature highlights — Basic (free) vs Lite/Shield tools
+- **PS-03**: Shield/Shield+ awareness links (subtle, non-pushy)
+- **PS-04**: Content engagement links to articles
+
+### Checkout Page (`/checkout`) — *NEW*
+- **TS-02**: Subscription payment for Lite & Shield tiers
+- Order summary with plan name, price, and billing cycle
+- **TS-05**: Success state → redirect to dashboard with tier badge
+
+### Admin Panel (`/admin/*`) — *NEW*
+> **🚧 Under Construction:** The Admin Panel interface is currently in development and populated with mock data for demonstration purposes. To access it, log in using the pre-configured admin profile (PAN: `ABCDE1234F`).
+
+- **Ops Dashboard** (`/admin`): Hot leads, pipeline funnel, overdue follow-ups, wins
+- **Lead List** (`/admin/leads`): Filterable by stage, priority, search
+- **Lead Detail** (`/admin/leads/[id]`): Score, debt metrics, notes, timeline, stage management
+- **Technical Documentation** (`/admin/docs`): Internal architecture and API reference
+
+### Cookie Consent Banner — *NEW*
+- **LP-05**: DPDP Act compliant cookie consent
+- localStorage persistence — banner hides after user choice
+- "Accept All" and "Essential Only" options
+
 ## Authentication & Security
 
 ### How Auth Works
@@ -149,7 +177,19 @@ User enters PAN + Phone → OTP sent → OTP verified → JWT issued → JWT sen
 1. **OTP Login** — User provides phone number, receives a 6-digit OTP, and verifies it.
 2. **JWT Token** — On successful OTP verification, the backend returns a JWT token (valid for 60 min).
 3. **Bearer Auth** — The frontend includes this token in every API request as `Authorization: Bearer <token>`.
-4. **Cookie Persistence** — Session state (panHash, phone, tier) is persisted in a 30-day cookie. **Raw PAN is never stored.**
+4. **Cookie Persistence** — Session state (panHash, phone, tier, onboardingComplete) is persisted in a 30-day cookie. **Raw PAN is never stored.**
+
+### Dashboard Access Gate
+
+The dashboard is gated on the `onboardingComplete` flag in `AuthContext`:
+
+```
+Step 1 (Basic Details) → Step 2 (PAN ✓ → OTP ✓ → Aadhar ✓ → Decentro fetch ✓) → completeOnboarding() → Dashboard unlocked
+```
+
+- **Not logged in** → redirects to `/`
+- **Logged in but onboarding incomplete** → redirects to `/onboarding`
+- **Logged in + onboarding complete** → shows dashboard
 
 ### Security Rules
 
@@ -157,6 +197,7 @@ User enters PAN + Phone → OTP sent → OTP verified → JWT issued → JWT sen
 |---|---|
 | **PAN Storage** | SHA-256 hashed with server-side pepper — raw PAN is **never** stored in cookies or state |
 | **Session Persistence** | Cookie-based, 30-day auto-expire |
+| **Onboarding Gate** | `onboardingComplete` flag — dashboard requires Step 2 verification + Decentro data fetch |
 | **Consent Tracking** | Timestamp + version stored for DPDP compliance |
 | **Hydration Guard** | `isReady` flag prevents flash-of-redirect |
 | **Error Handling** | All `catch` blocks use `unknown` type (never `any`) |
@@ -295,15 +336,24 @@ npm run test:watch
 ```
 src/
 ├── app/
-│   ├── layout.tsx              # Root layout, fonts, SEO, JSON-LD schema
+│   ├── layout.tsx              # Root layout, fonts, SEO, JSON-LD schema, CookieConsent
 │   ├── page.tsx                # Landing page (OTP flow + testimonials)
 │   ├── globals.css             # @theme tokens, animations
 │   ├── income/page.tsx         # Income collection screen
 │   ├── dashboard/page.tsx      # Debt Intelligence Dashboard
+│   ├── welcome/page.tsx        # Post-signup engagement (Screen 4)
+│   ├── checkout/page.tsx       # Subscription payment checkout
 │   ├── profile/page.tsx        # User profile (masked PAN, Equifax score)
 │   ├── schedule/page.tsx       # Book a callback
+│   ├── upgrade/page.tsx        # Tier selection / plan comparison
 │   ├── faq/page.tsx            # FAQ with accordion sections
 │   ├── docs/page.tsx           # API documentation
+│   ├── admin/
+│   │   ├── layout.tsx          # Admin sidebar layout
+│   │   ├── page.tsx            # Ops dashboard (hot leads, funnel)
+│   │   └── leads/
+│   │       ├── page.tsx        # Filterable lead list
+│   │       └── [id]/page.tsx   # Lead detail (notes, timeline, stage)
 │   ├── articles/[slug]/        # Blog article pages (SSG)
 │   └── api/
 │       ├── otp/                # OTP send + verify
@@ -315,9 +365,12 @@ src/
 ├── components/
 │   ├── Navbar.tsx              # Auth-aware nav with profile avatar
 │   ├── Footer.tsx              # Footer
+│   ├── CookieConsent.tsx       # DPDP cookie consent banner
 │   ├── Form.tsx                # PAN/phone validation
 │   ├── FAQAccordion.tsx        # Reusable accordion
 │   ├── PrimaryButton.tsx       # Button with loading spinner
+│   ├── PricingCard.tsx         # Tier pricing card (Lite/Shield/Shield+)
+│   ├── PricingToggle.tsx       # Monthly/Annual billing toggle
 │   └── dashboard/
 │       ├── DashboardBanner.tsx
 │       ├── DashboardScoreGauge.tsx
@@ -327,9 +380,12 @@ src/
 │       ├── InterestLeakReport.tsx
 │       ├── SmartPaymentPrioritizer.tsx
 │       ├── SalaryCashFlow.tsx
+│       ├── CreditScorePredictor.tsx  # RS-09: Score impact estimator
+│       ├── MilestoneCelebrations.tsx # RS-10: Achievement celebrations
 │       └── RefreshShare.tsx
 └── lib/
     ├── AuthContext.tsx          # Cookie auth + SHA-256 + consent tracking
+    ├── SubscriptionContext.tsx  # Tier and subscription state
     ├── mockProfiles.ts         # 4 profiles with creditUtilization, missedPayments
     ├── calculations.ts         # Scoring, interest leak, prioritizer, cash flow, savings
     └── utils.ts                # Validation, hashPAN, selectProfile, formatCurrency

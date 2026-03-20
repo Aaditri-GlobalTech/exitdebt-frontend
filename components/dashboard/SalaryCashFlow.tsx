@@ -14,7 +14,7 @@ export default function SalaryCashFlow({ cashFlow }: SalaryCashFlowProps) {
     const finalSavings = Math.max(0, remainingAfterEMIs - rentUtility);
 
     const events = [
-        { day: cashFlow.salaryDay, label: "SALARY IN", amount: `+${formatCurrency(cashFlow.salary)}`, color: "#14B8A6", text: "#14B8A6", bg: "#F0FDFA" },
+        { day: cashFlow.salaryDay, label: "SALARY IN", amount: `+${formatCurrency(cashFlow.salary)}`, color: "var(--color-teal)", text: "var(--color-teal)", bg: "var(--color-teal-light)" },
         ...cashFlow.emis.map((emi) => ({
             day: emi.day,
             label: emi.lender.split(' ')[0] + " EMI",
@@ -68,7 +68,7 @@ export default function SalaryCashFlow({ cashFlow }: SalaryCashFlowProps) {
                     {events.map((ev, i) => (
                         <div key={i} className="flex flex-col items-center text-center group">
                             <div 
-                                className="w-16 h-16 rounded-full flex flex-col items-center justify-center mb-6 border-2 transition-all group-hover:scale-110 shadow-sm"
+                                className="w-16 h-16 rounded-full flex flex-col items-center justify-center mb-6 border-2 transition-all shadow-sm"
                                 style={{ 
                                     backgroundColor: "white", 
                                     borderColor: ev.bg,

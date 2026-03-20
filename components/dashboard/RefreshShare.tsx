@@ -12,7 +12,11 @@ export default function RefreshShare({ onRefresh }: RefreshShareProps) {
         setTimeout(() => { onRefresh(); setRefreshing(false); }, 1000);
     }
 
-    function handlePDF() { alert("PDF download will be available in the full version."); }
+    /**
+     * RS-11: Download PDF of debt summary.
+     * Phase 1 uses browser print-to-PDF. Server-side generation deferred to Phase 2.
+     */
+    function handlePDF() { window.print(); }
 
     function handleWhatsApp() {
         const text = encodeURIComponent("I just checked my debt health on ExitDebt! See how much you could save: https://exitdebt.com");

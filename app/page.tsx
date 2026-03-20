@@ -14,9 +14,9 @@ import PricingCard from "@/components/PricingCard";
 /* ───── Data ───── */
 
 const STEPS = [
-  { num: "1", title: "Enter PAN Details", desc: "Provide your basic details and PAN for a secure identity verification process." },
-  { num: "2", title: "See Your Score", desc: "Get a comprehensive analysis of your current debt-to-income ratio and interest leakage." },
-  { num: "3", title: "Get a Plan", desc: "Receive a tailored step-by-step strategy to consolidate and payoff debts faster." },
+  { num: "1", title: "Enter PAN Details", desc: "No long forms. Just provide your PAN and we'll securely verify your identity in seconds.", icon: "/PAN3.svg" },
+  { num: "2", title: "See Your Score", desc: "We pull your real-time data to uncover hidden interest traps and calculate your true debt health.", icon: "/credit assessment.svg" },
+  { num: "3", title: "Get a Plan", desc: "Unlock a custom roadmap designed to consolidate high-interest debt and accelerate your freedom.", icon: "/plan.svg" },
 ];
 
 const TRUST_POINTS = [
@@ -27,9 +27,10 @@ const TRUST_POINTS = [
 ];
 
 const LANDING_FAQS = [
-  { question: "Will this check affect my credit score?", answer: "No, we perform a \"soft pull\" on your credit record which does not impact your Equifax or other bureau credit scores in any way." },
-  { question: "How long does the analysis take?", answer: "The analysis is near-instant. Once you provide your details and verify your mobile via OTP, your dashboard will be ready in under 60 seconds." },
-  { question: "Is ExitDebt a bank or a lender?", answer: "ExitDebt is a financial wellness platform. We analyze your debt and suggest the best strategies or products from our partner lenders to help you save money." },
+  { question: "Is this really free?", answer: "Yes, our Basic dashboard and debt health assessment are 100% free forever. It includes your Debt Health Score, Debt Summary, Interest Leak Report, and Salary Day Cash Flow analysis." },
+  { question: "How do you make money?", answer: "We offer premium subscription tiers (Lite and Shield) for advanced intelligence tools, continuous monitoring, and active harassment protection. For complex cases, our Shield+ service provides full debt negotiation for a performance fee." },
+  { question: "Is my PAN data safe?", answer: "Absolutely. We use bank-grade AES-256 encryption. We only use your PAN to fetch your credit report once you provide explicit consent, and we never share your raw PAN details." },
+  { question: "Will this affect my credit score?", answer: "No, we perform a \"soft pull\" on your credit record which does not impact your Equifax or other bureau credit scores in any way." },
 ];
 
 /* ───── Indian States ───── */
@@ -46,7 +47,49 @@ const INDIAN_STATES = [
 
 /* ───── Component ───── */
 
+/* ───── Components ───── */
+const TypingText = ({ text, className }: { text: string; className?: string }) => {
+  const [displayedText, setDisplayedText] = useState("");
+  const [isStarted, setIsStarted] = useState(false);
+  const containerRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsStarted(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    if (containerRef.current) observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!isStarted) return;
+    let i = 0;
+    const timer = setInterval(() => {
+      setDisplayedText(text.slice(0, i + 1));
+      i++;
+      if (i >= text.length) clearInterval(timer);
+    }, 100);
+    return () => clearInterval(timer);
+  }, [isStarted, text]);
+
+  return (
+    <h3 ref={containerRef} className={className} style={{ color: "var(--color-text-primary)" }}>
+      {displayedText}
+      {isStarted && displayedText.length < text.length && (
+        <span className="inline-block w-1.5 h-10 lg:h-12 bg-[var(--color-teal)] ml-2 animate-pulse align-middle" />
+      )}
+    </h3>
+  );
+};
+
 export default function LandingPage() {
+
   const { isLoggedIn, phone, user, isReady, onboardUser } = useAuth();
   const router = useRouter();
   const [isAnnual, setIsAnnual] = useState(true);
@@ -60,6 +103,7 @@ export default function LandingPage() {
   const [userState, setUserState] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showForm, setShowForm] = useState(false);
 
   // Glow effect
   useEffect(() => {
@@ -80,7 +124,7 @@ export default function LandingPage() {
   const handleStep1Submit = async () => {
     setError("");
     if (!fullName.trim()) { setError("Full name is required."); return; }
-    if (!/^[6-9]\d{9}$/.test(mobile)) { setError("Enter a valid 10-digit mobile number."); return; }
+    if (!/^\d{10}$/.test(mobile)) { setError("Enter a valid 10-digit mobile number."); return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError("Enter a valid email address."); return; }
     if (!city.trim()) { setError("City is required."); return; }
     if (!userState) { setError("Please select your state."); return; }
@@ -93,7 +137,10 @@ export default function LandingPage() {
         body: JSON.stringify({ full_name: fullName, mobile, email, city, state: userState }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || "Something went wrong.");
+      if (!res.ok) {
+        const msg = typeof data.detail === "string" ? data.detail : Array.isArray(data.detail) ? data.detail.map((e: { msg?: string }) => e.msg || JSON.stringify(e)).join(", ") : "Something went wrong.";
+        throw new Error(msg);
+      }
 
       // Set user session in context
       onboardUser(data.user_id, fullName, mobile);
@@ -154,12 +201,11 @@ export default function LandingPage() {
 
             {/* Right — Form Card */}
             <div className="lg:col-span-5 animate-slideUp stagger-1">
-              <div
-                ref={formCardRef}
-                className="rounded-xl p-8 lg:p-10 border border-gray-100 shadow-2xl transition-all"
-                style={{ backgroundColor: "var(--color-bg-card)", boxShadow: "0 20px 50px rgba(0,0,0,0.06)" }}
-              >
-                {isReady && isLoggedIn && user ? (
+              {isReady && isLoggedIn && user ? (
+                <div
+                  className="rounded-xl p-8 lg:p-10 border border-gray-100 shadow-2xl transition-all"
+                  style={{ backgroundColor: "var(--color-bg-card)", boxShadow: "0 20px 50px rgba(0,0,0,0.06)" }}
+                >
                   <div className="text-center space-y-6 py-8">
                     <div className="w-20 h-20 rounded-full mx-auto flex items-center justify-center text-3xl font-bold text-white shadow-lg" style={{ backgroundColor: "var(--color-teal)" }}>
                       {user.name.charAt(0).toUpperCase()}
@@ -184,114 +230,149 @@ export default function LandingPage() {
                       </Link>
                     )}
                   </div>
-                ) : (
-                  <>
-                    <h2 className="text-xl font-bold mb-8 text-left" style={{ color: "var(--color-text-primary)" }}>
+                </div>
+              ) : !isLoggedIn && !showForm ? (
+                <div className="flex flex-col items-center text-center animate-fadeIn py-4">
+                   <img 
+                     src="/question2.svg" 
+                     alt="Get Started" 
+                     className="w-72 h-72 sm:w-80 sm:h-80 lg:w-full lg:h-[400px] mb-12 object-contain drop-shadow-sm transition-transform duration-700 pointer-events-none select-none" 
+                   />
+                   <div className="space-y-8 w-full max-w-sm">
+                     <div className="space-y-3">
+                       <h2 className="text-3xl font-black tracking-tight" style={{ color: "var(--color-text-primary)" }}>Ready to see your savings?</h2>
+                       <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+                         Our AI-powered assessment identifies hidden interest costs and creates a clear path to financial freedom.
+                       </p>
+                     </div>
+                     <button
+                       onClick={() => setShowForm(true)}
+                       className="w-full py-5 rounded-2xl flex items-center justify-center gap-4 text-lg font-black text-white transition-all hover:shadow-2xl hover:shadow-teal-100/50 active:scale-[0.98] bg-[var(--color-teal)] tracking-tight group"
+                     >
+                       Start Your Analysis
+                       <span className="text-2xl group-hover:translate-x-2 transition-transform duration-300 leading-none pb-0.5">›</span>
+                     </button>
+                   </div>
+                </div>
+              ) : (
+                <div
+                  ref={formCardRef}
+                  className="rounded-xl p-8 lg:p-10 border border-gray-100 shadow-2xl transition-all animate-fadeIn"
+                  style={{ backgroundColor: "var(--color-bg-card)", boxShadow: "0 20px 50px rgba(0,0,0,0.06)" }}
+                >
+                  <div className="flex items-center justify-between mb-8">
+                    <h2 className="text-xl font-black text-left" style={{ color: "var(--color-text-primary)" }}>
                       Start Your Debt Analysis
                     </h2>
+                    <button 
+                       onClick={() => setShowForm(false)}
+                       className="text-[10px] font-bold text-[var(--color-teal)] uppercase tracking-widest hover:underline"
+                    >
+                       ← Back
+                    </button>
+                  </div>
 
-                    <div className="space-y-5">
-                      {/* Full Name */}
+                  <div className="space-y-5">
+                    {/* Full Name */}
+                    <div className="space-y-2 text-left">
+                      <label className="block text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>Full Name</label>
+                      <input
+                        type="text"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        placeholder="Saurabh Kumar"
+                        className="w-full px-4 py-3.5 rounded-lg text-sm transition-all focus:outline-none focus:ring-1 focus:ring-teal-500 border border-transparent font-medium"
+                        style={{ backgroundColor: "var(--color-teal-light)", color: "var(--color-text-primary)" }}
+                      />
+                    </div>
+
+                    {/* Mobile Number */}
+                    <div className="space-y-2 text-left">
+                      <label className="block text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>Mobile Number</label>
+                      <div className="flex gap-2">
+                        <div
+                          className="px-4 py-3.5 rounded-lg text-sm font-medium flex items-center shrink-0"
+                          style={{ backgroundColor: "var(--color-teal-light)", color: "var(--color-text-secondary)" }}
+                        >
+                          +91
+                        </div>
+                        <input
+                          type="tel"
+                          value={mobile}
+                          onChange={(e) => setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                          placeholder="9876543210"
+                          maxLength={10}
+                          className="w-full px-4 py-3.5 rounded-lg text-sm transition-all focus:outline-none focus:ring-1 focus:ring-teal-500 border border-transparent font-medium"
+                          style={{ backgroundColor: "var(--color-teal-light)", color: "var(--color-text-primary)" }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Email */}
+                    <div className="space-y-2 text-left">
+                      <label className="block text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>Email Address</label>
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="you@example.com"
+                        className="w-full px-4 py-3.5 rounded-lg text-sm transition-all focus:outline-none focus:ring-1 focus:ring-teal-500 border border-transparent font-medium"
+                        style={{ backgroundColor: "var(--color-teal-light)", color: "var(--color-text-primary)" }}
+                      />
+                    </div>
+
+                    {/* City + State row */}
+                    <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-2 text-left">
-                        <label className="block text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>Full Name</label>
+                        <label className="block text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>City</label>
                         <input
                           type="text"
-                          value={fullName}
-                          onChange={(e) => setFullName(e.target.value)}
-                          placeholder="Saurabh Kumar"
+                          value={city}
+                          onChange={(e) => setCity(e.target.value)}
+                          placeholder="Mumbai"
                           className="w-full px-4 py-3.5 rounded-lg text-sm transition-all focus:outline-none focus:ring-1 focus:ring-teal-500 border border-transparent font-medium"
                           style={{ backgroundColor: "var(--color-teal-light)", color: "var(--color-text-primary)" }}
                         />
                       </div>
-
-                      {/* Mobile Number */}
                       <div className="space-y-2 text-left">
-                        <label className="block text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>Mobile Number</label>
-                        <div className="flex gap-2">
-                          <div
-                            className="px-4 py-3.5 rounded-lg text-sm font-medium flex items-center shrink-0"
-                            style={{ backgroundColor: "var(--color-teal-light)", color: "var(--color-text-secondary)" }}
-                          >
-                            +91
-                          </div>
-                          <input
-                            type="tel"
-                            value={mobile}
-                            onChange={(e) => setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                            placeholder="9876543210"
-                            maxLength={10}
-                            className="w-full px-4 py-3.5 rounded-lg text-sm transition-all focus:outline-none focus:ring-1 focus:ring-teal-500 border border-transparent font-medium"
-                            style={{ backgroundColor: "var(--color-teal-light)", color: "var(--color-text-primary)" }}
-                          />
-                        </div>
+                        <label className="block text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>State</label>
+                        <select
+                          value={userState}
+                          onChange={(e) => setUserState(e.target.value)}
+                          className="w-full px-4 py-3.5 rounded-lg text-sm transition-all focus:outline-none focus:ring-1 focus:ring-teal-500 border border-transparent font-medium appearance-none cursor-pointer"
+                          style={{ backgroundColor: "var(--color-teal-light)", color: userState ? "var(--color-text-primary)" : "var(--color-text-muted)" }}
+                        >
+                          <option value="">Select...</option>
+                          {INDIAN_STATES.map((s) => (
+                            <option key={s} value={s}>{s}</option>
+                          ))}
+                        </select>
                       </div>
-
-                      {/* Email */}
-                      <div className="space-y-2 text-left">
-                        <label className="block text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>Email Address</label>
-                        <input
-                          type="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          placeholder="you@example.com"
-                          className="w-full px-4 py-3.5 rounded-lg text-sm transition-all focus:outline-none focus:ring-1 focus:ring-teal-500 border border-transparent font-medium"
-                          style={{ backgroundColor: "var(--color-teal-light)", color: "var(--color-text-primary)" }}
-                        />
-                      </div>
-
-                      {/* City + State row */}
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="space-y-2 text-left">
-                          <label className="block text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>City</label>
-                          <input
-                            type="text"
-                            value={city}
-                            onChange={(e) => setCity(e.target.value)}
-                            placeholder="Mumbai"
-                            className="w-full px-4 py-3.5 rounded-lg text-sm transition-all focus:outline-none focus:ring-1 focus:ring-teal-500 border border-transparent font-medium"
-                            style={{ backgroundColor: "var(--color-teal-light)", color: "var(--color-text-primary)" }}
-                          />
-                        </div>
-                        <div className="space-y-2 text-left">
-                          <label className="block text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>State</label>
-                          <select
-                            value={userState}
-                            onChange={(e) => setUserState(e.target.value)}
-                            className="w-full px-4 py-3.5 rounded-lg text-sm transition-all focus:outline-none focus:ring-1 focus:ring-teal-500 border border-transparent font-medium appearance-none cursor-pointer"
-                            style={{ backgroundColor: "var(--color-teal-light)", color: userState ? "var(--color-text-primary)" : "var(--color-text-muted)" }}
-                          >
-                            <option value="">Select...</option>
-                            {INDIAN_STATES.map((s) => (
-                              <option key={s} value={s}>{s}</option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-
-                      {error && (
-                        <p className="text-xs text-center font-medium animate-fadeIn" style={{ color: "var(--color-danger)" }}>{error}</p>
-                      )}
-
-                      <button
-                        onClick={handleStep1Submit}
-                        disabled={loading}
-                        className="w-full py-4 rounded-lg flex items-center justify-center gap-3 text-sm font-bold text-white transition-all hover:shadow-lg active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                        style={{ backgroundColor: "var(--color-teal)" }}
-                      >
-                        {loading ? (
-                           <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        ) : (
-                          <>Get Started <span className="text-lg leading-none">›</span></>
-                        )}
-                      </button>
-
-                      <p className="text-[9px] text-center px-4 leading-relaxed" style={{ color: "var(--color-text-muted)" }}>
-                        By proceeding, you agree to our <a href="#" className="underline">Terms of Service</a> and <a href="#" className="underline">Privacy Policy</a>.
-                      </p>
                     </div>
-                  </>
-                )}
-              </div>
+
+                    {error && (
+                      <p className="text-xs text-center font-medium animate-fadeIn" style={{ color: "var(--color-danger)" }}>{error}</p>
+                    )}
+
+                    <button
+                      onClick={handleStep1Submit}
+                      disabled={loading}
+                      className="w-full py-4 rounded-lg flex items-center justify-center gap-3 text-sm font-bold text-white transition-all hover:shadow-lg active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                      style={{ backgroundColor: "var(--color-teal)" }}
+                    >
+                      {loading ? (
+                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        <>Analyze My Debt <span className="text-lg leading-none">›</span></>
+                      )}
+                    </button>
+
+                    <p className="text-[9px] text-center px-4 leading-relaxed" style={{ color: "var(--color-text-muted)" }}>
+                      By proceeding, you agree to our <a href="#" className="underline">Terms of Service</a> and <a href="#" className="underline">Privacy Policy</a>.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -303,58 +384,138 @@ export default function LandingPage() {
           <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "var(--color-teal)" }}>Process</p>
           <h2 className="text-3xl sm:text-4xl font-bold" style={{ color: "var(--color-text-primary)" }}>How It Works</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {STEPS.map((s, i) => (
-            <div
-              key={s.num}
-              className={`relative rounded-xl p-10 text-left border border-gray-50 flex flex-col items-start transition-all hover:shadow-xl hover:shadow-gray-100`}
-              style={{ backgroundColor: "var(--color-bg-card)" }}
-            >
-              <span className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold text-white mb-6 shadow-lg shadow-teal-100" style={{ backgroundColor: "var(--color-teal)" }}>{s.num}</span>
-              <h3 className="text-lg font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>{s.title}</h3>
-              <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>{s.desc}</p>
-            </div>
-          ))}
+        <div className="relative space-y-32 lg:space-y-48">
+          {/* Subtle connecting path (hidden on mobile) */}
+          <div className="hidden lg:block absolute left-1/2 top-40 bottom-40 w-0.5 border-l-2 border-dashed border-teal-100 -translate-x-1/2 -z-10" />
+
+          {STEPS.map((s, i) => {
+            const isEven = i % 2 !== 0;
+            return (
+              <div 
+                key={s.num} 
+                className={`flex flex-col ${isEven ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-center gap-16 lg:gap-32 px-4 group`}
+              >
+                {/* Visual Anchor */}
+                <div className="flex-1 relative w-full flex justify-center">
+                  {/* Organic Blob Background */}
+                  <div className={`absolute -inset-20 bg-[var(--color-teal)] opacity-[0.03] rounded-full blur-[100px] scale-150 transition-transform duration-1000`} />
+                  
+                  <div className="relative w-full max-w-[500px] aspect-square flex items-center justify-center transition-all duration-700">
+                     <img 
+                       src={s.icon} 
+                       alt={s.title} 
+                       className="w-full h-full object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-transform duration-700 pointer-events-none select-none group-hover:scale-[1.02]" 
+                     />
+                     
+                     {/* Dynamic Step Marker - Integrated */}
+                     <div 
+                       className={`absolute -top-10 ${isEven ? '-left-10' : '-right-10'} w-24 h-24 rounded-[2rem] flex flex-col items-center justify-center shadow-2xl border border-white/50 backdrop-blur-xl transition-all duration-500`}
+                       style={{ backgroundColor: "var(--color-teal)" }}
+                     >
+                       <span className="text-xs font-black tracking-widest text-white/50 mb-1 uppercase">Step</span>
+                       <span className="text-4xl font-black text-white leading-none">0{s.num}</span>
+                     </div>
+                  </div>
+                </div>
+
+                {/* Narrative Text */}
+                <div className="flex-1 text-center lg:text-left space-y-8 max-w-lg">
+                  <div className="space-y-4">
+                    {s.num === "1" ? (
+                      <TypingText 
+                        text={s.title} 
+                        className="text-4xl lg:text-5xl font-black tracking-tighter leading-none min-h-[1.2em]" 
+                      />
+                    ) : (
+                      <h3 className="text-4xl lg:text-5xl font-black tracking-tighter leading-none" style={{ color: "var(--color-text-primary)" }}>
+                        {s.title}
+                      </h3>
+                    )}
+                    <div className="h-1.5 w-20 bg-[var(--color-teal)] rounded-full transition-all duration-500" />
+                  </div>
+                  <p className="text-lg lg:text-xl leading-relaxed text-[var(--color-text-secondary)] font-medium opacity-90">
+                    {s.desc}
+                  </p>
+
+                  
+                  <div className="flex flex-wrap justify-center lg:justify-start gap-4 pt-4">
+                     {["Secure", "Fast", "Free"].map(tag => (
+                       <span key={tag} className="px-4 py-2 rounded-xl bg-teal-50 border border-teal-100 text-[10px] font-black uppercase tracking-widest text-[var(--color-teal)]">
+                         {tag}
+                       </span>
+                     ))}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </section>
 
       {/* ───── SECURITY SECTION ───── */}
-      <section id="security" className="max-w-6xl mx-auto px-8 py-20 lg:py-28 text-left">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "var(--color-teal)" }}>Security</p>
-            <h2 className="text-3xl sm:text-4xl font-bold mb-6" style={{ color: "var(--color-text-primary)" }}>Your Data Security is Our Top Priority</h2>
-            <p className="text-base leading-relaxed mb-8" style={{ color: "var(--color-text-secondary)" }}>
-              We use bank-grade security and encryption to ensure your data stays private and safe. 
-              ExitDebt is committed to maintaining the highest standards of data protection.
-            </p>
-            <div className="grid grid-cols-2 gap-6">
-               <div className="p-4 rounded-lg bg-gray-50 border border-gray-100">
-                  <p className="font-bold text-lg mb-1" style={{ color: "var(--color-teal)" }}>AES-256</p>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Encryption Standard</p>
-               </div>
-               <div className="p-4 rounded-lg bg-gray-50 border border-gray-100">
-                  <p className="font-bold text-lg mb-1" style={{ color: "var(--color-teal)" }}>SSL/TLS</p>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Secure Protocol</p>
-               </div>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {TRUST_POINTS.map((point, i) => (
-              <div
-                key={point.title}
-                className="rounded-xl p-8 border border-gray-100 shadow-sm"
-                style={{ backgroundColor: "var(--color-bg-card)" }}
-              >
-                <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: "var(--color-teal-light)" }}>
-                  <svg className="w-5 h-5" fill="var(--color-teal)" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M2.166 4.9L10 1.55l7.834 3.35a1 1 0 01.666.92v3.13a4 4 0 11-8 0V8.5a.5.5 0 011 0v.45a3 3 0 106 0V6.432L10 3.22 2.5 6.432v7.136c0 1.56 1.024 3.037 2.587 3.522L10 18.78l4.913-1.69c.991-.34 1.787-1.113 2.23-2.08a1 1 0 011.814.84a5.986 5.986 0 01-3.573 3.101L10 20.85l-5.384-1.854C2.616 18.358 1.5 16.51 1.5 14.5V6.5a1 1 0 01.666-.9z" clipRule="evenodd" />
-                  </svg>
+      <section id="security" className="py-24 sm:py-40 lg:py-48 border-t border-gray-50 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-8 relative">
+          <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-32">
+            
+            {/* Security Narrative */}
+            <div className="flex-1 space-y-12 animate-fadeIn order-2 lg:order-1">
+              <div className="space-y-6">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-50 border border-teal-100/50">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-teal)] animate-pulse" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-teal)]">Bank-Grade Protection</span>
                 </div>
-                <h3 className="text-sm font-bold mb-2" style={{ color: "var(--color-text-primary)" }}>{point.title}</h3>
-                <p className="text-[11px] leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>{point.desc}</p>
+                <h2 className="text-4xl lg:text-6xl font-black tracking-tighter leading-none" style={{ color: "var(--color-text-primary)" }}>
+                  Your Data is <br />
+                  <span className="text-[var(--color-teal)]">Fortress Protected.</span>
+                </h2>
+                <p className="text-lg lg:text-xl leading-relaxed text-[var(--color-text-secondary)] opacity-80 max-w-xl">
+                  ExitDebt uses institutional encryption standards to ensure your financial integrity. We protect your dignity as fiercely as your data.
+                </p>
               </div>
-            ))}
+
+              {/* High-Impact Security Specs */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-8">
+                <div className="space-y-3 p-8 rounded-[2.5rem] bg-gray-50/50 border border-gray-100/50 transition-all hover:shadow-xl hover:shadow-gray-200/20 group">
+                   <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-white shadow-sm mb-6 transition-transform">
+                      <svg className="w-6 h-6" fill="var(--color-teal)" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M2.166 4.9L10 1.55l7.834 3.35a1 1 0 01.666.92v3.13a4 4 0 11-8 0V8.5a.5.5 0 011 0v.45a3 3 0 106 0V6.432L10 3.22 2.5 6.432v7.136c0 1.56 1.024 3.037 2.587 3.522L10 18.78l4.913-1.69c.991-.34 1.787-1.113 2.23-2.08a1 1 0 011.814.84a5.986 5.986 0 01-3.573 3.101L10 20.85l-5.384-1.854C2.616 18.358 1.5 16.51 1.5 14.5V6.5a1 1 0 01.666-.9z" clipRule="evenodd" />
+                      </svg>
+                   </div>
+                   <h4 className="text-xl font-black" style={{ color: "var(--color-text-primary)" }}>AES-256 Bit</h4>
+                   <p className="text-sm text-[var(--color-text-secondary)]">Advanced military-grade encryption standards for all sensitive information.</p>
+                </div>
+
+                <div className="space-y-3 p-8 rounded-[2.5rem] bg-gray-50/50 border border-gray-100/50 transition-all hover:shadow-xl hover:shadow-gray-200/20 group">
+                   <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-white shadow-sm mb-6 transition-transform">
+                      <svg className="w-6 h-6" fill="var(--color-teal)" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z" />
+                      </svg>
+                   </div>
+                   <h4 className="text-xl font-black" style={{ color: "var(--color-text-primary)" }}>SSL/TLS 1.3</h4>
+                   <p className="text-sm text-[var(--color-text-secondary)]">Encrypted communication channels preventing any unauthorized interception.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Security Illustration Wrapper */}
+            <div className="flex-1 relative w-full flex justify-center order-1 lg:order-2 group">
+              {/* Organic Blob Background */}
+              <div className="absolute -inset-20 bg-[var(--color-teal)] opacity-[0.03] rounded-full blur-[100px] scale-150 transition-transform duration-1000" />
+              
+              <div className="relative w-full max-w-[550px] aspect-square flex items-center justify-center transition-all duration-700">
+                 <img 
+                   src="/security.svg" 
+                   alt="Bank-Grade Security" 
+                   className="w-full h-full object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-transform duration-700 pointer-events-none select-none" 
+                 />
+                 {/* Decorative Floating Shield Marker */}
+                 <div className="absolute top-10 right-10 bg-white/20 backdrop-blur-xl border border-white/50 w-24 h-24 rounded-full flex items-center justify-center shadow-2xl animate-bounce">
+                    <svg className="w-10 h-10 text-[var(--color-teal)]" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 1.944A11.947 11.947 0 012.383 4.41a.5.5 0 00-.198.544l1.307 5.455c.613 2.552 2.326 4.564 4.512 5.799l1.82 1.028a.5.5 0 00.47 0l1.82-1.028c2.186-1.235 3.899-3.247 4.512-5.799l1.307-5.455a.5.5 0 00-.198-.544A11.947 11.947 0 0110 1.944zM11 12a1 1 0 11-2 0 1 1 0 012 0zm-1-7a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                 </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -371,25 +532,20 @@ export default function LandingPage() {
           <PricingToggle isAnnual={isAnnual} onChange={setIsAnnual} />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6 mb-16 items-stretch max-w-5xl mx-auto">
           <PricingCard
             tier="lite"
             isAnnual={isAnnual}
-            onSubscribe={() => router.push("/schedule")}
+            onSubscribe={() => router.push(`/checkout?tier=lite&period=${isAnnual ? "annual" : "monthly"}`)}
           />
           <PricingCard
             tier="shield"
             isAnnual={isAnnual}
-            onSubscribe={() => router.push("/schedule")}
+            onSubscribe={() => router.push(`/checkout?tier=shield&period=${isAnnual ? "annual" : "monthly"}`)}
             isRecommended
           />
           <PricingCard
             tier="shield_plus"
-            isAnnual={isAnnual}
-            onSubscribe={() => router.push("/schedule")}
-          />
-          <PricingCard
-            tier="settlement"
             isAnnual={isAnnual}
             onBookCall={() => router.push("/schedule")}
           />
@@ -398,20 +554,41 @@ export default function LandingPage() {
 
       {/* ───── FAQ SECTION ───── */}
       <section id="faq" className="max-w-6xl mx-auto px-8 py-20 lg:py-28 border-t border-gray-50">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+          
+          {/* Left Column: Visuals & Headers */}
+          <div className="flex flex-col text-center lg:text-left">
             <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "var(--color-teal)" }}>Support</p>
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color: "var(--color-text-primary)" }}>Frequently Asked Questions</h2>
-            <p className="text-sm text-gray-500">Everything you need to know about checking your debt health.</p>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-6" style={{ color: "var(--color-text-primary)" }}>Frequently Asked Questions</h2>
+            <p className="text-sm lg:text-base text-gray-500 max-w-md mx-auto lg:mx-0 mb-10 leading-relaxed">
+              Everything you need to know about checking your debt health and how ExitDebt protects you.
+            </p>
+            
+            <div className="relative w-full max-w-[400px] mx-auto lg:mx-0 aspect-square flex items-center justify-center animate-slideUp">
+               <div className="absolute inset-0 bg-teal-500/5 rounded-full blur-[80px]" />
+               <img 
+                 src="/faq.svg" 
+                 alt="FAQ Support" 
+                 className="relative w-full h-full object-contain transition-transform duration-700 pointer-events-none select-none drop-shadow-xl" 
+               />
+            </div>
           </div>
-          <FAQAccordion items={LANDING_FAQS} />
-          <div className="text-center mt-12 p-8 rounded-2xl bg-teal-50 border border-teal-100">
-            <h4 className="font-bold mb-2">Still have questions?</h4>
-            <p className="text-sm text-gray-600 mb-6">Our team is here to help you navigate your financial journey.</p>
-            <Link href="/schedule" className="px-6 py-2.5 rounded-lg text-sm font-bold text-white bg-[var(--color-teal)] hover:shadow-lg transition-all">
-               Contact Support
-            </Link>
+
+          {/* Right Column: Accordion */ }
+          <div className="flex flex-col">
+            <FAQAccordion items={LANDING_FAQS} />
+            
+            <div className="text-center lg:text-left mt-12 p-8 rounded-2xl bg-teal-50 border border-teal-100 flex flex-col sm:flex-row items-center justify-between gap-6">
+              <div>
+                <h4 className="font-bold mb-1 text-gray-900">Still have questions?</h4>
+                <p className="text-sm text-gray-600">Our team is here to help you navigate your financial journey.</p>
+              </div>
+              <Link href="/schedule" className="whitespace-nowrap px-6 py-3 rounded-xl text-sm font-bold text-white bg-[var(--color-teal)] hover:shadow-xl hover:-translate-y-0.5 transition-all outline-none focus-visible:ring-2 focus-visible:ring-offset-2">
+                 Contact Support
+              </Link>
+            </div>
           </div>
+          
         </div>
       </section>
 

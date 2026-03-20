@@ -39,7 +39,7 @@ export default function NotFound() {
 
                     <Link
                         href="/"
-                        className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90 hover:scale-[1.02] active:scale-[0.98]"
+                        className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90 active:scale-[0.98]"
                         style={{
                             backgroundColor: "var(--color-teal)",
                             boxShadow: "0 4px 12px rgba(115,0,190,0.2)"

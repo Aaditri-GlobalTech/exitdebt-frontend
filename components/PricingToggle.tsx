@@ -19,8 +19,8 @@ export default function PricingToggle({ isAnnual, onChange }: PricingToggleProps
                 className={`px-10 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 ${isAnnual ? 'bg-white text-[#0F172A] shadow-md' : 'text-gray-400 hover:text-gray-600'}`}
             >
                 Annual
-                <span className="text-[10px] font-extrabold text-[#14B8A6] uppercase tracking-wider bg-[#F0FDFA] px-2 py-0.5 rounded ml-1">
-                    Save 20%
+                <span className="text-[10px] font-extrabold text-[var(--color-teal)] uppercase tracking-wider bg-[var(--color-teal-light)]/10 px-2 py-0.5 rounded ml-1">
+                    Save up to 37%
                 </span>
             </button>
         </div>

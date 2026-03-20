@@ -56,8 +56,8 @@ export default function UpgradePage() {
                     <PricingToggle isAnnual={isAnnual} onChange={setIsAnnual} />
                 </div>
 
-                {/* Pricing Grid — 4 cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20 items-stretch">
+                {/* Pricing Grid — 3 cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6 mb-20 items-stretch max-w-5xl mx-auto">
                     <PricingCard
                         tier="lite"
                         isAnnual={isAnnual}
@@ -72,11 +72,6 @@ export default function UpgradePage() {
                     <PricingCard
                         tier="shield_plus"
                         isAnnual={isAnnual}
-                        onSubscribe={handleSubscribe}
-                    />
-                    <PricingCard
-                        tier="settlement"
-                        isAnnual={isAnnual}
                         onBookCall={handleBookCall}
                     />
                 </div>
@@ -88,7 +83,7 @@ export default function UpgradePage() {
                         onClick={() => router.push("/schedule")}
                         className="inline-flex items-center gap-3 px-8 py-4 rounded-full border border-teal-100 bg-white text-teal-600 font-bold text-sm hover:bg-teal-50 transition-all shadow-sm group cursor-pointer"
                     >
-                        <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className="w-5 h-5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h2.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                         </svg>
                         Book a free 15-min discovery call

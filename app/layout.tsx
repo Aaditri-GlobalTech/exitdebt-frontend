@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Providers from "./providers";
+import CookieConsent from "@/components/CookieConsent";
 import "./globals.css";
 
 const inter = Inter({
@@ -29,17 +30,17 @@ export const metadata: Metadata = {
   },
 };
 
-// FAQ structured data for SEO
+// FAQ structured data for SEO — matches PRD Section 2.2 Screen 1 FAQ questions
 const faqSchema = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
   mainEntity: [
     {
       "@type": "Question",
-      name: "Is there a free trial?",
+      name: "Is this really free?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes. Every new user gets a free 3-month trial with full dashboard access. After the trial, plans start at ₹499/month (Lite). We also offer Shield protection and Settlement services.",
+        text: "Yes, our Basic dashboard and debt health assessment are 100% free forever. It includes your Debt Health Score, Debt Summary, Interest Leak Report, and Salary Day Cash Flow analysis.",
       },
     },
     {
@@ -47,7 +48,7 @@ const faqSchema = {
       name: "How do you make money?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "We offer tiered subscription plans: Lite (₹499/month), Shield (₹1,999/month) for protection services, and a one-time Settlement service (10% + GST). We may also earn referral fees from lending partners.",
+        text: "We offer premium subscription tiers (Lite and Shield) for advanced intelligence tools, continuous monitoring, and active harassment protection. For complex cases, our Shield+ service provides full debt negotiation for a performance fee.",
       },
     },
     {
@@ -55,15 +56,15 @@ const faqSchema = {
       name: "Is my PAN data safe?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Absolutely. We use bank-grade 256-bit encryption. Your PAN is used solely to fetch your credit report and is never stored on our servers.",
+        text: "Absolutely. We use bank-grade AES-256 encryption. We only use your PAN to fetch your credit report once you provide explicit consent, and we never share your raw PAN details.",
       },
     },
     {
       "@type": "Question",
-      name: "Will this affect my Equifax score?",
+      name: "Will this affect my credit score?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "No. We perform a soft pull of your credit report, which does not impact your Equifax score in any way.",
+        text: "No, we perform a soft pull on your credit record which does not impact your Equifax or other bureau credit scores in any way.",
       },
     },
   ],
@@ -84,6 +85,8 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased text-gray-900 bg-white">
         <Providers>{children}</Providers>
+        {/* LP-05: DPDP Act compliant cookie consent banner */}
+        <CookieConsent />
       </body>
     </html>
   );

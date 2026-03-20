@@ -9,10 +9,10 @@ export function validatePAN(pan: string): boolean {
 }
 
 /**
- * Validate Indian mobile number: starts with 6-9, 10 digits
+ * Validate mobile number: 10 digits
  */
 export function validatePhone(phone: string): boolean {
-    return /^[6-9]\d{9}$/.test(phone.trim());
+    return /^\d{10}$/.test(phone.trim());
 }
 
 /**

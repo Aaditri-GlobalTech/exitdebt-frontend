@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 export default function Footer() {
     return (
         <footer
@@ -38,7 +40,7 @@ export default function Footer() {
                     <div>
                         <p className="text-xs font-bold uppercase tracking-widest mb-5" style={{ color: "var(--color-text-primary)" }}>Company</p>
                         <ul className="space-y-3">
-                            <li><a href="#" className="text-sm hover:text-teal-600 transition-colors" style={{ color: "var(--color-text-secondary)" }}>About Us</a></li>
+                            <li><Link href="/about" className="text-sm hover:text-teal-600 transition-colors" style={{ color: "var(--color-text-secondary)" }}>About Us</Link></li>
                             <li><a href="#" className="text-sm hover:text-teal-600 transition-colors" style={{ color: "var(--color-text-secondary)" }}>Careers</a></li>
                             <li><a href="#" className="text-sm hover:text-teal-600 transition-colors" style={{ color: "var(--color-text-secondary)" }}>Contact Support</a></li>
                         </ul>
@@ -48,8 +50,8 @@ export default function Footer() {
                     <div>
                         <p className="text-xs font-bold uppercase tracking-widest mb-5" style={{ color: "var(--color-text-primary)" }}>Legal</p>
                         <ul className="space-y-3">
-                            <li><a href="#" className="text-sm hover:text-teal-600 transition-colors" style={{ color: "var(--color-text-secondary)" }}>Privacy Policy</a></li>
-                            <li><a href="#" className="text-sm hover:text-teal-600 transition-colors" style={{ color: "var(--color-text-secondary)" }}>Terms of Service</a></li>
+                            <li><Link href="/privacy" className="text-sm hover:text-teal-600 transition-colors" style={{ color: "var(--color-text-secondary)" }}>Privacy Policy</Link></li>
+                            <li><Link href="/terms" className="text-sm hover:text-teal-600 transition-colors" style={{ color: "var(--color-text-secondary)" }}>Terms of Service</Link></li>
                             <li><a href="#" className="text-sm hover:text-teal-600 transition-colors" style={{ color: "var(--color-text-secondary)" }}>Cookie Policy</a></li>
                         </ul>
                     </div>
@@ -74,7 +76,7 @@ export default function Footer() {
                     style={{ borderTop: "1px solid var(--color-border)" }}
                 >
                     <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-                        © {new Date().getFullYear()} ExitDebt Technologies Private Limited. All rights reserved.
+                        © {new Date().getFullYear()} Aaditri GlobalTech Private Limited. All rights reserved.
                     </p>
                 </div>
             </div>

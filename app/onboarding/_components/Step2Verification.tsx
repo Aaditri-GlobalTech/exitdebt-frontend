@@ -6,6 +6,7 @@ import OTPInput from "@/components/OTPInput";
 interface Step2Props {
   userId: string;
   token: string;
+  initialPhone?: string;
   onComplete: () => void;
 }
 
@@ -13,13 +14,15 @@ type VerifyPhase = "pan" | "mobile_otp" | "aadhar_otp" | "fetching";
 
 const OTP_COUNTDOWN_SECONDS = 60;
 
-export default function Step2Verification({ userId, token, onComplete }: Step2Props) {
+export default function Step2Verification({ userId, token, initialPhone = "", onComplete }: Step2Props) {
   const [phase, setPhase] = useState<VerifyPhase>("pan");
   const [pan, setPan] = useState("");
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState(initialPhone);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [consent, setConsent] = useState(false);
+  /* OB-04b: Optional consent for sharing insights with financial partners (DPDP) */
+  const [partnerConsent, setPartnerConsent] = useState(false);
   const [devOtp, setDevOtp] = useState("");
 
   // OTP resend countdown
@@ -55,7 +58,10 @@ export default function Step2Verification({ userId, token, onComplete }: Step2Pr
       body: JSON.stringify({ phone }),
     });
     const otpData = await otpRes.json();
-    if (!otpRes.ok) throw new Error(otpData.detail || "Failed to send OTP.");
+    if (!otpRes.ok) {
+      const msg = typeof otpData.detail === "string" ? otpData.detail : Array.isArray(otpData.detail) ? otpData.detail.map((e: { msg?: string }) => e.msg || JSON.stringify(e)).join(", ") : "Failed to send OTP.";
+      throw new Error(msg);
+    }
 
     if (otpData.dev_otp) {
       setDevOtp(otpData.dev_otp);
@@ -71,8 +77,8 @@ export default function Step2Verification({ userId, token, onComplete }: Step2Pr
       setError("Invalid PAN format. Expected: ABCDE1234F (5 letters, 4 digits, 1 letter).");
       return;
     }
-    if (!/^[6-9]\d{9}$/.test(phone)) {
-      setError("Please enter a valid 10-digit Indian mobile number.");
+    if (!/^\d{10}$/.test(phone)) {
+      setError("Please enter a valid 10-digit mobile number.");
       return;
     }
     if (!consent) {
@@ -83,13 +89,21 @@ export default function Step2Verification({ userId, token, onComplete }: Step2Pr
     setLoading(true);
     try {
       // Verify PAN
+      /* Send PAN + consent flags to backend for verification and credit bureau pull */
       const panRes = await fetch("/api/onboarding/verify-pan", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-        body: JSON.stringify({ user_id: userId, pan: pan.toUpperCase() }),
+        body: JSON.stringify({
+          user_id: userId,
+          pan: pan.toUpperCase(),
+          partner_consent: partnerConsent, /* OB-04b: optional partner sharing consent */
+        }),
       });
       const panData = await panRes.json();
-      if (!panRes.ok) throw new Error(panData.detail || "PAN verification failed.");
+      if (!panRes.ok) {
+        const msg = typeof panData.detail === "string" ? panData.detail : Array.isArray(panData.detail) ? panData.detail.map((e: { msg?: string }) => e.msg || JSON.stringify(e)).join(", ") : "PAN verification failed.";
+        throw new Error(msg);
+      }
 
       // Send Mobile OTP
       await sendMobileOtp();
@@ -126,7 +140,10 @@ export default function Step2Verification({ userId, token, onComplete }: Step2Pr
         body: JSON.stringify({ phone, otp_code: code }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || "Invalid OTP.");
+      if (!res.ok) {
+        const msg = typeof data.detail === "string" ? data.detail : Array.isArray(data.detail) ? data.detail.map((e: { msg?: string }) => e.msg || JSON.stringify(e)).join(", ") : "Invalid OTP.";
+        throw new Error(msg);
+      }
 
       // Move to Aadhar phase
       setPhase("aadhar_otp");
@@ -157,7 +174,10 @@ export default function Step2Verification({ userId, token, onComplete }: Step2Pr
         body: JSON.stringify({ user_id: userId, otp_code: code }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || "Aadhar verification failed.");
+      if (!res.ok) {
+        const msg = typeof data.detail === "string" ? data.detail : Array.isArray(data.detail) ? data.detail.map((e: { msg?: string }) => e.msg || JSON.stringify(e)).join(", ") : "Aadhar verification failed.";
+        throw new Error(msg);
+      }
 
       // Data fetching simulation
       setPhase("fetching");
@@ -219,7 +239,7 @@ export default function Step2Verification({ userId, token, onComplete }: Step2Pr
               </div>
             </div>
 
-            {/* Consent */}
+            {/* OB-04: Mandatory consent — credit bureau check */}
             <div className="flex items-start gap-3">
               <input
                 id="consent-verify"
@@ -231,7 +251,22 @@ export default function Step2Verification({ userId, token, onComplete }: Step2Pr
               <label htmlFor="consent-verify" className="text-xs text-gray-500 leading-relaxed">
                 I authorize ExitDebt to fetch my credit information for this assessment.
                 I agree to the{" "}
-                <a href="#" className="underline underline-offset-2 text-teal">Privacy Policy</a>.
+                <a href="/privacy" className="underline underline-offset-2 text-teal">Privacy Policy</a>.
+              </label>
+            </div>
+
+            {/* OB-04b: Optional consent — sharing with financial partners */}
+            <div className="flex items-start gap-3">
+              <input
+                id="consent-partner"
+                type="checkbox"
+                checked={partnerConsent}
+                onChange={(e) => setPartnerConsent(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-gray-300 accent-teal"
+              />
+              <label htmlFor="consent-partner" className="text-xs text-gray-400 leading-relaxed">
+                I consent to sharing my debt insights with ExitDebt&apos;s financial partners for
+                personalized product recommendations. <span className="italic">(Optional)</span>
               </label>
             </div>
 

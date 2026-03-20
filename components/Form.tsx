@@ -36,7 +36,7 @@ export default function DebtForm({ onResult, isLoading, setIsLoading, submitted 
         const digits = value.replace(/\D/g, "").slice(0, 10);
         setPhone(digits);
         if (digits.length === 10 && !validatePhone(digits)) {
-            setPhoneError("Invalid mobile number. Must start with 6-9.");
+            setPhoneError("Enter a valid 10-digit mobile number.");
         } else {
             setPhoneError("");
         }
@@ -51,7 +51,7 @@ export default function DebtForm({ onResult, isLoading, setIsLoading, submitted 
             valid = false;
         }
         if (!validatePhone(phone)) {
-            setPhoneError("Enter a valid 10-digit Indian mobile number.");
+            setPhoneError("Enter a valid 10-digit mobile number.");
             valid = false;
         }
         if (!consent) {

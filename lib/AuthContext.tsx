@@ -20,11 +20,13 @@ interface AuthState {
     userId: string;       // Backend UUID — persisted in cookie
     isReady: boolean;
     consent: ConsentRecord | null;
+    onboardingComplete: boolean; // True after PAN verification (Step 2+)
 }
 
 interface AuthContextType extends AuthState {
     login: (pan: string, phone: string, backendData?: Record<string, any>) => void;
     onboardUser: (userId: string, name: string, phone: string) => void;
+    completeOnboarding: () => void; // Call after Step 2 verification + Decentro fetch
     updateIncome: (salary: number, salaryDate: number, otherIncome?: number) => void;
     refreshData: () => void;
     logout: () => void;
@@ -69,8 +71,10 @@ const AuthContext = createContext<AuthContextType>({
     userId: "",
     isReady: false,
     consent: null,
+    onboardingComplete: false,
     login: () => { },
     onboardUser: () => { },
+    completeOnboarding: () => { },
     updateIncome: () => { },
     refreshData: () => { },
     logout: () => { },
@@ -85,6 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [phone, setPhone] = useState("");
     const [userId, setUserId] = useState("");   // Backend UUID — persisted
     const [consent, setConsent] = useState<ConsentRecord | null>(null);
+    const [onboardingComplete, setOnboardingComplete] = useState(false);
     const [isReady, setIsReady] = useState(false);
 
     // Hydrate from cookie on mount
@@ -132,7 +137,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     currentTimeline: "Pending",
                     optimizedTimeline: "Pending",
                     timelineSaved: "Pending",
-                    creditScore: 0
+                    creditScore: 0,
+                    role: (data.role as "user" | "admin") || "user"
                 });
             } else {
                 setUser(mockProfiles[0]); // fallback
@@ -142,6 +148,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setPhone(data.phone as string);
             if (data.consent) {
                 setConsent(data.consent as ConsentRecord);
+            }
+            if (data.onboardingComplete) {
+                setOnboardingComplete(true);
             }
         }
         setIsReady(true);
@@ -161,11 +170,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 otherIncome: user.otherIncome,
                 isEmailVerified: user.isEmailVerified,
                 consent,
+                onboardingComplete,  // Gate dashboard access
+                role: user.role,     // Persist role for admin checks
             });
         } else {
             deleteCookie();
         }
-    }, [user, pan, panHash, phone, userId, consent, isReady]);
+    }, [user, pan, panHash, phone, userId, consent, onboardingComplete, isReady]);
 
     const login = useCallback((panValue: string, phoneValue: string, backendData?: Record<string, any>) => {
         const normalizedPan = panValue.toUpperCase();
@@ -197,6 +208,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 optimizedTimeline: "Pending",
                 timelineSaved: "Pending",
                 creditScore: 0,
+                role: backendData.role || "user",
             };
         } else {
             // Fallback: mock profile selection (legacy flow)
@@ -218,6 +230,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         hashPAN(normalizedPan).then((hash) => {
             setPanHash(hash);
         });
+
+        // Mark onboarding as complete — user passed PAN + OTP verification
+        setOnboardingComplete(true);
     }, []);
 
     const onboardUser = useCallback((userId: string, name: string, phoneValue: string) => {
@@ -243,7 +258,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             currentTimeline: "Pending",
             optimizedTimeline: "Pending",
             timelineSaved: "Pending",
-            creditScore: 0
+            creditScore: 0,
+            role: "user", // Manually set role for onboarded user
         });
         setPan("ONBOARDING");
         setPanHash(userId);
@@ -254,6 +270,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             timestamp: new Date().toISOString(),
             version: CONSENT_VERSION,
         });
+    }, []);
+
+    /**
+     * Mark onboarding as complete — called after Step 2 verification
+     * AND Decentro credit bureau data fetch are both done.
+     * Dashboard access is gated on this flag.
+     */
+    const completeOnboarding = useCallback(() => {
+        setOnboardingComplete(true);
     }, []);
 
     const updateIncome = useCallback(
@@ -281,6 +306,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setPhone("");
         setUserId("");
         setConsent(null);
+        setOnboardingComplete(false);
         deleteCookie();
     }, []);
 
@@ -295,8 +321,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 userId,
                 isReady,
                 consent,
+                onboardingComplete,
                 login,
                 onboardUser,
+                completeOnboarding,
                 updateIncome,
                 refreshData,
                 logout,

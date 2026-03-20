@@ -4,6 +4,7 @@ import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { useAuth } from "@/lib/AuthContext";
 import Step1BasicDetails from "./_components/Step1BasicDetails";
 import Step2Verification from "./_components/Step2Verification";
 import Step3BookCall from "./_components/Step3BookCall";
@@ -17,43 +18,112 @@ const STEP_LABELS = [
   { num: 3, title: "Book a Call" },
 ];
 
+/* ───── JWT Decoder (base64url → JSON) ───── */
+function decodeJwtPayload(token: string): Record<string, string> | null {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return null;
+    // base64url → base64 → decode
+    const b64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const json = atob(b64);
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+}
+
 /* ───── Component ───── */
 function OnboardingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { completeOnboarding } = useAuth();
   
   const initialStep = Number(searchParams.get("step")) || 1;
   const initialUserId = searchParams.get("userId") || "";
 
   const [currentStep, setCurrentStep] = useState<OnboardingStep>(initialStep as OnboardingStep);
   const [userId, setUserId] = useState<string>(initialUserId);
+  const [mobile, setMobile] = useState<string>("");
   const [accessToken, setAccessToken] = useState<string>("");
+  const [hydrated, setHydrated] = useState(false);
 
+  // Hydrate credentials from sessionStorage on mount (runs once)
   useEffect(() => {
+    const savedToken = sessionStorage.getItem("onboarding_token");
+    const savedMobile = sessionStorage.getItem("onboarding_mobile");
+    const savedUserId = sessionStorage.getItem("onboarding_userId");
+
+    if (savedToken) {
+      setAccessToken(savedToken);
+
+      // Extract userId from JWT as canonical source of truth
+      const payload = decodeJwtPayload(savedToken);
+      if (payload?.sub) {
+        setUserId(payload.sub);
+        // Keep URL in sync
+        const params = new URLSearchParams(searchParams.toString());
+        if (params.get("userId") !== payload.sub) {
+          params.set("userId", payload.sub);
+          router.replace(`/onboarding?${params.toString()}`);
+        }
+      }
+    }
+    if (savedMobile) setMobile(savedMobile);
+    if (savedUserId && !savedToken) setUserId(savedUserId);
+
+    setHydrated(true);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Sync step from URL params (after hydration)
+  useEffect(() => {
+    if (!hydrated) return;
     const stepParam = searchParams.get("step");
     if (stepParam) {
       setCurrentStep(Number(stepParam) as OnboardingStep);
     }
-    const userIdParam = searchParams.get("userId");
-    if (userIdParam) {
-      setUserId(userIdParam);
-    }
-  }, [searchParams]);
+  }, [searchParams, hydrated]);
 
-  const handleStep1Complete = (newUserId: string, token: string) => {
+  const handleStep1Complete = (newUserId: string, token: string, newMobile: string) => {
+    // 1. Update state FIRST — accessToken must be set before Step2 renders
     setUserId(newUserId);
+    setMobile(newMobile);
     setAccessToken(token);
     setCurrentStep(2);
+
+    // 2. Persist to sessionStorage for page-refresh resilience
+    sessionStorage.setItem("onboarding_token", token);
+    sessionStorage.setItem("onboarding_mobile", newMobile);
+    sessionStorage.setItem("onboarding_userId", newUserId);
+    
+    // 3. Update URL on next tick to avoid race condition —
+    //    router.replace can cause re-render before state propagates
+    setTimeout(() => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("step", "2");
+      params.set("userId", newUserId);
+      router.replace(`/onboarding?${params.toString()}`);
+    }, 0);
   };
 
   const handleStep2Complete = () => {
+    /**
+     * At this point, Step 2 verification is fully done:
+     *  - PAN verified ✓
+     *  - Mobile OTP verified ✓
+     *  - Aadhar OTP verified ✓
+     *  - Decentro credit bureau data fetched ✓
+     *
+     * Mark onboarding as complete so the dashboard becomes accessible.
+     */
+    completeOnboarding();
     setCurrentStep(3);
   };
 
   const handleStep3Complete = () => {
     setCurrentStep("complete");
     // Redirect to dashboard after a brief success message
-    setTimeout(() => router.push("/dashboard"), 3000);
+    /* After onboarding, redirect to the Welcome screen (PRD Screen 4) */
+    setTimeout(() => router.push("/welcome"), 3000);
   };
 
   return (
@@ -127,10 +197,18 @@ function OnboardingContent() {
             {currentStep === 1 && (
               <Step1BasicDetails onComplete={handleStep1Complete} />
             )}
-            {currentStep === 2 && (
-              <Step2Verification userId={userId} token={accessToken} onComplete={handleStep2Complete} />
+            {currentStep === 2 && !hydrated ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full"></div>
+              </div>
+            ) : currentStep === 2 && (
+              <Step2Verification userId={userId} token={accessToken} initialPhone={mobile} onComplete={handleStep2Complete} />
             )}
-            {currentStep === 3 && (
+            {currentStep === 3 && !hydrated ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full"></div>
+              </div>
+            ) : currentStep === 3 && (
               <Step3BookCall userId={userId} token={accessToken} onComplete={handleStep3Complete} />
             )}
             {currentStep === "complete" && (

@@ -12,7 +12,7 @@ const STATUS_CONFIG: Record<string, { bg: string; text: string; alert: string }>
     Critical: { bg: "#FEF2F2", text: "#DC2626", alert: "Red Alert: High interest leakage detected." },
     "Needs Attention": { bg: "#FFF7ED", text: "#EA580C", alert: "Your debt-to-income ratio is in the critical zone. Let's look at ways to optimize." },
     Fair: { bg: "#FEFCE8", text: "#CA8A04", alert: "You're managing, but significant interest savings are possible." },
-    Good: { bg: "#F0FDFA", text: "#14B8A6", alert: "Your debt health is stable. Keep optimizing or settle for total freedom." },
+    Good: { bg: "var(--color-teal-light)", text: "var(--color-teal)", alert: "Your debt health is stable. Keep optimizing or settle for total freedom." },
 };
 
 export default function DashboardScoreGauge({ score, label, color }: DashboardScoreGaugeProps) {

@@ -1,7 +1,7 @@
 "use client";
 
 interface PricingCardProps {
-    tier: "lite" | "shield" | "shield_plus" | "settlement";
+    tier: "lite" | "shield" | "shield_plus";
     isAnnual: boolean;
     onSubscribe?: (tier: "lite" | "shield" | "shield_plus", period: "monthly" | "annual") => void;
     onBookCall?: () => void;
@@ -17,11 +17,13 @@ const TIER_CONTENT: Record<string, {
     buttonText: string;
     buttonStyle: string;
     annualPrice?: string;
+    savePercent?: string;
 }> = {
     lite: {
         name: "LITE",
         price: "499",
-        annualPrice: "4,799",
+        annualPrice: "4,999",
+        savePercent: "17%",
         tagline: "Essential tools for independent debt management and tracking.",
         features: [
             "Debt health dashboard",
@@ -37,6 +39,7 @@ const TIER_CONTENT: Record<string, {
         name: "SHIELD",
         price: "1,999",
         annualPrice: "14,999",
+        savePercent: "37%",
         tagline: "Active protection against harassment and direct bank coordination.",
         features: [
             "Everything in Lite",
@@ -50,22 +53,6 @@ const TIER_CONTENT: Record<string, {
     },
     shield_plus: {
         name: "SHIELD+",
-        price: "3,499",
-        annualPrice: "29,999",
-        tagline: "Premium protection with dedicated case manager and legal team.",
-        features: [
-            "Everything in Shield",
-            "Dedicated case manager",
-            "Full legal representation",
-            "Court hearing support",
-            "Monthly bureau refresh",
-            "Direct creditor negotiation",
-        ],
-        buttonText: "Get Shield+",
-        buttonStyle: "bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:from-teal-600 hover:to-emerald-600",
-    },
-    settlement: {
-        name: "SETTLEMENT",
         price: "10%",
         priceSuffix: "+ GST",
         tagline: "End-to-end legal and negotiation support for closing your debts.",
@@ -85,7 +72,7 @@ export default function PricingCard({ tier, isAnnual, onSubscribe, onBookCall, i
     const content = TIER_CONTENT[tier];
     if (!content) return null;
     
-    const isSettlement = tier === "settlement";
+    const isShieldPlus = tier === "shield_plus";
 
     return (
         <div 
@@ -105,25 +92,25 @@ export default function PricingCard({ tier, isAnnual, onSubscribe, onBookCall, i
                 <span className="text-[11px] font-bold tracking-widest text-gray-400 uppercase">{content.name}</span>
                 <div className="flex items-baseline gap-1 mt-4 mb-2">
                     <span className="text-4xl font-extrabold text-[#0F172A]">
-                        {isSettlement ? "" : "₹"}{content.price}
+                        {isShieldPlus ? "" : "₹"}{content.price}
                     </span>
-                    {!isSettlement ? (
+                    {!isShieldPlus ? (
                         <span className="text-gray-400 font-medium">/mo</span>
                     ) : (
                         <span className="text-gray-400 font-medium ml-1">{content.priceSuffix}</span>
                     )}
                 </div>
-                {!isSettlement && content.annualPrice && (
-                    <p className="text-[11px] font-bold text-teal-600 mb-4">
+                {!isShieldPlus && content.annualPrice && (
+                    <p className="text-[11px] font-bold text-teal-600 mb-4 h-4">
                         {isAnnual 
-                            ? `₹${content.annualPrice} billed annually — save up to 20%`
+                            ? `₹${content.annualPrice} billed annually — save ~${content.savePercent}`
                             : `or ₹${content.annualPrice}/year and save`
                         }
                     </p>
                 )}
-                {isSettlement && (
-                    <p className="text-[11px] font-bold text-teal-600 mb-4">
-                        calculated on settled amount
+                {isShieldPlus && (
+                    <p className="text-[11px] font-bold text-teal-600 mb-4 h-4">
+                        on settled amount (Min debt: ₹1L)
                     </p>
                 )}
                 <p className="text-sm text-gray-400 font-medium leading-relaxed">
@@ -145,7 +132,7 @@ export default function PricingCard({ tier, isAnnual, onSubscribe, onBookCall, i
             </ul>
 
             <button 
-                onClick={() => isSettlement ? onBookCall?.() : onSubscribe?.(tier as "lite" | "shield" | "shield_plus", isAnnual ? "annual" : "monthly")}
+                onClick={() => isShieldPlus ? onBookCall?.() : onSubscribe?.(tier as "lite" | "shield", isAnnual ? "annual" : "monthly")}
                 className={`w-full py-4 rounded-xl text-sm font-bold transition-all cursor-pointer ${content.buttonStyle}`}
             >
                 {content.buttonText}
