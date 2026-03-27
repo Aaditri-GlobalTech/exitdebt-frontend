@@ -24,6 +24,7 @@ export default function Step2Verification({ userId, token, initialPhone = "", on
   /* OB-04b: Optional consent for sharing insights with financial partners (DPDP) */
   const [partnerConsent, setPartnerConsent] = useState(false);
   const [devOtp, setDevOtp] = useState("");
+  const [aadharRequestId, setAadharRequestId] = useState("");
 
   // OTP resend countdown
   const [countdown, setCountdown] = useState(0);
@@ -152,9 +153,12 @@ export default function Step2Verification({ userId, token, initialPhone = "", on
       const aadharRes = await fetch("/api/onboarding/aadhar/init", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-        body: JSON.stringify({ user_id: userId, aadhar_number: "XXXX" }),
+        body: JSON.stringify({ user_id: userId, aadhar_number: "999999999999" }),
       });
-      await aadharRes.json();
+      const aadharData = await aadharRes.json();
+      if (aadharData.request_id) {
+        setAadharRequestId(aadharData.request_id);
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "OTP verification failed.");
     } finally {
@@ -171,7 +175,7 @@ export default function Step2Verification({ userId, token, initialPhone = "", on
       const res = await fetch("/api/onboarding/aadhar/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-        body: JSON.stringify({ user_id: userId, otp_code: code }),
+        body: JSON.stringify({ user_id: userId, request_id: aadharRequestId, otp_code: code }),
       });
       const data = await res.json();
       if (!res.ok) {
