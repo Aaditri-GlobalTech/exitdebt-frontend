@@ -104,7 +104,7 @@ Landing Page → PAN + Phone → OTP Verify → Income Details → Debt Intellig
 - **3-Step OTP Flow** — Details → OTP verification → Processing animation → Income
 - **Testimonials** — Priya (₹62K saved), Rahul (38→14% rate), Sneha (debt-free in 18mo)
 - **FAQ Preview** — Accordion with top questions linking to `/faq`
-- **Trust Signals** — "No Equifax impact", "256-bit encrypted", "Free forever"
+- **Trust Signals** — "NO CREDIT IMPACT", "256-bit encrypted", "Free forever"
 - **Rich Media & Animations** — Engaging `.gif` and `.lottie` animations throughout the onboarding flow
 - **DPDP Cookie Consent** — Built-in cookie consent manager for compliance
 - **Resilient UI** — React Error Boundaries and Skeleton Loaders for graceful state handling
