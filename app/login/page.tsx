@@ -141,7 +141,7 @@ export default function LoginPage() {
             }
 
             // Step 3: Set auth context with real backend data
-            login(pan, phone, loginData.name, loginData.user_id);
+            login(pan, phone, loginData);
             router.push("/dashboard");
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : "Verification failed.");
