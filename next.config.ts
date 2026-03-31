@@ -11,6 +11,14 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  // Soft-launch temporary redirects — bypass old KYC/OTP flows
+  async redirects() {
+    return [
+      { source: '/onboarding', destination: '/get-started', permanent: false },
+      { source: '/login', destination: '/get-started', permanent: false },
+      { source: '/dashboard', destination: '/get-started', permanent: false },
+    ];
+  },
   async headers() {
     return [
       {

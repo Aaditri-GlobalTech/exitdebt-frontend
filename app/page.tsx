@@ -1,22 +1,20 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import PrimaryButton from "@/components/PrimaryButton";
-import FAQAccordion from "@/components/FAQAccordion";
 import PricingToggle from "@/components/PricingToggle";
 import PricingCard from "@/components/PricingCard";
+import FAQAccordion from "@/components/FAQAccordion";
 
 /* ───── Data ───── */
 
 const STEPS = [
-  { num: "1", title: "Enter PAN Details", desc: "No long forms. Just provide your PAN and we'll securely verify your identity in seconds.", icon: "/PAN3.svg" },
-  { num: "2", title: "See Your Score", desc: "We pull your real-time data to uncover hidden interest traps and calculate your true debt health.", icon: "/credit assessment.svg" },
-  { num: "3", title: "Get a Plan", desc: "Unlock a custom roadmap designed to consolidate high-interest debt and accelerate your freedom.", icon: "/plan.svg" },
+  { num: "1", title: "Tell Us About Your Debt", desc: "Quick and confidential — just your name, phone, and total debt amount. No credit score checks.", icon: "/PAN3.svg" },
+  { num: "2", title: "Book a Free Call", desc: "Choose a time that works for you. Our expert debt advisor will call to discuss your options.", icon: "/credit assessment.svg" },
+  { num: "3", title: "Get a Plan", desc: "Receive a personalized debt reduction strategy — consolidation, negotiation, or restructuring.", icon: "/plan.svg" },
 ];
 
 const TRUST_POINTS = [
@@ -33,17 +31,7 @@ const LANDING_FAQS = [
   { question: "Will this affect my credit score?", answer: "No, we perform a \"soft pull\" on your credit record which does not impact your Equifax or other bureau credit scores in any way." },
 ];
 
-/* ───── Indian States ───── */
-const INDIAN_STATES = [
-  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
-  "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka",
-  "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya",
-  "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim",
-  "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand",
-  "West Bengal", "Andaman and Nicobar Islands", "Chandigarh",
-  "Dadra and Nagar Haveli and Daman and Diu", "Delhi", "Jammu and Kashmir",
-  "Ladakh", "Lakshadweep", "Puducherry",
-];
+
 
 /* ───── Component ───── */
 
@@ -90,20 +78,9 @@ const TypingText = ({ text, className }: { text: string; className?: string }) =
 
 export default function LandingPage() {
 
-  const { isLoggedIn, phone, user, isReady, onboardUser } = useAuth();
-  const router = useRouter();
   const [isAnnual, setIsAnnual] = useState(true);
+  const { isLoggedIn, user } = useAuth();
   const formCardRef = useRef<HTMLDivElement>(null);
-
-  // Step 1 form state
-  const [fullName, setFullName] = useState("");
-  const [mobile, setMobile] = useState("");
-  const [email, setEmail] = useState("");
-  const [city, setCity] = useState("");
-  const [userState, setUserState] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [showForm, setShowForm] = useState(false);
 
   // Glow effect
   useEffect(() => {
@@ -119,41 +96,6 @@ export default function LandingPage() {
     document.addEventListener("click", handleClick);
     return () => document.removeEventListener("click", handleClick);
   }, []);
-
-  // Step 1 submit
-  const handleStep1Submit = async () => {
-    setError("");
-    if (!fullName.trim()) { setError("Full name is required."); return; }
-    if (!/^\d{10}$/.test(mobile)) { setError("Enter a valid 10-digit mobile number."); return; }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError("Enter a valid email address."); return; }
-    if (!city.trim()) { setError("City is required."); return; }
-    if (!userState) { setError("Please select your state."); return; }
-
-    setLoading(true);
-    try {
-      const res = await fetch("/api/onboarding/step-1", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ full_name: fullName, mobile, email, city, state: userState }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        const msg = typeof data.detail === "string" ? data.detail : Array.isArray(data.detail) ? data.detail.map((e: { msg?: string }) => e.msg || JSON.stringify(e)).join(", ") : "Something went wrong.";
-        throw new Error(msg);
-      }
-
-      // Set user session in context
-      onboardUser(data.user_id, fullName, mobile);
-
-      router.push(`/onboarding?step=2&userId=${data.user_id}`);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to connect.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const authPhone = phone || "";
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "var(--color-bg)" }}>
@@ -199,180 +141,43 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Right — Form Card */}
+            {/* Right — CTA Card */}
             <div className="lg:col-span-5 animate-slideUp stagger-1">
-              {isReady && isLoggedIn && user ? (
-                <div
-                  className="rounded-xl p-8 lg:p-10 border border-gray-100 shadow-2xl transition-all"
-                  style={{ backgroundColor: "var(--color-bg-card)", boxShadow: "0 20px 50px rgba(0,0,0,0.06)" }}
-                >
-                  <div className="text-center space-y-6 py-8">
-                    <div className="w-20 h-20 rounded-full mx-auto flex items-center justify-center text-3xl font-bold text-white shadow-lg" style={{ backgroundColor: "var(--color-teal)" }}>
-                      {user.name.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold mb-1">Welcome back, {user.name.split(' ')[0]}!</h3>
-                      <p className="text-sm text-gray-500">You are logged in.</p>
-                    </div>
-                    {user.scoreLabel === "Pending Analysis" ? (
-                      <Link
-                        href={`/onboarding?step=2&userId=${user.panHash}`}
-                        className="w-full py-4 rounded-lg flex items-center justify-center gap-2 text-sm font-bold text-white transition-all hover:shadow-lg active:scale-95 bg-[var(--color-teal)]"
-                      >
-                        Continue Onboarding →
-                      </Link>
-                    ) : (
-                      <Link
-                        href="/dashboard"
-                        className="w-full py-4 rounded-lg flex items-center justify-center gap-2 text-sm font-bold text-white transition-all hover:shadow-lg active:scale-95 bg-[var(--color-teal)]"
-                      >
-                        Go to Dashboard →
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              ) : !isLoggedIn && !showForm ? (
-                <div className="flex flex-col items-center text-center animate-fadeIn py-4">
-                   <img 
-                     src="/question2.svg" 
-                     alt="Get Started" 
-                     className="w-72 h-72 sm:w-80 sm:h-80 lg:w-full lg:h-[400px] mb-12 object-contain drop-shadow-sm transition-transform duration-700 pointer-events-none select-none" 
-                   />
-                   <div className="space-y-8 w-full max-w-sm">
-                     <div className="space-y-3">
-                       <h2 className="text-3xl font-black tracking-tight" style={{ color: "var(--color-text-primary)" }}>Ready to see your savings?</h2>
-                       <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
-                         Our AI-powered assessment identifies hidden interest costs and creates a clear path to financial freedom.
-                       </p>
-                     </div>
-                     <button
-                       onClick={() => setShowForm(true)}
-                       className="w-full py-5 rounded-2xl flex items-center justify-center gap-4 text-lg font-black text-white transition-all hover:shadow-2xl hover:shadow-teal-100/50 active:scale-[0.98] bg-[var(--color-teal)] tracking-tight group"
-                     >
-                       Start Your Analysis
-                       <span className="text-2xl group-hover:translate-x-2 transition-transform duration-300 leading-none pb-0.5">›</span>
-                     </button>
-                   </div>
-                </div>
-              ) : (
-                <div
-                  ref={formCardRef}
-                  className="rounded-xl p-8 lg:p-10 border border-gray-100 shadow-2xl transition-all animate-fadeIn"
-                  style={{ backgroundColor: "var(--color-bg-card)", boxShadow: "0 20px 50px rgba(0,0,0,0.06)" }}
-                >
-                  <div className="flex items-center justify-between mb-8">
-                    <h2 className="text-xl font-black text-left" style={{ color: "var(--color-text-primary)" }}>
-                      Start Your Debt Analysis
+              <div className="flex flex-col items-center text-center py-4">
+                <img 
+                  src="/question2.svg" 
+                  alt="Get Started" 
+                  className="w-72 h-72 sm:w-80 sm:h-80 lg:w-full lg:h-[400px] mb-12 object-contain drop-shadow-sm transition-transform duration-700 pointer-events-none select-none" 
+                />
+                <div className="space-y-8 w-full max-w-sm">
+                  <div className="space-y-3">
+                    <h2 className="text-3xl font-black tracking-tight" style={{ color: "var(--color-text-primary)" }}>
+                      {isLoggedIn ? `Welcome back, ${user?.name?.split(' ')[0] || 'User'}!` : 'Ready to get debt-free?'}
                     </h2>
-                    <button 
-                       onClick={() => setShowForm(false)}
-                       className="text-[10px] font-bold text-[var(--color-teal)] uppercase tracking-widest hover:underline"
-                    >
-                       ← Back
-                    </button>
-                  </div>
-
-                  <div className="space-y-5">
-                    {/* Full Name */}
-                    <div className="space-y-2 text-left">
-                      <label className="block text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>Full Name</label>
-                      <input
-                        type="text"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        placeholder="Saurabh Kumar"
-                        className="w-full px-4 py-3.5 rounded-lg text-sm transition-all focus:outline-none focus:ring-1 focus:ring-teal-500 border border-transparent font-medium"
-                        style={{ backgroundColor: "var(--color-teal-light)", color: "var(--color-text-primary)" }}
-                      />
-                    </div>
-
-                    {/* Mobile Number */}
-                    <div className="space-y-2 text-left">
-                      <label className="block text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>Mobile Number</label>
-                      <div className="flex gap-2">
-                        <div
-                          className="px-4 py-3.5 rounded-lg text-sm font-medium flex items-center shrink-0"
-                          style={{ backgroundColor: "var(--color-teal-light)", color: "var(--color-text-secondary)" }}
-                        >
-                          +91
-                        </div>
-                        <input
-                          type="tel"
-                          value={mobile}
-                          onChange={(e) => setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                          placeholder="9876543210"
-                          maxLength={10}
-                          className="w-full px-4 py-3.5 rounded-lg text-sm transition-all focus:outline-none focus:ring-1 focus:ring-teal-500 border border-transparent font-medium"
-                          style={{ backgroundColor: "var(--color-teal-light)", color: "var(--color-text-primary)" }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Email */}
-                    <div className="space-y-2 text-left">
-                      <label className="block text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>Email Address</label>
-                      <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="you@example.com"
-                        className="w-full px-4 py-3.5 rounded-lg text-sm transition-all focus:outline-none focus:ring-1 focus:ring-teal-500 border border-transparent font-medium"
-                        style={{ backgroundColor: "var(--color-teal-light)", color: "var(--color-text-primary)" }}
-                      />
-                    </div>
-
-                    {/* City + State row */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-2 text-left">
-                        <label className="block text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>City</label>
-                        <input
-                          type="text"
-                          value={city}
-                          onChange={(e) => setCity(e.target.value)}
-                          placeholder="Mumbai"
-                          className="w-full px-4 py-3.5 rounded-lg text-sm transition-all focus:outline-none focus:ring-1 focus:ring-teal-500 border border-transparent font-medium"
-                          style={{ backgroundColor: "var(--color-teal-light)", color: "var(--color-text-primary)" }}
-                        />
-                      </div>
-                      <div className="space-y-2 text-left">
-                        <label className="block text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>State</label>
-                        <select
-                          value={userState}
-                          onChange={(e) => setUserState(e.target.value)}
-                          className="w-full px-4 py-3.5 rounded-lg text-sm transition-all focus:outline-none focus:ring-1 focus:ring-teal-500 border border-transparent font-medium appearance-none cursor-pointer"
-                          style={{ backgroundColor: "var(--color-teal-light)", color: userState ? "var(--color-text-primary)" : "var(--color-text-muted)" }}
-                        >
-                          <option value="">Select...</option>
-                          {INDIAN_STATES.map((s) => (
-                            <option key={s} value={s}>{s}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-
-                    {error && (
-                      <p className="text-xs text-center font-medium animate-fadeIn" style={{ color: "var(--color-danger)" }}>{error}</p>
-                    )}
-
-                    <button
-                      onClick={handleStep1Submit}
-                      disabled={loading}
-                      className="w-full py-4 rounded-lg flex items-center justify-center gap-3 text-sm font-bold text-white transition-all hover:shadow-lg active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                      style={{ backgroundColor: "var(--color-teal)" }}
-                    >
-                      {loading ? (
-                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      ) : (
-                        <>Analyze My Debt <span className="text-lg leading-none">›</span></>
-                      )}
-                    </button>
-
-                    <p className="text-[9px] text-center px-4 leading-relaxed" style={{ color: "var(--color-text-muted)" }}>
-                      By proceeding, you agree to our <a href="#" className="underline">Terms of Service</a> and <a href="#" className="underline">Privacy Policy</a>.
+                    <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+                      {isLoggedIn
+                        ? 'Your debt-free journey has started. View your profile to track your progress.'
+                        : 'Talk to our expert debt advisors for free. No credit score checks, no complicated forms — just a simple conversation about your options.'}
                     </p>
                   </div>
+                  <Link
+                    href={isLoggedIn ? "/profile" : "/get-started"}
+                    className="w-full py-5 rounded-2xl flex items-center justify-center gap-4 text-lg font-black text-white transition-all hover:shadow-2xl hover:shadow-teal-100/50 active:scale-[0.98] bg-[var(--color-teal)] tracking-tight group"
+                  >
+                    {isLoggedIn ? 'View Your Profile' : "Get Started — It\u0027s Free"}
+                    <span className="text-2xl group-hover:translate-x-2 transition-transform duration-300 leading-none pb-0.5">›</span>
+                  </Link>
+                  {!isLoggedIn && (
+                  <Link
+                    href="/get-started"
+                    className="w-full py-3 rounded-xl flex items-center justify-center text-sm font-semibold transition-all hover:opacity-80 cursor-pointer"
+                    style={{ color: "var(--color-teal)" }}
+                  >
+                    Already a member? Continue here →
+                  </Link>
+                  )}
                 </div>
-              )}
+              </div>
             </div>
           </div>
         </div>
@@ -536,18 +341,18 @@ export default function LandingPage() {
           <PricingCard
             tier="lite"
             isAnnual={isAnnual}
-            onSubscribe={() => router.push(`/checkout?tier=lite&period=${isAnnual ? "annual" : "monthly"}`)}
+            onSubscribe={() => { window.location.href = "/get-started"; }}
           />
           <PricingCard
             tier="shield"
             isAnnual={isAnnual}
-            onSubscribe={() => router.push(`/checkout?tier=shield&period=${isAnnual ? "annual" : "monthly"}`)}
+            onSubscribe={() => { window.location.href = "/get-started"; }}
             isRecommended
           />
           <PricingCard
             tier="shield_plus"
             isAnnual={isAnnual}
-            onBookCall={() => router.push("/schedule")}
+            onBookCall={() => { window.location.href = "/get-started"; }}
           />
         </div>
       </section>

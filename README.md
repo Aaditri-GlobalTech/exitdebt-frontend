@@ -1,5 +1,7 @@
 # ExitDebt
 
+> **Note**: For a detailed technical breakdown of the frontend SSR architecture, CRM Call Logging timeline structures, and AWS EC2 deployment workflows, please read the newly added [Architecture & Deployment Guide](./DEPLOYMENT.md).
+
 **See your debt clearly. Solve it smartly.**
 
 ExitDebt is a full-spectrum debt platform for salaried Indians. Users enter their PAN and phone number, get an instant Equifax-powered debt health score with unique intelligence tools, and get 3 months of free access — all in 30 seconds.
@@ -159,6 +161,10 @@ Landing Page → PAN + Phone → OTP Verify → Income Details → Debt Intellig
 - **Ops Dashboard** (`/admin`): Hot leads, pipeline funnel, overdue follow-ups, wins
 - **Lead List** (`/admin/leads`): Filterable by stage, priority, search
 - **Lead Detail** (`/admin/leads/[id]`): Score, debt metrics, notes, timeline, stage management
+  - **Call Logging**: Built-in "Start Call" timer that tracks call duration and outcome tags.
+  - **Device Auto-Tracking**: Automatic `deviceId` generation to maintain identity across IP changes for transparent note attribution.
+  - **JSON Profile Export**: One-click download of all lead details, full timeline events, and call logs explicitly formatting records locally.
+- **Admin Activity Logs** (`/admin` Logs tab): Structured timeline measuring every `login_log` and `logout_log`, tracing the admin operator IP locally.
 - **Technical Documentation** (`/admin/docs`): Internal architecture and API reference
 
 ### Cookie Consent Banner — *NEW*
