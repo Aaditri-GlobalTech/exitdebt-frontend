@@ -98,7 +98,7 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "var(--color-bg)" }}>
+    <main className="min-h-screen w-full overflow-x-hidden relative" style={{ backgroundColor: "var(--color-bg)" }}>
       <Navbar />
 
       {/* ───── HERO ───── */}
@@ -387,6 +387,6 @@ export default function LandingPage() {
       </section>
 
       <Footer />
-    </div>
+    </main>
   );
 }
