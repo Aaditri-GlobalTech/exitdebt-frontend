@@ -18,6 +18,7 @@ interface Lead {
   assigned_to: string | null;
   source: string | null;
   tags: string | null;
+  follow_up_at: string | null;
   created_at: string;
   updated_at: string | null;
 }
@@ -728,20 +729,27 @@ export default function AdminCRMPage() {
                       <span className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
                         {lead.name}
                       </span>
-                      <span
-                        className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase"
-                        style={{ backgroundColor: prioColor.bg, color: prioColor.text }}
-                      >
-                        {lead.priority}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        {lead.assigned_to && (
+                            <span className="text-[10px] font-semibold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-100">
+                                {lead.assigned_to}
+                            </span>
+                        )}
+                        <span
+                            className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase"
+                            style={{ backgroundColor: prioColor.bg, color: prioColor.text }}
+                        >
+                            {lead.priority}
+                        </span>
+                      </div>
                     </div>
 
                     <div className="flex items-center gap-3 text-xs" style={{ color: "var(--color-text-muted)" }}>
                       <span>{lead.phone}</span>
-                      <span>{lead.city ?? "—"}{lead.user_state ? `, ${lead.user_state}` : ""}</span>
+                      <span>{[lead.city, lead.user_state].filter(s => s && s.trim().length > 0).join(", ") || "—"}</span>
                     </div>
 
-                    <div className="flex items-center gap-3 mt-1.5">
+                    <div className="flex items-center gap-3 mt-2">
                       <span
                         className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
                         style={{ backgroundColor: stageColor.bg, color: stageColor.text }}
@@ -751,8 +759,11 @@ export default function AdminCRMPage() {
                       <span className="text-[10px] font-medium" style={{ color: "var(--color-teal)" }}>
                         {extractDebt(lead.tags)}
                       </span>
-                      <time className="text-[10px] ml-auto" style={{ color: "var(--color-text-muted)" }} dateTime={lead.created_at}>
-                        {formatDate(lead.created_at)}
+                      <time className="text-[10px] ml-auto flex flex-col items-end gap-1" style={{ color: "var(--color-text-muted)" }}>
+                        {lead.follow_up_at && (
+                          <span className="text-teal-600 font-semibold">Sch: {formatDate(lead.follow_up_at)}</span>
+                        )}
+                        <span>{formatDate(lead.created_at)}</span>
                       </time>
                     </div>
                   </button>
@@ -787,8 +798,13 @@ export default function AdminCRMPage() {
                       {selectedLead.name}
                     </h2>
                     <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
-                      {selectedLead.phone} · {selectedLead.city ?? "—"}, {selectedLead.user_state ?? "—"}
+                      {selectedLead.phone} · {[selectedLead.city, selectedLead.user_state].filter(s => s && s.trim().length > 0).join(", ") || "Unknown Location"}
                     </p>
+                    {selectedLead.assigned_to && (
+                        <p className="text-xs font-semibold text-teal-700 bg-teal-50 px-2 py-1 rounded-md border border-teal-100 inline-block mt-2">
+                            Assigned to: {selectedLead.assigned_to}
+                        </p>
+                    )}
                   </div>
                   <div className="flex items-center gap-3">
                     <p className="text-lg font-bold" style={{ color: "var(--color-teal)" }}>

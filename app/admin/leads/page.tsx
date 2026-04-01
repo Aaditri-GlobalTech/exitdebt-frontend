@@ -17,11 +17,14 @@ interface Lead {
     name: string;
     phone: string;
     email: string;
+    city: string | null;
+    user_state: string | null;
     score: number;
     stage: string;
     priority: string;
     source: string;
     assigned_to: string;
+    follow_up_at: string | null;
     created_at: string;
 }
 
@@ -55,11 +58,11 @@ export default function AdminLeadsPage() {
                 setError(err instanceof Error ? err.message : "Failed to load.");
                 /* Mock data for development */
                 setLeads([
-                    { id: "1", name: "Saurabh Kapoor", phone: "9876543210", email: "saurabh@example.com", score: 38, stage: "New", priority: "Hot", source: "Organic", assigned_to: "Kumar", created_at: "2026-03-19" },
-                    { id: "2", name: "Priya Sharma", phone: "9876543211", email: "priya@example.com", score: 52, stage: "Contacted", priority: "Warm", source: "Reddit", assigned_to: "Vikram", created_at: "2026-03-18" },
-                    { id: "3", name: "Anil Mehta", phone: "9876543212", email: "anil@example.com", score: 24, stage: "Qualified", priority: "Hot", source: "X", assigned_to: "Kumar", created_at: "2026-03-17" },
-                    { id: "4", name: "Kavitha Reddy", phone: "9876543213", email: "kavitha@example.com", score: 67, stage: "Consultation Done", priority: "Cold", source: "Organic", assigned_to: "Vikram", created_at: "2026-03-16" },
-                    { id: "5", name: "Rajesh Kumar", phone: "9876543214", email: "rajesh@example.com", score: 41, stage: "Subscribed", priority: "Warm", source: "Organic", assigned_to: "Kumar", created_at: "2026-03-15" },
+                    { id: "1", name: "Saurabh Kapoor", phone: "9876543210", email: "saurabh@example.com", city: "Mumbai", user_state: "Maharashtra", score: 38, stage: "New", priority: "Hot", source: "Organic", assigned_to: "Kumar", follow_up_at: "2026-03-24T10:00:00Z", created_at: "2026-03-19" },
+                    { id: "2", name: "Priya Sharma", phone: "9876543211", email: "priya@example.com", city: "Delhi", user_state: "Delhi", score: 52, stage: "Contacted", priority: "Warm", source: "Reddit", assigned_to: "Vikram", follow_up_at: "2026-03-22T14:30:00Z", created_at: "2026-03-18" },
+                    { id: "3", name: "Anil Mehta", phone: "9876543212", email: "anil@example.com", city: "Pune", user_state: "Maharashtra", score: 24, stage: "Qualified", priority: "Hot", source: "X", assigned_to: "Kumar", follow_up_at: null, created_at: "2026-03-17" },
+                    { id: "4", name: "Kavitha Reddy", phone: "9876543213", email: "kavitha@example.com", city: "Hyderabad", user_state: "Telangana", score: 67, stage: "Consultation Done", priority: "Cold", source: "Organic", assigned_to: "Vikram", follow_up_at: null, created_at: "2026-03-16" },
+                    { id: "5", name: "Rajesh Kumar", phone: "9876543214", email: "rajesh@example.com", city: "Bengaluru", user_state: "Karnataka", score: 41, stage: "Subscribed", priority: "Warm", source: "Organic", assigned_to: "Kumar", follow_up_at: null, created_at: "2026-03-15" },
                 ]);
             } finally {
                 setLoading(false);
@@ -114,6 +117,8 @@ export default function AdminLeadsPage() {
                     className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-200 w-64"
                 />
                 <select
+                    title="Filter by Stage"
+                    aria-label="Filter by Stage"
                     value={stageFilter}
                     onChange={(e) => setStageFilter(e.target.value)}
                     className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-200"
@@ -121,6 +126,8 @@ export default function AdminLeadsPage() {
                     {STAGES.map((s) => <option key={s} value={s}>{s === "All" ? "All Stages" : s}</option>)}
                 </select>
                 <select
+                    title="Filter by Priority"
+                    aria-label="Filter by Priority"
                     value={priorityFilter}
                     onChange={(e) => setPriorityFilter(e.target.value)}
                     className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-200"
@@ -135,11 +142,13 @@ export default function AdminLeadsPage() {
                     <thead>
                         <tr className="border-b border-gray-100 bg-gray-50/50">
                             <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">Name</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">Location</th>
                             <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">Score</th>
                             <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">Stage</th>
                             <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">Priority</th>
                             <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">Assigned</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">Date</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">Scheduled</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">Created</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -150,6 +159,9 @@ export default function AdminLeadsPage() {
                                         {lead.name}
                                     </Link>
                                     <p className="text-xs text-gray-400">{lead.phone}</p>
+                                </td>
+                                <td className="px-6 py-4 text-sm text-gray-600">
+                                    {[lead.city, lead.user_state].filter(s => s && s.trim().length > 0).join(", ") || "—"}
                                 </td>
                                 <td className="px-6 py-4">
                                     <span className={`text-sm font-bold ${lead.score < 40 ? "text-red-600" : lead.score < 60 ? "text-amber-600" : "text-green-600"}`}>
@@ -166,13 +178,18 @@ export default function AdminLeadsPage() {
                                         {lead.priority}
                                     </span>
                                 </td>
-                                <td className="px-6 py-4 text-gray-600">{lead.assigned_to}</td>
-                                <td className="px-6 py-4 text-gray-400 text-xs">{lead.created_at}</td>
+                                <td className="px-6 py-4 text-gray-600">{lead.assigned_to || "—"}</td>
+                                <td className="px-6 py-4 text-sm text-gray-900 font-medium">
+                                    {lead.follow_up_at 
+                                        ? new Date(lead.follow_up_at).toLocaleDateString("en-IN", { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+                                        : "—"}
+                                </td>
+                                <td className="px-6 py-4 text-gray-400 text-xs">{new Date(lead.created_at).toLocaleDateString()}</td>
                             </tr>
                         ))}
                         {filteredLeads.length === 0 && (
                             <tr>
-                                <td colSpan={6} className="px-6 py-12 text-center text-sm text-gray-400">
+                                <td colSpan={8} className="px-6 py-12 text-center text-sm text-gray-400">
                                     No leads match your filters.
                                 </td>
                             </tr>

@@ -22,7 +22,8 @@ interface LeadDetail {
     name: string;
     phone: string;
     email: string;
-    city: string;
+    city: string | null;
+    user_state: string | null;
     score: number;
     scoreLabel: string;
     stage: string;
@@ -35,6 +36,7 @@ interface LeadDetail {
     notes: { text: string; created_at: string; author: string }[];
     timeline: { event: string; timestamp: string }[];
     consultations: { id: string; scheduled_at: string; criticality: string; status: string; duration_minutes: number; created_at: string }[];
+    callbacks?: { id: string; preferred_time: string; status: string; reason: string | null; assigned_to: string | null }[];
 }
 
 const STAGES = ["New", "Contacted", "Qualified", "Consultation Done", "Subscribed", "Shield Active", "Settlement", "Won", "Lost"];
@@ -68,6 +70,7 @@ export default function LeadDetailPage() {
                     phone: "9876543210",
                     email: "saurabh@example.com",
                     city: "Mumbai",
+                    user_state: "Maharashtra",
                     score: 38,
                     scoreLabel: "Critical",
                     stage: "New",
@@ -90,6 +93,9 @@ export default function LeadDetailPage() {
                     consultations: [
                         { id: "c1", scheduled_at: "2026-03-20T10:30:00", criticality: "Missing payments", status: "scheduled", duration_minutes: 10, created_at: "2026-03-17T09:20:00" },
                     ],
+                    callbacks: [
+                        { id: "cb1", preferred_time: "2026-03-22T14:30:00", status: "pending", reason: "Settlement inquiry", assigned_to: "Kumar" }
+                    ]
                 });
             } finally {
                 setLoading(false);
@@ -157,12 +163,16 @@ export default function LeadDetailPage() {
                 <div>
                     <Link href="/admin/leads" className="text-xs text-teal-600 hover:underline mb-2 inline-block"><ArrowLeft className="w-3 h-3 inline" /> Back to Leads</Link>
                     <h1 className="text-2xl font-bold text-gray-900">{lead.name}</h1>
-                    <p className="text-sm text-gray-400">{lead.phone} · {lead.email} · {lead.city}</p>
+                    <p className="text-sm text-gray-400">
+                        {lead.phone} · {lead.email} · {lead.city || lead.user_state ? `${lead.city || ""} ${lead.user_state || ""}`.trim().replace(" ", ", ") : "Unknown Location"}
+                    </p>
                     {error && <p className="text-xs text-amber-600 mt-1">(Using mock data)</p>}
                 </div>
                 <div className="flex items-center gap-3">
                     {/* Stage selector */}
                     <select
+                        title="Update Lead Stage"
+                        aria-label="Update Lead Stage"
                         value={lead.stage}
                         onChange={(e) => handleStageChange(e.target.value)}
                         className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-bold bg-white focus:outline-none focus:ring-2 focus:ring-teal-200"
@@ -207,6 +217,32 @@ export default function LeadDetailPage() {
                                     </div>
                                     <span className={`px-3 py-1 rounded-full text-xs font-bold capitalize ${statusColor}`}>
                                         {c.status}
+                                    </span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+
+            {/* General Callbacks */}
+            {lead.callbacks && lead.callbacks.length > 0 && (
+                <div className="bg-white rounded-2xl border border-gray-100 p-6">
+                    <h2 className="text-base font-bold text-gray-900 mb-4">Scheduled Callbacks</h2>
+                    <div className="space-y-3">
+                        {lead.callbacks.map((cb) => {
+                            const dt = new Date(cb.preferred_time);
+                            const dateStr = dt.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+                            const timeStr = dt.toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", hour12: true });
+                            const statusColor = cb.status === "completed" ? "bg-green-100 text-green-700" : cb.status === "cancelled" ? "bg-red-100 text-red-700" : "bg-teal-100 text-teal-700";
+                            return (
+                                <div key={cb.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-900">{dateStr} at {timeStr}</p>
+                                        <p className="text-xs text-gray-500 mt-0.5">Reason: {cb.reason || "General Callback"} · Assigned: {cb.assigned_to || "Unassigned"}</p>
+                                    </div>
+                                    <span className={`px-3 py-1 rounded-full text-xs font-bold capitalize ${statusColor}`}>
+                                        {cb.status}
                                     </span>
                                 </div>
                             );
