@@ -24,7 +24,7 @@ const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 export default function SchedulePage() {
-  const { userId } = useAuth();
+  const { userId, logout } = useAuth();
   const router = useRouter();
   const [slots, setSlots] = useState<Slot[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>("");
@@ -253,7 +253,7 @@ export default function SchedulePage() {
                 Our expert will review your debt profile and discuss savings options. No fees, no pressure.
               </p>
               <button
-                onClick={() => router.push("/")}
+                onClick={() => { logout(); router.push("/"); }}
                 className="w-full py-3.5 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90 cursor-pointer"
                 style={{ backgroundColor: "var(--color-teal)" }}
               >

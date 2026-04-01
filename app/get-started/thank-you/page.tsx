@@ -3,6 +3,7 @@
 import React, { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Check, ArrowLeft } from "lucide-react";
+import { useAuth } from "@/lib/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -15,6 +16,7 @@ const CALL_TIME_LABELS: Record<string, string> = {
 
 function ThankYouContent() {
   const router = useRouter();
+  const { logout } = useAuth();
   const params = useSearchParams();
   const name = params.get("name") || "there";
   const callTime = params.get("call") || "asap";
@@ -93,7 +95,7 @@ function ThankYouContent() {
 
             {/* Back to Home */}
             <button
-              onClick={() => router.push("/")}
+              onClick={() => { logout(); router.push("/"); }}
               className="w-full py-3.5 rounded-xl text-sm font-semibold transition-all cursor-pointer"
               style={{
                 backgroundColor: "var(--color-bg-soft)",
