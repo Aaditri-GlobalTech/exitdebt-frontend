@@ -275,7 +275,14 @@ export default function AdminCRMPage() {
       const res = await fetch(`${API_BASE}/leads?${params}`, { headers: authHeaders() });
       if (res.ok) {
         const data = await res.json();
-        setLeads(data.items ?? []);
+        const fetchedLeads = data.items ?? [];
+        setLeads(fetchedLeads);
+        // Sync selectedLead so it doesn't get stale on refresh
+        setSelectedLead(prev => {
+            if (!prev) return null;
+            const updated = fetchedLeads.find((l: Lead) => l.id === prev.id);
+            return updated || prev;
+        });
       }
     } catch (err) {
       console.error("Failed to fetch leads:", err);
@@ -801,8 +808,13 @@ export default function AdminCRMPage() {
                       {selectedLead.phone} · {[selectedLead.city, selectedLead.user_state].filter(s => s && s.trim().length > 0).join(", ") || "Unknown Location"}
                     </p>
                     {selectedLead.assigned_to && (
-                        <p className="text-xs font-semibold text-teal-700 bg-teal-50 px-2 py-1 rounded-md border border-teal-100 inline-block mt-2">
+                        <p className="text-xs font-semibold text-teal-700 bg-teal-50 px-2 py-1 rounded-md border border-teal-100 inline-block mt-2 mr-2">
                             Assigned to: {selectedLead.assigned_to}
+                        </p>
+                    )}
+                    {selectedLead.follow_up_at && (
+                        <p className="text-xs font-semibold text-amber-700 bg-amber-50 px-2 py-1 rounded-md border border-amber-100 inline-block mt-2">
+                            Scheduled: {formatDate(selectedLead.follow_up_at)}
                         </p>
                     )}
                   </div>
