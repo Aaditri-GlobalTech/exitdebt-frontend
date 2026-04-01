@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { ArrowRight, ArrowLeft, Phone, Check } from "lucide-react";
 
 /* ═══════════════════════════════════════════════════════════════════════
  * Types
@@ -389,7 +390,7 @@ export default function AdminCRMPage() {
       await fetch(`${API_BASE}/leads/${selectedLead.id}/notes`, {
         method: "POST",
         headers: authHeaders(),
-        body: JSON.stringify({ content: "☎️ Call Started", author: `${adminName || "admin"} (${deviceId})` }),
+        body: JSON.stringify({ content: "\u260e\ufe0f Call Started", author: `${adminName || "admin"} (${deviceId})` }),
       });
       openLeadDetail(selectedLead);
     } catch {}
@@ -528,7 +529,7 @@ export default function AdminCRMPage() {
             className="w-full py-3 rounded-xl text-sm font-bold text-white cursor-pointer transition-opacity hover:opacity-90"
             style={{ backgroundColor: "var(--color-teal)" }}
           >
-            Access CRM →
+            Access CRM <ArrowRight className="w-4 h-4 inline" />
           </button>
         </div>
       </div>
@@ -766,7 +767,7 @@ export default function AdminCRMPage() {
           {!selectedLead ? (
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center" role="status">
-                <p className="text-3xl mb-3" aria-hidden="true">👈</p>
+                <p className="text-3xl mb-3" aria-hidden="true"><ArrowLeft className="w-8 h-8" /></p>
                 <p className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>
                   Select a lead to view details
                 </p>
@@ -996,7 +997,7 @@ export default function AdminCRMPage() {
                               className="text-[10px] px-2 py-1 rounded-md font-medium cursor-pointer transition-colors hover:opacity-80"
                               style={{ backgroundColor: "#05966915", color: "#059669", border: "1px solid #05966930" }}
                             >
-                              ✓ Connected
+                              <Check className="w-3 h-3 inline" /> Connected
                             </button>
                             <button
                               onClick={() => logCall(cb.id, "no_answer")}

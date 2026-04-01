@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Shield, Coins } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import Navbar from "@/components/Navbar";
 
@@ -293,7 +294,7 @@ export default function IncomePage() {
                     </h3>
                     <div className="space-y-3">
                         <div className="flex items-start gap-3">
-                            <span className="text-lg">🛡️</span>
+                            <span className="text-lg"><Shield className="w-5 h-5 text-blue-600" /></span>
                             <div>
                                 <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
                                     Shield
@@ -304,7 +305,7 @@ export default function IncomePage() {
                             </div>
                         </div>
                         <div className="flex items-start gap-3">
-                            <span className="text-lg">💰</span>
+                            <span className="text-lg"><Coins className="w-5 h-5 text-amber-600" /></span>
                             <div>
                                 <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
                                     Settlement

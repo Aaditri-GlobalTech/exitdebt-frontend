@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Phone } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/lib/AuthContext";
@@ -123,7 +124,7 @@ export default function SchedulePage() {
               style={{ backgroundColor: "var(--color-bg-card)", border: "1px solid var(--color-border)", boxShadow: "0 4px 32px rgba(0,0,0,0.06)" }}
             >
               <h2 className="text-xl font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>
-                📞 Book a Free Consultation
+                <Phone className="w-5 h-5 inline mr-1" /> Book a Free Consultation
               </h2>
               <p className="text-sm mb-6" style={{ color: "var(--color-text-secondary)" }}>
                 Schedule a 10-minute call with our expert debt advisors.

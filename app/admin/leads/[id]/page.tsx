@@ -14,6 +14,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 /** Full lead detail shape */
 interface LeadDetail {
@@ -150,7 +151,7 @@ export default function LeadDetailPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <Link href="/admin/leads" className="text-xs text-teal-600 hover:underline mb-2 inline-block">← Back to Leads</Link>
+                    <Link href="/admin/leads" className="text-xs text-teal-600 hover:underline mb-2 inline-block"><ArrowLeft className="w-3 h-3 inline" /> Back to Leads</Link>
                     <h1 className="text-2xl font-bold text-gray-900">{lead.name}</h1>
                     <p className="text-sm text-gray-400">{lead.phone} · {lead.email} · {lead.city}</p>
                     {error && <p className="text-xs text-amber-600 mt-1">(Using mock data)</p>}

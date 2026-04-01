@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, FormEvent } from "react";
+import { ArrowRight } from "lucide-react";
 import { validatePAN, validatePhone, selectProfile, hashPAN } from "@/lib/utils";
 import { MockProfile } from "@/lib/mockProfiles";
 import LoadingSpinner from "./LoadingSpinner";
@@ -180,7 +181,7 @@ export default function DebtForm({ onResult, isLoading, setIsLoading, submitted 
                     color: "var(--ink)",
                 }}
             >
-                Check your debt health →
+                Check your debt health <ArrowRight className="w-4 h-4 inline" />
             </button>
 
             <p className="text-center text-xs text-gray-400">

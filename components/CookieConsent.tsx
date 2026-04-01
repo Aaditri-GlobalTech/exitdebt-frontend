@@ -12,6 +12,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Cookie } from "lucide-react";
 
 /** Key used to persist cookie consent in localStorage */
 const CONSENT_KEY = "exitdebt_cookie_consent";
@@ -56,7 +57,7 @@ export default function CookieConsent() {
             <div className="max-w-4xl mx-auto bg-white border border-gray-200 rounded-2xl shadow-2xl shadow-gray-200/50 p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
                 {/* Consent text */}
                 <div className="flex-1">
-                    <p className="text-sm font-semibold text-gray-900 mb-1">🍪 We value your privacy</p>
+                    <p className="text-sm font-semibold text-gray-900 mb-1"><Cookie className="w-4 h-4 inline" /> We value your privacy</p>
                     <p className="text-xs text-gray-500 leading-relaxed">
                         We use cookies to enhance your experience, analyze site traffic, and personalize content. 
                         By clicking &quot;Accept All&quot;, you consent to our use of cookies in accordance with the{" "}

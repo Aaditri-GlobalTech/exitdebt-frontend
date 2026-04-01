@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { Lock, Lightbulb, Phone, HelpCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FAQAccordion from "@/components/FAQAccordion";
@@ -63,7 +64,7 @@ export default function FAQPage() {
                         className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-4"
                         style={{ backgroundColor: "rgba(115,0,190,0.08)", color: "var(--color-teal)" }}
                     >
-                        ❓ Help & FAQ
+                        <HelpCircle className="w-3.5 h-3.5" /> Help & FAQ
                     </span>
                     <h1 className="text-3xl sm:text-4xl font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
                         Frequently Asked Questions
@@ -76,7 +77,7 @@ export default function FAQPage() {
                 {/* Trust & Security */}
                 <div className="mb-12">
                     <h2 className="text-lg font-bold mb-5 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
-                        🔒 Trust &amp; Security
+                        <Lock className="w-5 h-5" /> Trust &amp; Security
                     </h2>
                     <FAQAccordion items={trustFaqs} />
                 </div>
@@ -84,7 +85,7 @@ export default function FAQPage() {
                 {/* About ExitDebt */}
                 <div className="mb-14">
                     <h2 className="text-lg font-bold mb-5 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
-                        💡 About ExitDebt
+                        <Lightbulb className="w-5 h-5" /> About ExitDebt
                     </h2>
                     <FAQAccordion items={aboutFaqs} />
                 </div>
@@ -106,7 +107,7 @@ export default function FAQPage() {
                             className="px-6 py-2.5 rounded-xl text-white font-semibold text-sm hover:opacity-90 transition-opacity"
                             style={{ backgroundColor: "var(--color-teal)" }}
                         >
-                            📞 Schedule a Free Call
+                            <Phone className="w-4 h-4 inline mr-1" />Schedule a Free Call
                         </Link>
                         <Link
                             href="/"

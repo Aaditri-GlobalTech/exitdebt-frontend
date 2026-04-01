@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/lib/AuthContext";
 import { useSubscription } from "@/lib/SubscriptionContext";
+import { ArrowRight, Briefcase } from "lucide-react";
 import {
     calculateInterestLeak,
     calculateCashFlow,
@@ -73,17 +74,13 @@ export default function LiteDashboard({ lastUpdated }: { lastUpdated: Date }) {
                 <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 animate-fadeIn">
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900 mb-1">
-                            Hi, {user.name.split(' ')[0]} 👋
+                            Hi, {user.name.split(' ')[0]}
                         </h1>
                         <p className="text-sm text-gray-500 font-medium">
                             Here is your debt health analysis for today.
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <button className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-teal-100 bg-teal-50/30 text-teal-600 text-sm font-semibold hover:bg-teal-50 transition-all">
-                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" /></svg>
-                            Share on WhatsApp
-                        </button>
                         <button className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-teal-600 text-white text-sm font-semibold hover:bg-teal-700 shadow-md shadow-teal-100 transition-all">
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4-4v12" /></svg>
                             Download PDF
@@ -151,7 +148,7 @@ export default function LiteDashboard({ lastUpdated }: { lastUpdated: Date }) {
                             href="/upgrade"
                             className="px-8 py-3 rounded-xl bg-teal-500 text-white font-bold text-sm shadow-lg shadow-teal-500/20 hover:bg-teal-600 transition-all whitespace-nowrap"
                         >
-                            Explore Shield →
+                            Explore Shield <ArrowRight className="w-4 h-4 inline" />
                         </Link>
                     </div>
                 ) : tier === "shield" ? (
@@ -159,7 +156,7 @@ export default function LiteDashboard({ lastUpdated }: { lastUpdated: Date }) {
                         <div className="flex items-center gap-6">
                             <div className="relative">
                                 <div className="w-16 h-16 rounded-2xl bg-teal-50 flex items-center justify-center text-2xl">
-                                    👨‍💼
+                                    <Briefcase className="w-6 h-6" />
                                 </div>
                                 <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-2 border-white rounded-full" title="Online" />
                             </div>

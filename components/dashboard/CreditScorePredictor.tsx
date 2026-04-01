@@ -14,6 +14,8 @@
  */
 "use client";
 
+import { TrendingUp } from "lucide-react";
+
 import { useState } from "react";
 
 interface Account {
@@ -82,7 +84,7 @@ export default function CreditScorePredictor({ accounts, currentScore }: CreditS
         >
             <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center">
-                    <span className="text-xl">📈</span>
+                    <span className="text-xl"><TrendingUp className="w-5 h-5" /></span>
                 </div>
                 <div>
                     <h3 className="text-base font-bold text-gray-900">Credit Score Impact Predictor</h3>

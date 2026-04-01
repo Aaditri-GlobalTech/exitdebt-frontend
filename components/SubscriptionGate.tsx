@@ -2,6 +2,7 @@
 
 import { ReactNode } from "react";
 import Link from "next/link";
+import { Lock, ArrowRight } from "lucide-react";
 import { useSubscription } from "@/lib/SubscriptionContext";
 
 import { TierKey } from "@/lib/mockPlans";
@@ -37,7 +38,7 @@ export default function SubscriptionGate({ children, requiredTier }: Subscriptio
                         <div
                             className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 text-2xl bg-teal-50"
                         >
-                            🔒
+                            <Lock className="w-8 h-8" />
                         </div>
                         <h2 className="text-xl sm:text-2xl font-bold mb-2 text-slate-900">
                             Your free trial has ended
@@ -50,7 +51,7 @@ export default function SubscriptionGate({ children, requiredTier }: Subscriptio
                             href="/upgrade"
                             className="inline-block w-full py-3.5 rounded-xl text-sm font-bold text-white bg-teal-600 transition-all hover:bg-teal-700 hover:shadow-lg"
                         >
-                            Choose a Plan →
+                            Choose a Plan <ArrowRight className="w-4 h-4 inline" />
                         </Link>
                         <p className="text-xs mt-4 text-slate-400">
                             Plans start at ₹499/month

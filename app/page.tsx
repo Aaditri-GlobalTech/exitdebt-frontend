@@ -123,9 +123,9 @@ export default function LandingPage() {
               </h1>
 
               <p className="text-lg leading-relaxed max-w-xl mb-10" style={{ color: "var(--color-text-secondary)" }}>
-                Take control of your financial future. Our AI-driven analysis helps you
-                find hidden savings and creates a personalized debt reduction plan in
-                minutes.
+                Take control of your financial future. Our industry experts help you
+                find hidden savings and create a personalized debt reduction plan
+                tailored to your situation.
               </p>
 
               {/* Trust Indicators */}
@@ -155,27 +155,16 @@ export default function LandingPage() {
                       {isLoggedIn ? `Welcome back, ${user?.name?.split(' ')[0] || 'User'}!` : 'Ready to get debt-free?'}
                     </h2>
                     <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
-                      {isLoggedIn
-                        ? 'Your debt-free journey has started. View your profile to track your progress.'
-                        : 'Talk to our expert debt advisors for free. No credit score checks, no complicated forms — just a simple conversation about your options.'}
+                      Talk to our expert debt advisors for free. No credit score checks, no complicated forms — just a simple conversation about your options.
                     </p>
                   </div>
                   <Link
-                    href={isLoggedIn ? "/profile" : "/get-started"}
+                    href="/get-started"
                     className="w-full py-5 rounded-2xl flex items-center justify-center gap-4 text-lg font-black text-white transition-all hover:shadow-2xl hover:shadow-teal-100/50 active:scale-[0.98] bg-[var(--color-teal)] tracking-tight group"
                   >
-                    {isLoggedIn ? 'View Your Profile' : "Get Started — It\u0027s Free"}
+                    Get Started — It&apos;s Free
                     <span className="text-2xl group-hover:translate-x-2 transition-transform duration-300 leading-none pb-0.5">›</span>
                   </Link>
-                  {!isLoggedIn && (
-                  <Link
-                    href="/get-started"
-                    className="w-full py-3 rounded-xl flex items-center justify-center text-sm font-semibold transition-all hover:opacity-80 cursor-pointer"
-                    style={{ color: "var(--color-teal)" }}
-                  >
-                    Already a member? Continue here →
-                  </Link>
-                  )}
                 </div>
               </div>
             </div>

@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Smartphone, MapPin, Coins, BarChart3, Phone, CalendarDays } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -68,7 +69,7 @@ export default function ProfilePage() {
               <h3 className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--color-text-muted)" }}>Personal</h3>
 
               <div className="flex items-start gap-3">
-                <div className="mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-teal)" }}>📱</div>
+                <div className="mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-teal)" }}><Smartphone className="w-4 h-4" /></div>
                 <div>
                   <p className="text-xs mb-0.5" style={{ color: "var(--color-text-muted)" }}>Phone</p>
                   <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>{maskedPhone}</p>
@@ -76,7 +77,7 @@ export default function ProfilePage() {
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-teal)" }}>📍</div>
+                <div className="mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-teal)" }}><MapPin className="w-4 h-4" /></div>
                 <div>
                   <p className="text-xs mb-0.5" style={{ color: "var(--color-text-muted)" }}>Status</p>
                   <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
@@ -90,7 +91,7 @@ export default function ProfilePage() {
               <h3 className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--color-text-muted)" }}>Financial</h3>
 
               <div className="flex items-start gap-3">
-                <div className="mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-teal)" }}>💰</div>
+                <div className="mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-teal)" }}><Coins className="w-4 h-4" /></div>
                 <div>
                   <p className="text-xs mb-0.5" style={{ color: "var(--color-text-muted)" }}>Monthly Salary</p>
                   <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
@@ -100,7 +101,7 @@ export default function ProfilePage() {
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-teal)" }}>📊</div>
+                <div className="mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-teal)" }}><BarChart3 className="w-4 h-4" /></div>
                 <div>
                   <p className="text-xs mb-0.5" style={{ color: "var(--color-text-muted)" }}>Debt Health Score</p>
                   <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
@@ -114,7 +115,7 @@ export default function ProfilePage() {
           {/* Info Banner */}
           <div className="mx-6 mb-4 p-4 rounded-xl" style={{ backgroundColor: "var(--color-bg-soft)" }}>
             <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
-              📞 <strong>Our debt expert will call you</strong> at your preferred time to discuss your situation and create a personalized plan.
+              <Phone className="w-4 h-4 inline mr-1" /> <strong>Our debt expert will call you</strong> at your preferred time to discuss your situation and create a personalized plan.
             </p>
           </div>
 
@@ -125,17 +126,8 @@ export default function ProfilePage() {
               className="flex-1 text-center py-2.5 px-4 rounded-lg text-white font-semibold text-sm hover:opacity-90 transition-opacity"
               style={{ backgroundColor: "var(--color-teal)" }}
             >
-              📅 Book Another Call
+              <CalendarDays className="w-4 h-4 inline mr-1" /> Book Another Call
             </Link>
-            <a
-              href="https://wa.me/919876543210?text=Hi%20ExitDebt%2C%20I%20need%20help%20with%20my%20debt"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 text-center py-2.5 px-4 rounded-lg font-medium text-sm transition-colors hover:bg-gray-50"
-              style={{ border: "1px solid var(--color-border)", color: "#25D366" }}
-            >
-              💬 WhatsApp Support
-            </a>
             <button
               onClick={handleLogout}
               className="flex-1 text-center py-2.5 px-4 rounded-lg font-medium text-sm transition-colors cursor-pointer hover:bg-gray-50"

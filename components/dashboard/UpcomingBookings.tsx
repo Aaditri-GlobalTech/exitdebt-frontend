@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 
 interface Booking {
@@ -71,7 +72,7 @@ export default function UpcomingBookings() {
                     href="/schedule"
                     className="text-xs font-bold text-teal-600 hover:text-teal-700 transition-colors"
                 >
-                    Book New →
+                    Book New <ArrowRight className="w-3 h-3 inline" />
                 </Link>
             </div>
 

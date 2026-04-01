@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Footer() {
     return (
@@ -14,19 +15,8 @@ export default function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
                     {/* Brand */}
                     <div className="col-span-1 md:col-span-1">
-                        <div className="flex items-center gap-2 mb-4">
-                            <div
-                                className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-bold"
-                                style={{ backgroundColor: "var(--color-teal)" }}
-                            >
-                                E
-                            </div>
-                            <span
-                                className="text-xl font-bold tracking-tight"
-                                style={{ color: "var(--color-text-primary)" }}
-                            >
-                                EXITDEBT
-                            </span>
+                        <div className="mb-4">
+                            <Image src="/logo.png" alt="ExitDebt" width={240} height={80} className="h-20 w-auto" />
                         </div>
                         <p
                             className="text-sm leading-relaxed mb-6"

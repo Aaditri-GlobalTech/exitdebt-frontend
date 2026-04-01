@@ -13,6 +13,9 @@
  */
 "use client";
 
+import { ReactNode } from "react";
+import { PartyPopper, Rocket, Trophy } from "lucide-react";
+
 interface Account {
     lender: string;
     status?: string;
@@ -34,8 +37,8 @@ function getMilestones(
     accounts: Account[],
     currentScore: number,
     previousScore?: number
-): { icon: string; title: string; description: string }[] {
-    const milestones: { icon: string; title: string; description: string }[] = [];
+): { icon: ReactNode; title: string; description: string }[] {
+    const milestones: { icon: ReactNode; title: string; description: string }[] = [];
 
     /* Detect closed/settled accounts */
     const closedAccounts = accounts.filter(
@@ -43,7 +46,7 @@ function getMilestones(
     );
     if (closedAccounts.length > 0) {
         milestones.push({
-            icon: "🎉",
+            icon: <PartyPopper className="w-6 h-6" />,
             title: `${closedAccounts.length} Account${closedAccounts.length > 1 ? "s" : ""} Closed!`,
             description: `You've successfully closed ${closedAccounts.map((a) => a.lender).join(", ")}. Great progress!`,
         });
@@ -53,7 +56,7 @@ function getMilestones(
     if (previousScore !== undefined && currentScore > previousScore) {
         const improvement = currentScore - previousScore;
         milestones.push({
-            icon: "🚀",
+            icon: <Rocket className="w-6 h-6" />,
             title: `Score Up by ${improvement} Points!`,
             description: `Your debt health improved from ${previousScore} to ${currentScore} since your last check.`,
         });
@@ -62,7 +65,7 @@ function getMilestones(
     /* Detect healthy score threshold */
     if (currentScore >= 80) {
         milestones.push({
-            icon: "🏆",
+            icon: <Trophy className="w-6 h-6" />,
             title: "Healthy Debt Score!",
             description: "Your debt structure is well-managed. Keep it up!",
         });

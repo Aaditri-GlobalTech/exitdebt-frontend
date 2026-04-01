@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { ArrowLeft, Save } from "lucide-react";
 
 /* ═══════════════════════════════════════════════════════════════════════
  * Types & Constants
@@ -270,7 +271,7 @@ export default function AdminIntakePage() {
             className="text-sm cursor-pointer hover:opacity-70"
             style={{ color: "var(--color-text-secondary)" }}
           >
-            ← Back to CRM
+            <ArrowLeft className="w-4 h-4 inline" /> Back to CRM
           </button>
           <span className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>
             Intake: {lead.name}
@@ -472,7 +473,7 @@ export default function AdminIntakePage() {
             style={{ backgroundColor: "var(--color-teal)" }}
             type="button"
           >
-            {saving ? "Saving…" : "💾 Save Changes"}
+          {saving ? "Saving…" : <><Save className="w-4 h-4 inline" /> Save All</>}
           </button>
         </div>
       </main>

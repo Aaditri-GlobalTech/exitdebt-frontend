@@ -77,7 +77,7 @@ export default function LoginPage() {
             return;
         }
 
-        if (!/^[6-9]\d{9}$/.test(phone)) {
+        if (!/^\d{10}$/.test(phone)) {
             setError("Please enter a valid 10-digit Indian mobile number.");
             return;
         }

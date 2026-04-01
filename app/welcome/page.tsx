@@ -16,6 +16,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { BarChart3, ClipboardList, TrendingDown, CalendarDays, Compass, Coins, LineChart, Shield, Banknote } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -63,10 +64,10 @@ export default function WelcomePage() {
                     <p className="text-xs text-gray-400 mb-6">Your essential debt intelligence tools</p>
                     <ul className="space-y-3">
                         {[
-                            { icon: "📊", title: "Debt Health Score", desc: "your 0–100 debt picture" },
-                            { icon: "📋", title: "Debt Summary", desc: "all loans and cards in one view" },
-                            { icon: "💸", title: "Interest Leak Report", desc: "see where money is wasted" },
-                            { icon: "📅", title: "Salary Day Cash Flow", desc: "see what's left after EMIs" },
+                            { icon: <BarChart3 className="w-6 h-6 text-teal-600" />, title: "Debt Health Score", desc: "your 0–100 debt picture" },
+                            { icon: <ClipboardList className="w-6 h-6 text-teal-600" />, title: "Debt Summary", desc: "all loans and cards in one view" },
+                            { icon: <TrendingDown className="w-6 h-6 text-teal-600" />, title: "Interest Leak Report", desc: "see where money is wasted" },
+                            { icon: <CalendarDays className="w-6 h-6 text-teal-600" />, title: "Salary Day Cash Flow", desc: "see what's left after EMIs" },
                         ].map((item, i) => (
                             <li key={i} className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors">
                                 <span className="text-2xl">{item.icon}</span>
@@ -85,12 +86,12 @@ export default function WelcomePage() {
                     <p className="text-xs text-slate-400 mb-5">Advanced tools for serious debt optimization</p>
                     <ul className="space-y-3 mb-6">
                         {[
-                            "🧭 Debt Freedom GPS — your debt-free countdown",
-                            "💰 Smart Payment Prioritizer — optimize extra payments",
-                            "📈 Credit Score Impact Predictor",
+                            { icon: <Compass className="w-4 h-4 text-teal-400 shrink-0" />, text: "Debt Freedom GPS — your debt-free countdown" },
+                            { icon: <Coins className="w-4 h-4 text-teal-400 shrink-0" />, text: "Smart Payment Prioritizer — optimize extra payments" },
+                            { icon: <LineChart className="w-4 h-4 text-teal-400 shrink-0" />, text: "Credit Score Impact Predictor" },
                         ].map((item, i) => (
                             <li key={i} className="flex items-center gap-3 text-sm text-slate-200">
-                                <span>{item}</span>
+                                {item.icon}<span>{item.text}</span>
                             </li>
                         ))}
                     </ul>
@@ -123,11 +124,11 @@ export default function WelcomePage() {
                     <h3 className="text-sm font-bold text-gray-900 mb-4">Need more help?</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="p-4 rounded-xl bg-blue-50/50 border border-blue-100">
-                            <p className="text-sm font-bold text-gray-800 mb-1">🛡️ Shield</p>
+                            <p className="text-sm font-bold text-gray-800 mb-1 flex items-center gap-1.5"><Shield className="w-4 h-4 text-blue-600" /> Shield</p>
                             <p className="text-xs text-gray-500">Harassment protection + creditor negotiation</p>
                         </div>
                         <div className="p-4 rounded-xl bg-amber-50/50 border border-amber-100">
-                            <p className="text-sm font-bold text-gray-800 mb-1">💰 Shield+</p>
+                            <p className="text-sm font-bold text-gray-800 mb-1 flex items-center gap-1.5"><Banknote className="w-4 h-4 text-amber-600" /> Shield+</p>
                             <p className="text-xs text-gray-500">We negotiate debt reduction for you</p>
                         </div>
                     </div>

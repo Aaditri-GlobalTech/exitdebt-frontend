@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 const ARTICLES = [
     {
@@ -55,7 +56,7 @@ export default function BlogSection() {
                             </h3>
                             <p className="text-xs text-gray-400 mt-2 leading-relaxed">{article.excerpt}</p>
                             <span className="inline-block mt-3 text-xs font-medium text-teal-600 group-hover:translate-x-1 transition-transform duration-200">
-                                Read more →
+                                Read more <ArrowRight className="w-3 h-3 inline" />
                             </span>
                         </div>
                     </Link>

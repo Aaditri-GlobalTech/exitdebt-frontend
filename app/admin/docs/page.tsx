@@ -41,7 +41,7 @@ const COMPONENTS = [
     { name: "InterestLeakReport", file: "dashboard/InterestLeakReport.tsx", desc: "Splits EMI into principal vs. interest with avoidable interest warning." },
     { name: "SmartPaymentPrioritizer", file: "dashboard/SmartPaymentPrioritizer.tsx", desc: "Interactive tool: enter extra cash, see optimal allocation via avalanche method." },
     { name: "SalaryCashFlow", file: "dashboard/SalaryCashFlow.tsx", desc: "Visualizes salary credit vs. ordered EMI outflows with ratio warning." },
-    { name: "RefreshShare", file: "dashboard/RefreshShare.tsx", desc: "Refresh data, download PDF (placeholder), share on WhatsApp." },
+    { name: "RefreshShare", file: "dashboard/RefreshShare.tsx", desc: "Refresh data, download PDF (placeholder)." },
 ];
 
 const CALCULATIONS = [

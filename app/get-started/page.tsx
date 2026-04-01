@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ArrowRight, ArrowLeft, Check, Rocket, Phone, Zap } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -110,7 +111,7 @@ export default function GetStartedPage() {
       setError("Please enter your full name (minimum 2 characters).");
       return false;
     }
-    if (!/^[6-9]\d{9}$/.test(phone.trim())) {
+    if (!/^\d{10}$/.test(phone.trim())) {
       setError("Please enter a valid 10-digit Indian mobile number.");
       return false;
     }
@@ -226,7 +227,7 @@ export default function GetStartedPage() {
                 className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white"
                 style={{ backgroundColor: "var(--color-teal)" }}
               >
-                {step > 1 ? "✓" : "1"}
+                {step > 1 ? <Check className="w-4 h-4" /> : "1"}
               </div>
               <span className="text-sm font-medium" style={{ color: step === 1 ? "var(--color-text-primary)" : "var(--color-text-muted)" }}>
                 Your Details
@@ -269,7 +270,7 @@ export default function GetStartedPage() {
                   className="text-xl font-bold mb-1"
                   style={{ color: "var(--color-text-primary)" }}
                 >
-                  🚀 Get Started — It&apos;s Free
+                  <Rocket className="w-4 h-4 inline" /> Get Started — It&apos;s Free
                 </h2>
                 <p
                   className="text-sm mb-6"
@@ -407,7 +408,7 @@ export default function GetStartedPage() {
                   className="w-full py-3.5 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 cursor-pointer mt-6"
                   style={{ backgroundColor: "var(--color-teal)" }}
                 >
-                  Continue → Book a Call
+                  Continue <ArrowRight className="w-4 h-4 inline" /> Book a Call
                 </button>
 
                 <p className="text-center text-xs mt-4" style={{ color: "var(--color-text-muted)" }}>
@@ -421,7 +422,7 @@ export default function GetStartedPage() {
                   className="text-xl font-bold mb-1"
                   style={{ color: "var(--color-text-primary)" }}
                 >
-                  📞 Book a Free Consultation
+                  <Phone className="w-4 h-4 inline" /> Book a Free Consultation
                 </h2>
                 <p
                   className="text-sm mb-6"
@@ -479,7 +480,7 @@ export default function GetStartedPage() {
                     aria-pressed={isAsap}
                     type="button"
                   >
-                    ⚡ Earliest available — call me ASAP
+                    <Zap className="w-4 h-4 inline" /> Earliest available — call me ASAP
                   </button>
 
                   {/* Divider */}
@@ -601,7 +602,7 @@ export default function GetStartedPage() {
                       color: "var(--color-text-primary)",
                     }}
                   >
-                    ← Back
+                    <ArrowLeft className="w-4 h-4 inline" /> Back
                   </button>
                   <button
                     onClick={handleSubmit}
@@ -617,7 +618,7 @@ export default function GetStartedPage() {
                         Submitting...
                       </span>
                     ) : (
-                      "Book Free Consultation →"
+                      <>Book Free Consultation <ArrowRight className="w-4 h-4 inline" /></>
                     )}
                   </button>
                 </div>
