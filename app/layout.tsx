@@ -250,7 +250,7 @@ export default function RootLayout({
           />
         ))}
       </head>
-      <body className="font-sans antialiased text-gray-900 bg-white">
+      <body className="font-sans antialiased text-gray-900 bg-white overflow-x-hidden">
         <Providers>{children}</Providers>
         {/* LP-05: DPDP Act compliant cookie consent banner */}
         <CookieConsent />
