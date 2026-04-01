@@ -103,14 +103,14 @@ export default function FAQPage() {
                     </p>
                     <div className="flex justify-center gap-3 flex-wrap">
                         <Link
-                            href="/schedule"
+                            href="/get-started"
                             className="px-6 py-2.5 rounded-xl text-white font-semibold text-sm hover:opacity-90 transition-opacity"
                             style={{ backgroundColor: "var(--color-teal)" }}
                         >
                             <Phone className="w-4 h-4 inline mr-1" />Schedule a Free Call
                         </Link>
                         <Link
-                            href="/"
+                            href="/get-started"
                             className="px-6 py-2.5 rounded-xl font-medium text-sm transition-colors hover:bg-gray-50"
                             style={{ border: "1px solid var(--color-border)", color: "var(--color-text-primary)" }}
                         >
