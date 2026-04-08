@@ -19,8 +19,17 @@ interface Lead {
   source: string | null;
   tags: string | null;
   follow_up_at: string | null;
+  submission_count: number;
   created_at: string;
   updated_at: string | null;
+}
+
+interface DevConsoleLog {
+  id: string;
+  timestamp: string;
+  level: "error" | "warn" | "info";
+  message: string;
+  stack?: string;
 }
 
 interface LeadNote {
@@ -55,7 +64,7 @@ interface TimelineEvent {
  * ═══════════════════════════════════════════════════════════════════════ */
 
 const API_BASE = "/api/admin";
-const STAGES = ["new", "contacted", "qualified", "negotiating", "converted", "lost"] as const;
+const STAGES = ["new", "contacted", "qualified", "negotiating", "converted", "lost", "spam", "archived"] as const;
 const PRIORITIES = ["cold", "warm", "hot", "urgent"] as const;
 
 const PRIORITY_COLORS: Record<string, { bg: string; text: string }> = {
@@ -72,6 +81,8 @@ const STAGE_COLORS: Record<string, { bg: string; text: string }> = {
   negotiating: { bg: "#8B5CF620", text: "#8B5CF6" },
   converted:   { bg: "#05966920", text: "#059669" },
   lost:        { bg: "#9CA3AF20", text: "#9CA3AF" },
+  spam:        { bg: "#EF444420", text: "#EF4444" },
+  archived:    { bg: "#1F293720", text: "#1F2937" },
 };
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -182,8 +193,47 @@ export default function AdminCRMPage() {
   const [criticalityFilter, setCriticalityFilter] = useState("");
 
   /* ── Logs View ── */
-  const [activeTab, setActiveTab] = useState<"leads" | "logs">("leads");
+  const [activeTab, setActiveTab] = useState<"leads" | "spam_archive" | "dev_console" | "logs">("leads");
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
+  const [devLogs, setDevLogs] = useState<DevConsoleLog[]>([]);
+
+  /* ── Error Logger Hook ── */
+  useEffect(() => {
+    const handleLog = (level: "error"|"warn"|"info", ...args: any[]) => {
+      const message = args.map(a => (typeof a === "object" ? JSON.stringify(a) : String(a))).join(" ");
+      const stack = new Error().stack;
+      setDevLogs(prev => [{
+        id: Math.random().toString(36).substring(2, 9),
+        timestamp: new Date().toISOString(),
+        level,
+        message,
+        stack
+      }, ...prev].slice(0, 100)); // Keep last 100 logs
+    };
+
+    const originalError = console.error;
+    console.error = (...args) => {
+      handleLog("error", ...args);
+      originalError.apply(console, args);
+    };
+
+    const handleWindowError = (event: ErrorEvent) => {
+      handleLog("error", `Uncaught: ${event.message}`, event.filename, event.lineno, event.colno);
+    };
+
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      handleLog("error", `Unhandled Rejection: ${event.reason}`);
+    };
+
+    window.addEventListener("error", handleWindowError);
+    window.addEventListener("unhandledrejection", handleUnhandledRejection);
+
+    return () => {
+      console.error = originalError;
+      window.removeEventListener("error", handleWindowError);
+      window.removeEventListener("unhandledrejection", handleUnhandledRejection);
+    };
+  }, []);
 
   /* ── Resume saved session & Device ID ── */
   useEffect(() => {
@@ -575,16 +625,28 @@ export default function AdminCRMPage() {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1 p-1 rounded-lg" style={{ backgroundColor: "var(--color-bg-soft)", border: "1px solid var(--color-border)" }}>
             <button
-              onClick={() => setActiveTab("leads")}
-              className={`text-xs px-3 py-1 rounded-md font-medium transition-colors cursor-pointer ${activeTab === "leads" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
+               onClick={() => setActiveTab("leads")}
+               className={`text-xs px-3 py-1 rounded-md font-medium transition-colors cursor-pointer ${activeTab === "leads" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
             >
-              Leads
+               Leads
             </button>
             <button
-              onClick={() => setActiveTab("logs")}
-              className={`text-xs px-3 py-1 rounded-md font-medium transition-colors cursor-pointer ${activeTab === "logs" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
+               onClick={() => setActiveTab("spam_archive")}
+               className={`text-xs px-3 py-1 rounded-md font-medium transition-colors cursor-pointer ${activeTab === "spam_archive" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
             >
-              Logs
+               Spam/Archive
+            </button>
+            <button
+               onClick={() => setActiveTab("dev_console")}
+               className={`text-xs px-3 py-1 rounded-md font-medium transition-colors cursor-pointer ${activeTab === "dev_console" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
+            >
+               Dev Console
+            </button>
+            <button
+               onClick={() => setActiveTab("logs")}
+               className={`text-xs px-3 py-1 rounded-md font-medium transition-colors cursor-pointer ${activeTab === "logs" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
+            >
+               Admin Logs
             </button>
           </div>
           <button
@@ -611,7 +673,7 @@ export default function AdminCRMPage() {
       </header>
 
       <div className="flex flex-1 overflow-hidden" style={{ height: "calc(100vh - 65px)" }}>
-        {activeTab === "leads" ? (
+        {activeTab === "leads" || activeTab === "spam_archive" ? (
           <>
             {/* ════════════ Left — Leads List ════════════ */}
             <aside
@@ -707,7 +769,7 @@ export default function AdminCRMPage() {
                 <div className="w-8 h-8 border-[3px] border-teal-200 border-t-teal-500 rounded-full animate-spin mx-auto mb-3" />
                 <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>Loading leads…</p>
               </div>
-            ) : leads.length === 0 ? (
+            ) : leads.filter(l => (activeTab === "spam_archive") ? ["spam", "archived"].includes(l.stage) : !["spam", "archived"].includes(l.stage)).length === 0 ? (
               <div className="p-8 text-center">
                 <p className="text-sm font-medium mb-1" style={{ color: "var(--color-text-secondary)" }}>
                   No leads found
@@ -717,7 +779,7 @@ export default function AdminCRMPage() {
                 </p>
               </div>
             ) : (
-              leads.map((lead) => {
+              leads.filter(l => (activeTab === "spam_archive") ? ["spam", "archived"].includes(l.stage) : !["spam", "archived"].includes(l.stage)).map((lead) => {
                 const prioColor = getColorSet(PRIORITY_COLORS, lead.priority);
                 const stageColor = getColorSet(STAGE_COLORS, lead.stage);
                 const isActive = selectedLead?.id === lead.id;
@@ -735,6 +797,11 @@ export default function AdminCRMPage() {
                     <div className="flex items-start justify-between mb-1.5">
                       <span className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
                         {lead.name}
+                        {lead.submission_count > 1 && (
+                          <span className="ml-2 text-[10px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full inline-block" title="Duplicate Submissions">
+                            {lead.submission_count}x inserted
+                          </span>
+                        )}
                       </span>
                       <div className="flex items-center gap-2">
                         {lead.assigned_to && (
@@ -803,6 +870,11 @@ export default function AdminCRMPage() {
                   <div>
                     <h2 className="text-xl font-bold" style={{ color: "var(--color-text-primary)" }}>
                       {selectedLead.name}
+                      {selectedLead.submission_count > 1 && (
+                          <span className="ml-2 text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full align-middle font-bold">
+                            {selectedLead.submission_count}x inserted
+                          </span>
+                      )}
                     </h2>
                     <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
                       {selectedLead.phone} · {[selectedLead.city, selectedLead.user_state].filter(s => s && s.trim().length > 0).join(", ") || "Unknown Location"}
@@ -845,8 +917,20 @@ export default function AdminCRMPage() {
                           }}
                         >
                           <button
+                            onClick={() => { setShowActions(false); updateLeadField(selectedLead.id, "stage", "spam"); }}
+                            className="w-full text-left px-4 py-2 text-xs hover:bg-gray-100 text-gray-700 cursor-pointer"
+                          >
+                            Mark as Spam
+                          </button>
+                          <button
+                            onClick={() => { setShowActions(false); updateLeadField(selectedLead.id, "stage", "archived"); }}
+                            className="w-full text-left px-4 py-2 text-xs hover:bg-gray-100 text-gray-700 cursor-pointer"
+                          >
+                            Move to Archive
+                          </button>
+                          <button
                             onClick={() => { setShowActions(false); deleteLead(selectedLead.id); }}
-                            className="w-full text-left px-4 py-2 text-xs hover:bg-red-50 text-red-600 cursor-pointer"
+                            className="w-full text-left px-4 py-2 text-xs hover:bg-red-50 text-red-600 cursor-pointer border-t border-gray-100"
                           >
                             Delete Lead
                           </button>
@@ -1164,6 +1248,42 @@ export default function AdminCRMPage() {
           )}
         </main>
         </>
+        ) : activeTab === "dev_console" ? (
+          <main className="flex-1 overflow-y-auto p-6" style={{ backgroundColor: "var(--color-bg)" }}>
+            <h2 className="text-xl font-bold mb-2" style={{ color: "var(--color-text-primary)" }}>Developer Error Console</h2>
+            <p className="text-xs mb-6" style={{ color: "var(--color-text-secondary)" }}>Frontend errors, warnings, and snapshots are recorded locally during this session.</p>
+            <div className="rounded-xl overflow-hidden" style={{ backgroundColor: "var(--color-bg-card)", border: "1px solid var(--color-border)" }}>
+              <div className="p-4 flex justify-between items-center" style={{ borderBottom: "1px solid var(--color-border)", backgroundColor: "var(--color-bg-soft)" }}>
+                  <span className="text-xs font-semibold" style={{ color: "var(--color-text-secondary)" }}>{devLogs.length} Events Logged</span>
+                  <button onClick={() => setDevLogs([])} className="text-xs px-3 py-1 bg-white border border-gray-200 rounded text-red-600 hover:bg-red-50 font-medium cursor-pointer transition-colors">Clear Logs</button>
+              </div>
+              <ul className="divide-y" style={{ borderColor: "var(--color-border)" }}>
+                {devLogs.map(log => (
+                  <li key={log.id} className="p-4" style={{ backgroundColor: log.level === "error" ? "rgba(239, 68, 68, 0.05)" : "transparent" }}>
+                    <div className="flex gap-4">
+                      <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${log.level === "error" ? "bg-red-100 text-red-700" : "bg-yellow-100 text-yellow-700"}`} style={{ alignSelf: "flex-start" }}>
+                        {log.level}
+                      </span>
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold mb-1" style={{ color: "var(--color-text-primary)" }}>{log.message}</p>
+                        {log.stack && (
+                           <pre className="text-[10px] p-2 mt-2 rounded overflow-x-auto" style={{ backgroundColor: "var(--color-bg-soft)", color: "var(--color-text-secondary)", border: "1px solid var(--color-border)" }}>
+                             {log.stack}
+                           </pre>
+                        )}
+                      </div>
+                      <time className="text-xs font-mono whitespace-nowrap" style={{ color: "var(--color-text-muted)" }}>
+                        {formatDateTime(log.timestamp)}
+                      </time>
+                    </div>
+                  </li>
+                ))}
+                {devLogs.length === 0 && (
+                   <li className="p-8 text-center text-sm" style={{ color: "var(--color-text-muted)" }}>No errors logged. Keep this tab open to monitor errors from the console.</li>
+                )}
+              </ul>
+            </div>
+          </main>
         ) : (
           <main className="flex-1 overflow-y-auto p-6" style={{ backgroundColor: "var(--color-bg)" }}>
             <h2 className="text-xl font-bold mb-6" style={{ color: "var(--color-text-primary)" }}>Admin Activity Logs</h2>
