@@ -21,10 +21,10 @@ export default function Navbar() {
                 {/* Nav Links */}
                 <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
                     <Link href="/#steps" className="text-sm font-medium hover:text-teal-600 transition-colors" style={{ color: "var(--color-text-secondary)" }}>How it Works</Link>
-                    <Link href="/articles" className="text-sm font-medium hover:text-teal-600 transition-colors" style={{ color: "var(--color-text-secondary)" }}>Guides</Link>
                     <Link href="/#pricing" className="text-sm font-medium hover:text-teal-600 transition-colors" style={{ color: "var(--color-text-secondary)" }}>Plans</Link>
                     <Link href="/#trust" className="text-sm font-medium hover:text-teal-600 transition-colors" style={{ color: "var(--color-text-secondary)" }}>Security</Link>
                     <Link href="/faq" className="text-sm font-medium hover:text-teal-600 transition-colors" style={{ color: "var(--color-text-secondary)" }}>FAQs</Link>
+                    <Link href="/blogs" className="text-sm font-medium hover:text-teal-600 transition-colors" style={{ color: "var(--color-text-secondary)" }}>Blog</Link>
                 </div>
             </div>
         </nav>

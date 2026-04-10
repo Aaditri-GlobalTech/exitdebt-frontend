@@ -37,7 +37,7 @@ export default function BlogSection() {
                 {ARTICLES.map((article, i) => (
                     <Link
                         key={article.id}
-                        href={`/articles/${article.slug}`}
+                        href={`/blogs/${article.slug}`}
                         className="group bg-white border border-gray-100 rounded-xl overflow-hidden hover:shadow-md transition-all duration-300 hover:-translate-y-1 animate-slideUp"
                         style={{ animationDelay: `${i * 0.1}s` }}
                     >

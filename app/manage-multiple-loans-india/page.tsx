@@ -19,9 +19,9 @@ export default function ManageMultipleLoansIndia() {
       <main className="flex-grow">
         <section className="bg-[var(--color-bg-soft)] py-20 sm:py-32">
           <div className="max-w-4xl mx-auto px-6">
-            <Link href="/articles" className="text-sm font-medium text-[var(--color-teal)] hover:underline flex items-center gap-1 mb-10 animate-fadeIn">
+            <Link href="/blogs" className="text-sm font-medium text-[var(--color-teal)] hover:underline flex items-center gap-1 mb-10 animate-fadeIn">
                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-               Back to Guides
+               Back to Blog
             </Link>
             <h1 className="text-5xl sm:text-7xl font-black mb-8 tracking-tight leading-[1.1] text-[var(--color-text-primary)]">
               Manage <span className="text-[var(--color-teal)]">Multiple Loans</span> in India

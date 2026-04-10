@@ -2,12 +2,13 @@ import React from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Link from "next/link";
+import Image from "next/image";
 
 export const metadata = {
   title: "Expert Debt Management Guides | ExitDebt India",
   description: "Comprehensive guides on credit card debt, EMI reduction, loan management, and legal debt restructuring in India.",
   alternates: {
-    canonical: "/articles",
+    canonical: "/blogs",
   },
 };
 
@@ -57,13 +58,18 @@ export default function ArticlesListing() {
       <main className="flex-grow">
         {/* Hero */}
         <section className="bg-[var(--color-bg-soft)] py-20 sm:py-32">
-          <div className="max-w-6xl mx-auto px-8 text-center sm:text-left">
-            <h1 className="text-5xl sm:text-7xl font-black mb-6 tracking-tight leading-[1.1] animate-slideUp">
-              Expert <span className="text-[var(--color-teal)]">Guides</span>
-            </h1>
-            <p className="text-xl text-[var(--color-text-secondary)] max-w-2xl animate-fadeIn">
-              Empowering you with the knowledge to handle debt legally and regain your financial freedom.
-            </p>
+          <div className="max-w-6xl mx-auto px-8 flex flex-col sm:flex-row items-center gap-12">
+            <div className="flex-1">
+              <h1 className="text-5xl sm:text-7xl font-black mb-6 tracking-tight leading-[1.1] animate-slideUp">
+                <span className="text-[var(--color-teal)]">Blog</span>
+              </h1>
+              <p className="text-xl text-[var(--color-text-secondary)] max-w-2xl animate-fadeIn">
+                Debt feels overwhelming when you don&apos;t know your options. Our guides give you the knowledge banks never share — your legal rights, proven repayment strategies, and negotiation tools — so you can face your finances with confidence and find your way out.
+              </p>
+            </div>
+            <div className="flex-shrink-0 w-full sm:w-[420px] animate-fadeIn">
+              <Image src="/blog.svg" alt="Blog illustration" width={420} height={420} className="w-full h-auto" />
+            </div>
           </div>
         </section>
 
@@ -93,7 +99,7 @@ export default function ArticlesListing() {
                     {article.description}
                   </p>
                   <div className="flex items-center gap-2 text-[var(--color-teal)] font-bold text-sm uppercase tracking-wider">
-                    Read Guide 
+                    Read Post
                     <svg className="group-hover:translate-x-1 transition-transform" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
                   </div>
                 </Link>
