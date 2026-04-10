@@ -193,7 +193,38 @@ export default function AdminCRMPage() {
   const [criticalityFilter, setCriticalityFilter] = useState("");
 
   /* ── Logs View ── */
-  const [activeTab, setActiveTab] = useState<"leads" | "spam_archive" | "dev_console" | "logs">("leads");
+  const [activeTab, setActiveTab] = useState<"leads" | "spam_archive" | "dev_console" | "logs" | "cms">("leads");
+
+  /* ── Blog CMS State ── */
+  interface BlogPost {
+    id: string;
+    slug: string;
+    title: string;
+    description: string;
+    content: string;
+    tag: string;
+    read_time: string;
+    is_published: boolean;
+    author: string;
+    created_at: string;
+    updated_at: string;
+  }
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [blogLoading, setBlogLoading] = useState(false);
+  const [blogFormOpen, setBlogFormOpen] = useState(false);
+  const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null);
+  const [blogForm, setBlogForm] = useState({
+    title: "",
+    slug: "",
+    description: "",
+    content: "",
+    tag: "General",
+    read_time: "5 min read",
+    is_published: true,
+    author: "ExitDebt Team",
+  });
+  const [blogInputMethod, setBlogInputMethod] = useState<"write" | "markdown" | "upload">("write");
+  const [blogSaving, setBlogSaving] = useState(false);
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
   const [devLogs, setDevLogs] = useState<DevConsoleLog[]>([]);
 
@@ -363,6 +394,18 @@ export default function AdminCRMPage() {
   useEffect(() => {
     if (isAuthenticated && activeTab === "logs") fetchLogs();
   }, [isAuthenticated, activeTab, fetchLogs]);
+
+  /* ── Fetch blogs when CMS tab is active ── */
+  useEffect(() => {
+    if (isAuthenticated && activeTab === "cms") {
+      setBlogLoading(true);
+      fetch(`${API_BASE.replace('/admin', '')}/admin/blogs`, { headers: authHeaders() })
+        .then((res) => (res.ok ? res.json() : []))
+        .then((data) => setBlogPosts(data))
+        .catch(() => {})
+        .finally(() => setBlogLoading(false));
+    }
+  }, [isAuthenticated, activeTab, authHeaders]);
 
   /* ── Delete / Archive Lead ── */
   const deleteLead = async (id: string) => {
@@ -641,6 +684,12 @@ export default function AdminCRMPage() {
                className={`text-xs px-3 py-1 rounded-md font-medium transition-colors cursor-pointer ${activeTab === "dev_console" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
             >
                Dev Console
+            </button>
+            <button
+               onClick={() => setActiveTab("cms")}
+               className={`text-xs px-3 py-1 rounded-md font-medium transition-colors cursor-pointer ${activeTab === "cms" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
+            >
+               Blog CMS
             </button>
             <button
                onClick={() => setActiveTab("logs")}
@@ -1248,6 +1297,397 @@ export default function AdminCRMPage() {
           )}
         </main>
         </>
+        ) : activeTab === "cms" ? (
+          <main className="flex-1 overflow-y-auto p-6" style={{ backgroundColor: "var(--color-bg)" }}>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-xl font-bold" style={{ color: "var(--color-text-primary)" }}>Blog CMS</h2>
+                <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>Create, edit, and manage blog posts. Content supports Markdown formatting.</p>
+              </div>
+              <button
+                onClick={() => {
+                  setEditingBlog(null);
+                  setBlogForm({ title: "", slug: "", description: "", content: "", tag: "General", read_time: "5 min read", is_published: true, author: "ExitDebt Team" });
+                  setBlogInputMethod("write");
+                  setBlogFormOpen(true);
+                }}
+                className="px-4 py-2 rounded-lg text-xs font-bold text-white cursor-pointer transition-opacity hover:opacity-90"
+                style={{ backgroundColor: "var(--color-teal)" }}
+              >
+                + New Blog Post
+              </button>
+            </div>
+
+            {/* ── Blog Form Modal ── */}
+            {blogFormOpen && (
+              <div className="mb-6 rounded-xl p-6" style={{ backgroundColor: "var(--color-bg-card)", border: "1px solid var(--color-border)" }}>
+                <div className="flex items-center justify-between mb-5">
+                  <h3 className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>
+                    {editingBlog ? "Edit Blog Post" : "Create New Blog Post"}
+                  </h3>
+                  <button
+                    onClick={() => setBlogFormOpen(false)}
+                    className="text-xs px-3 py-1 rounded-md cursor-pointer hover:opacity-80"
+                    style={{ color: "var(--color-text-muted)" }}
+                  >
+                    ✕ Close
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "var(--color-text-muted)" }}>Title</label>
+                    <input
+                      type="text"
+                      value={blogForm.title}
+                      onChange={(e) => {
+                        const title = e.target.value;
+                        const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+                        setBlogForm((prev) => ({ ...prev, title, slug }));
+                      }}
+                      placeholder="Blog post title"
+                      className="w-full px-3 py-2 rounded-lg text-sm"
+                      style={{ backgroundColor: "var(--color-bg-soft)", border: "1px solid var(--color-border)", color: "var(--color-text-primary)" }}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "var(--color-text-muted)" }}>Slug</label>
+                    <input
+                      type="text"
+                      value={blogForm.slug}
+                      onChange={(e) => setBlogForm((prev) => ({ ...prev, slug: e.target.value }))}
+                      placeholder="url-friendly-slug"
+                      className="w-full px-3 py-2 rounded-lg text-sm font-mono"
+                      style={{ backgroundColor: "var(--color-bg-soft)", border: "1px solid var(--color-border)", color: "var(--color-text-primary)" }}
+                    />
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "var(--color-text-muted)" }}>Description</label>
+                  <input
+                    type="text"
+                    value={blogForm.description}
+                    onChange={(e) => setBlogForm((prev) => ({ ...prev, description: e.target.value }))}
+                    placeholder="Short description for the blog listing card"
+                    className="w-full px-3 py-2 rounded-lg text-sm"
+                    style={{ backgroundColor: "var(--color-bg-soft)", border: "1px solid var(--color-border)", color: "var(--color-text-primary)" }}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-5">
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "var(--color-text-muted)" }}>Tag / Category</label>
+                    <input
+                      type="text"
+                      value={blogForm.tag}
+                      onChange={(e) => setBlogForm((prev) => ({ ...prev, tag: e.target.value }))}
+                      placeholder="e.g. Credit Cards"
+                      className="w-full px-3 py-2 rounded-lg text-sm"
+                      style={{ backgroundColor: "var(--color-bg-soft)", border: "1px solid var(--color-border)", color: "var(--color-text-primary)" }}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "var(--color-text-muted)" }}>Read Time</label>
+                    <input
+                      type="text"
+                      value={blogForm.read_time}
+                      onChange={(e) => setBlogForm((prev) => ({ ...prev, read_time: e.target.value }))}
+                      placeholder="5 min read"
+                      className="w-full px-3 py-2 rounded-lg text-sm"
+                      style={{ backgroundColor: "var(--color-bg-soft)", border: "1px solid var(--color-border)", color: "var(--color-text-primary)" }}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "var(--color-text-muted)" }}>Author</label>
+                    <input
+                      type="text"
+                      value={blogForm.author}
+                      onChange={(e) => setBlogForm((prev) => ({ ...prev, author: e.target.value }))}
+                      placeholder="ExitDebt Team"
+                      className="w-full px-3 py-2 rounded-lg text-sm"
+                      style={{ backgroundColor: "var(--color-bg-soft)", border: "1px solid var(--color-border)", color: "var(--color-text-primary)" }}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "var(--color-text-muted)" }}>Status</label>
+                    <select
+                      value={blogForm.is_published ? "published" : "draft"}
+                      onChange={(e) => setBlogForm((prev) => ({ ...prev, is_published: e.target.value === "published" }))}
+                      className="w-full px-3 py-2 rounded-lg text-sm appearance-none cursor-pointer"
+                      style={{ backgroundColor: "var(--color-bg-soft)", border: "1px solid var(--color-border)", color: "var(--color-text-primary)" }}
+                    >
+                      <option value="published">Published</option>
+                      <option value="draft">Draft</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* ── Content Input Method Picker ── */}
+                <div className="mb-3">
+                  <label className="block text-[10px] font-bold uppercase tracking-wider mb-2" style={{ color: "var(--color-text-muted)" }}>Content Input Method</label>
+                  <div className="flex items-center gap-1 p-1 rounded-lg w-fit" style={{ backgroundColor: "var(--color-bg-soft)", border: "1px solid var(--color-border)" }}>
+                    <button
+                      onClick={() => setBlogInputMethod("write")}
+                      className={`text-xs px-3 py-1.5 rounded-md font-medium transition-colors cursor-pointer ${blogInputMethod === "write" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
+                    >
+                      ✏️ Write Manually
+                    </button>
+                    <button
+                      onClick={() => setBlogInputMethod("markdown")}
+                      className={`text-xs px-3 py-1.5 rounded-md font-medium transition-colors cursor-pointer ${blogInputMethod === "markdown" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
+                    >
+                      📝 Markdown
+                    </button>
+                    <button
+                      onClick={() => setBlogInputMethod("upload")}
+                      className={`text-xs px-3 py-1.5 rounded-md font-medium transition-colors cursor-pointer ${blogInputMethod === "upload" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
+                    >
+                      📁 Upload File
+                    </button>
+                  </div>
+                </div>
+
+                {/* ── Content Area ── */}
+                {blogInputMethod === "upload" ? (
+                  <div
+                    className="mb-5 rounded-xl p-8 text-center transition-colors"
+                    style={{ backgroundColor: "var(--color-bg-soft)", border: "2px dashed var(--color-border)" }}
+                    onDragOver={(e) => { e.preventDefault(); e.currentTarget.style.borderColor = "var(--color-teal)"; }}
+                    onDragLeave={(e) => { e.currentTarget.style.borderColor = "var(--color-border)"; }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      e.currentTarget.style.borderColor = "var(--color-border)";
+                      const file = e.dataTransfer.files[0];
+                      if (file && (file.name.endsWith(".md") || file.name.endsWith(".txt") || file.name.endsWith(".markdown"))) {
+                        const reader = new FileReader();
+                        reader.onload = (ev) => {
+                          const text = ev.target?.result as string;
+                          setBlogForm((prev) => ({ ...prev, content: text }));
+                          setBlogInputMethod("markdown");
+                        };
+                        reader.readAsText(file);
+                      } else {
+                        alert("Please upload a .md, .markdown, or .txt file.");
+                      }
+                    }}
+                  >
+                    <p className="text-sm font-medium mb-2" style={{ color: "var(--color-text-secondary)" }}>Drag & drop a Markdown file here</p>
+                    <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>Supports .md, .markdown, or .txt files</p>
+                    <label className="inline-block px-4 py-2 rounded-lg text-xs font-bold text-white cursor-pointer transition-opacity hover:opacity-90" style={{ backgroundColor: "var(--color-teal)" }}>
+                      Browse Files
+                      <input
+                        type="file"
+                        accept=".md,.markdown,.txt"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (ev) => {
+                              const text = ev.target?.result as string;
+                              setBlogForm((prev) => ({ ...prev, content: text }));
+                              setBlogInputMethod("markdown");
+                            };
+                            reader.readAsText(file);
+                          }
+                        }}
+                      />
+                    </label>
+                  </div>
+                ) : (
+                  <div className="mb-5">
+                    <textarea
+                      value={blogForm.content}
+                      onChange={(e) => setBlogForm((prev) => ({ ...prev, content: e.target.value }))}
+                      placeholder={blogInputMethod === "markdown" ? "# My Blog Post\n\nWrite your content in **Markdown** format...\n\n## Section Title\n\nParagraph text here." : "Write your blog post content here...\n\nUse plain text. Each paragraph will be rendered as a separate block."}
+                      rows={16}
+                      className="w-full px-4 py-3 rounded-xl text-sm font-mono leading-relaxed resize-y"
+                      style={{ backgroundColor: "var(--color-bg-soft)", border: "1px solid var(--color-border)", color: "var(--color-text-primary)" }}
+                    />
+                    <p className="text-[10px] mt-1" style={{ color: "var(--color-text-muted)" }}>
+                      {blogInputMethod === "markdown" ? "Content will be rendered as Markdown on the frontend. Supports headings, bold, italic, lists, blockquotes, links, and code blocks." : "Plain text mode. Use Markdown syntax (# headings, **bold**, *italic*, - lists) for richer formatting."}
+                    </p>
+                  </div>
+                )}
+
+                {/* ── Submit ── */}
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={async () => {
+                      if (!blogForm.title.trim() || !blogForm.slug.trim() || !blogForm.content.trim() || !blogForm.description.trim()) {
+                        alert("Please fill in all required fields: Title, Slug, Description, and Content.");
+                        return;
+                      }
+                      setBlogSaving(true);
+                      try {
+                        const url = editingBlog
+                          ? `${API_BASE.replace('/admin', '')}/admin/blogs/${editingBlog.id}`
+                          : `${API_BASE.replace('/admin', '')}/admin/blogs`;
+                        const method = editingBlog ? "PUT" : "POST";
+                        const res = await fetch(url, {
+                          method,
+                          headers: authHeaders(),
+                          body: JSON.stringify(blogForm),
+                        });
+                        if (res.ok) {
+                          setBlogFormOpen(false);
+                          setEditingBlog(null);
+                          // Refresh blog list
+                          const listRes = await fetch(`${API_BASE.replace('/admin', '')}/admin/blogs`, { headers: authHeaders() });
+                          if (listRes.ok) setBlogPosts(await listRes.json());
+                        } else {
+                          const err = await res.json().catch(() => ({ detail: "Unknown error" }));
+                          alert(`Failed to save: ${err.detail || res.statusText}`);
+                        }
+                      } catch (err) {
+                        console.error("Failed to save blog:", err);
+                        alert("Error saving blog post.");
+                      } finally {
+                        setBlogSaving(false);
+                      }
+                    }}
+                    disabled={blogSaving}
+                    className="px-6 py-2.5 rounded-lg text-xs font-bold text-white cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-opacity hover:opacity-90"
+                    style={{ backgroundColor: "var(--color-teal)" }}
+                  >
+                    {blogSaving ? "Saving…" : editingBlog ? "Update Post" : "Publish Post"}
+                  </button>
+                  <button
+                    onClick={() => { setBlogFormOpen(false); setEditingBlog(null); }}
+                    className="px-4 py-2.5 rounded-lg text-xs font-medium cursor-pointer transition-colors hover:opacity-80"
+                    style={{ backgroundColor: "var(--color-bg-soft)", border: "1px solid var(--color-border)", color: "var(--color-text-secondary)" }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ── Blog Posts Table ── */}
+            <div className="rounded-xl overflow-hidden" style={{ backgroundColor: "var(--color-bg-card)", border: "1px solid var(--color-border)" }}>
+              <div className="p-4 flex justify-between items-center" style={{ borderBottom: "1px solid var(--color-border)", backgroundColor: "var(--color-bg-soft)" }}>
+                <span className="text-xs font-semibold" style={{ color: "var(--color-text-secondary)" }}>{blogPosts.length} Blog Posts</span>
+                <button
+                  onClick={async () => {
+                    setBlogLoading(true);
+                    try {
+                      const res = await fetch(`${API_BASE.replace('/admin', '')}/admin/blogs`, { headers: authHeaders() });
+                      if (res.ok) setBlogPosts(await res.json());
+                    } catch (err) { console.error(err); }
+                    finally { setBlogLoading(false); }
+                  }}
+                  className="text-xs px-3 py-1 bg-white border border-gray-200 rounded font-medium cursor-pointer transition-colors hover:bg-gray-50"
+                  style={{ color: "var(--color-text-secondary)" }}
+                >
+                  ↻ Refresh
+                </button>
+              </div>
+
+              {blogLoading ? (
+                <div className="p-8 text-center">
+                  <div className="w-8 h-8 border-[3px] border-teal-200 border-t-teal-500 rounded-full animate-spin mx-auto mb-3" />
+                  <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>Loading blog posts…</p>
+                </div>
+              ) : (
+                <table className="w-full text-left text-sm">
+                  <thead style={{ backgroundColor: "var(--color-bg-soft)", borderBottom: "1px solid var(--color-border)" }}>
+                    <tr>
+                      <th className="px-4 py-3 font-medium" style={{ color: "var(--color-text-secondary)" }}>Title</th>
+                      <th className="px-4 py-3 font-medium" style={{ color: "var(--color-text-secondary)" }}>Slug</th>
+                      <th className="px-4 py-3 font-medium" style={{ color: "var(--color-text-secondary)" }}>Tag</th>
+                      <th className="px-4 py-3 font-medium" style={{ color: "var(--color-text-secondary)" }}>Status</th>
+                      <th className="px-4 py-3 font-medium" style={{ color: "var(--color-text-secondary)" }}>Created</th>
+                      <th className="px-4 py-3 font-medium text-right" style={{ color: "var(--color-text-secondary)" }}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y" style={{ borderColor: "var(--color-border)" }}>
+                    {blogPosts.map((post) => (
+                      <tr key={post.id} className="transition-colors hover:bg-black/5">
+                        <td className="px-4 py-3 font-medium max-w-[240px] truncate" style={{ color: "var(--color-text-primary)" }}>{post.title}</td>
+                        <td className="px-4 py-3 font-mono text-xs" style={{ color: "var(--color-text-secondary)" }}>{post.slug}</td>
+                        <td className="px-4 py-3">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase" style={{ backgroundColor: "var(--color-teal-light)", color: "var(--color-teal)" }}>
+                            {post.tag}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${post.is_published ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>
+                            {post.is_published ? "Published" : "Draft"}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap text-xs" style={{ color: "var(--color-text-secondary)" }}>{formatDate(post.created_at)}</td>
+                        <td className="px-4 py-3 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => {
+                                setEditingBlog(post);
+                                setBlogForm({
+                                  title: post.title,
+                                  slug: post.slug,
+                                  description: post.description,
+                                  content: post.content,
+                                  tag: post.tag,
+                                  read_time: post.read_time,
+                                  is_published: post.is_published,
+                                  author: post.author,
+                                });
+                                setBlogInputMethod("markdown");
+                                setBlogFormOpen(true);
+                              }}
+                              className="text-[10px] font-semibold px-2.5 py-1 rounded-md cursor-pointer transition-colors hover:opacity-80"
+                              style={{ backgroundColor: "var(--color-teal-light)", color: "var(--color-teal)" }}
+                            >
+                              Edit
+                            </button>
+                            <a
+                              href={`/blogs/${post.slug}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[10px] font-semibold px-2.5 py-1 rounded-md cursor-pointer transition-colors hover:opacity-80"
+                              style={{ backgroundColor: "var(--color-bg-soft)", border: "1px solid var(--color-border)", color: "var(--color-text-secondary)" }}
+                            >
+                              View
+                            </a>
+                            <button
+                              onClick={async () => {
+                                if (!confirm(`Delete "${post.title}"? This cannot be undone.`)) return;
+                                try {
+                                  const res = await fetch(`${API_BASE.replace('/admin', '')}/admin/blogs/${post.id}`, {
+                                    method: "DELETE",
+                                    headers: authHeaders(),
+                                  });
+                                  if (res.ok) {
+                                    setBlogPosts((prev) => prev.filter((p) => p.id !== post.id));
+                                  } else {
+                                    alert("Failed to delete blog post.");
+                                  }
+                                } catch (err) {
+                                  console.error(err);
+                                  alert("Error deleting blog post.");
+                                }
+                              }}
+                              className="text-[10px] font-semibold px-2.5 py-1 rounded-md cursor-pointer transition-colors hover:bg-red-50"
+                              style={{ color: "#EF4444", border: "1px solid #EF444430" }}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                    {blogPosts.length === 0 && (
+                      <tr>
+                        <td colSpan={6} className="px-4 py-8 text-center text-xs" style={{ color: "var(--color-text-muted)" }}>
+                          No blog posts yet. Click &quot;+ New Blog Post&quot; to create one.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </main>
         ) : activeTab === "dev_console" ? (
           <main className="flex-1 overflow-y-auto p-6" style={{ backgroundColor: "var(--color-bg)" }}>
             <h2 className="text-xl font-bold mb-2" style={{ color: "var(--color-text-primary)" }}>Developer Error Console</h2>

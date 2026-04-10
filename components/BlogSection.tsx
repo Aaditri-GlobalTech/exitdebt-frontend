@@ -1,7 +1,26 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
-const ARTICLES = [
+/* ═══════════════════════════════════════════════════════════════════════
+ * Types
+ * ═══════════════════════════════════════════════════════════════════════ */
+
+interface BlogItem {
+    id: string | number;
+    slug: string;
+    title: string;
+    excerpt: string;
+    category: string;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+ * Static fallback articles (legacy)
+ * ═══════════════════════════════════════════════════════════════════════ */
+
+const STATIC_ARTICLES: BlogItem[] = [
     {
         id: 1,
         slug: "credit-card-mistakes",
@@ -25,7 +44,44 @@ const ARTICLES = [
     },
 ];
 
+/* ═══════════════════════════════════════════════════════════════════════
+ * Constants
+ * ═══════════════════════════════════════════════════════════════════════ */
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+
+/* ═══════════════════════════════════════════════════════════════════════
+ * Component
+ * ═══════════════════════════════════════════════════════════════════════ */
+
 export default function BlogSection() {
+    const [articles, setArticles] = useState<BlogItem[]>(STATIC_ARTICLES);
+
+    useEffect(() => {
+        async function fetchLatest() {
+            try {
+                const res = await fetch(`${API_URL}/api/blogs?limit=3`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.length > 0) {
+                        setArticles(
+                            data.map((b: { id: string; slug: string; title: string; description: string; tag: string }) => ({
+                                id: b.id,
+                                slug: b.slug,
+                                title: b.title,
+                                excerpt: b.description,
+                                category: b.tag,
+                            }))
+                        );
+                    }
+                }
+            } catch {
+                // Keep static fallback
+            }
+        }
+        fetchLatest();
+    }, []);
+
     return (
         <section id="articles" className="max-w-4xl mx-auto px-4 py-16">
             <div className="text-center mb-10">
@@ -34,7 +90,7 @@ export default function BlogSection() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                {ARTICLES.map((article, i) => (
+                {articles.map((article, i) => (
                     <Link
                         key={article.id}
                         href={`/blogs/${article.slug}`}
