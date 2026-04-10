@@ -193,6 +193,39 @@ input[type="number"] {
   animation: spin 1s linear infinite;
 }
 
+/* ─── Logo Breathe ─── */
+@keyframes logo-breathe {
+  0%, 100% {
+    letter-spacing: -0.04em;
+    transform: scaleY(1);
+  }
+  50% {
+    letter-spacing: 0.01em;
+    transform: scaleY(1.04);
+  }
+}
+
+.logo-breathe {
+  display: inline-block;
+  color: #134E4A;
+  animation: logo-breathe 3.5s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* ─── Testimonial Marquee ─── */
+@keyframes testimonial-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.testimonial-marquee {
+  animation: testimonial-scroll 40s linear infinite;
+}
+
+.testimonial-marquee:hover {
+  animation-play-state: paused;
+}
+
 /* ─── Print Styles ─── */
 @media print {
   .no-print {

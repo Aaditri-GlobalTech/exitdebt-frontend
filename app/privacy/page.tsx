@@ -110,7 +110,7 @@ export default function PrivacyPolicyPage() {
                       <h3 className="text-lg font-bold text-[var(--color-teal)] uppercase tracking-widest">1.1 Provided by You</h3>
                       <p className="text-[var(--color-text-secondary)]">We collect information that you voluntarily provide when you interact with our Services, including but not limited to:</p>
                       <ul className="space-y-4 text-[var(--color-text-secondary)] font-medium">
-                        {["Name", "Email Address", "Phone Number", "Any other information you choose to provide"].map(item => (
+                        {["Name", "Email Address", "Phone Number", "PAN (used solely to fetch your credit report with your explicit consent)", "Any other information you choose to provide"].map(item => (
                           <li key={item} className="flex gap-4 items-center">
                             <span className="w-2 h-2 rounded-full bg-teal-100 border border-[var(--color-teal)]"></span>
                             {item}

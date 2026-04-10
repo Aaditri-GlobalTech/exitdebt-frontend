@@ -22,7 +22,7 @@ export default function Footer() {
                             className="text-sm leading-relaxed mb-6"
                             style={{ color: "var(--color-text-secondary)" }}
                         >
-                            Empowering millions to live debt-free with smart technology and personalized financial planning.
+                            Empowering Indians to find their structured, legal, and dignified path out of debt — because debt shouldn&apos;t define you.
                         </p>
                     </div>
 
@@ -31,7 +31,6 @@ export default function Footer() {
                         <p className="text-xs font-bold uppercase tracking-widest mb-5" style={{ color: "var(--color-text-primary)" }}>Company</p>
                         <ul className="space-y-3">
                             <li><Link href="/about" className="text-sm hover:text-teal-600 transition-colors" style={{ color: "var(--color-text-secondary)" }}>About Us</Link></li>
-                            <li><a href="#" className="text-sm hover:text-teal-600 transition-colors" style={{ color: "var(--color-text-secondary)" }}>Careers</a></li>
                             <li><a href="#" className="text-sm hover:text-teal-600 transition-colors" style={{ color: "var(--color-text-secondary)" }}>Contact Support</a></li>
                         </ul>
                     </div>
@@ -42,7 +41,6 @@ export default function Footer() {
                         <ul className="space-y-3">
                             <li><Link href="/privacy" className="text-sm hover:text-teal-600 transition-colors" style={{ color: "var(--color-text-secondary)" }}>Privacy Policy</Link></li>
                             <li><Link href="/terms" className="text-sm hover:text-teal-600 transition-colors" style={{ color: "var(--color-text-secondary)" }}>Terms of Service</Link></li>
-                            <li><a href="#" className="text-sm hover:text-teal-600 transition-colors" style={{ color: "var(--color-text-secondary)" }}>Cookie Policy</a></li>
                         </ul>
                     </div>
 

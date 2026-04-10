@@ -8,13 +8,14 @@ import Footer from "@/components/Footer";
 import PricingToggle from "@/components/PricingToggle";
 import PricingCard from "@/components/PricingCard";
 import FAQAccordion from "@/components/FAQAccordion";
+import { Lock, EyeOff } from "lucide-react";
 
 /* ───── Data ───── */
 
 const STEPS = [
-  { num: "1", title: "Tell Us About Your Debt", desc: "Quick and confidential — just your name, phone, and total debt amount. No credit score checks.", icon: "/PAN3.svg" },
-  { num: "2", title: "Book a Free Call", desc: "Choose a time that works for you. Our expert debt advisor will call to discuss your options.", icon: "/credit assessment.svg" },
-  { num: "3", title: "Get a Plan", desc: "Receive a personalized debt reduction strategy — consolidation, negotiation, or restructuring.", icon: "/plan.svg" },
+  { num: "1", title: "Tell Us About Your Debt", desc: "Quick and confidential — just your name, phone, and total debt amount. No credit score checks.", icon: "/PAN3.svg", tags: ["Private", "Secure", "One-Time"] },
+  { num: "2", title: "Book a Free Call", desc: "Choose a time that works for you. Our expert debt advisor will call to discuss your options.", icon: "/credit assessment.svg", tags: ["Instant", "0 Credit Impact", "No Guesswork"] },
+  { num: "3", title: "Get a Plan", desc: "Receive a personalized debt reduction strategy — consolidation, negotiation, or restructuring.", icon: "/plan.svg", tags: ["Your Data", "Our Insights", "Debt Freedom"] },
 ];
 
 const TRUST_POINTS = [
@@ -111,7 +112,7 @@ export default function LandingPage() {
                 className="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest mb-6"
                 style={{ backgroundColor: "var(--color-teal-light)", color: "var(--color-teal-dark)" }}
               >
-                <span className="mr-1.5 min-w-[12px] min-h-[12px] inline-flex items-center justify-center rounded-full bg-teal-600 text-[8px] text-white">✓</span> Trusted by 50,000+ Users
+                <span className="mr-1.5 min-w-[12px] min-h-[12px] inline-flex items-center justify-center rounded-full bg-teal-600 text-[8px] text-white">✓</span> India&apos;s First Debt Risk Intelligence Platform
               </div>
 
               <h1
@@ -119,25 +120,29 @@ export default function LandingPage() {
                 style={{ color: "var(--color-text-primary)" }}
               >
                 Are you <span style={{ color: "var(--color-teal)" }}>overpaying</span><br />
-                on your loans?
+                on your EMIs and debts?
               </h1>
 
               <p className="text-lg leading-relaxed max-w-xl mb-10" style={{ color: "var(--color-text-secondary)" }}>
-                Take control of your financial future. Our industry experts help you
-                find hidden savings and create a personalized debt reduction plan
-                tailored to your situation.
+                Most people in India pay more than they owe — and don&apos;t know it. ExitDebt analyses your credit report and gives you a clear, scored picture of your debt health — what&apos;s hurting you, how serious it is, and where to focus first.
               </p>
 
               {/* Trust Indicators */}
               <div className="flex flex-wrap gap-8">
-                <div className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-teal-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" /></svg>
-                  <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>256-bit encryption</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-teal-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
-                  <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>NO CREDIT IMPACT</span>
-                </div>
+                {[
+                  { label: "Soft Pull Only — No Credit Impact", icon: "check" },
+                  { label: "No Spam. Ever.", icon: "check" },
+                  { label: "Your data is as secure as your bank's", icon: "lock" },
+                ].map(({ label, icon }) => (
+                  <div key={label} className="flex items-center gap-2">
+                    {icon === "lock" ? (
+                      <svg className="w-5 h-5 text-teal-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" /></svg>
+                    ) : (
+                      <svg className="w-5 h-5 text-teal-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                    )}
+                    <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>{label}</span>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -152,7 +157,7 @@ export default function LandingPage() {
                 <div className="space-y-8 w-full max-w-sm">
                   <div className="space-y-3">
                     <h2 className="text-3xl font-black tracking-tight" style={{ color: "var(--color-text-primary)" }}>
-                      {isLoggedIn ? `Welcome back, ${user?.name?.split(' ')[0] || 'User'}!` : 'Ready to get debt-free?'}
+                      {isLoggedIn ? `Welcome back, ${user?.name?.split(' ')[0] || 'User'}!` : 'The complete picture of your debt.'}
                     </h2>
                     <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
                       Talk to our expert debt advisors for free. No credit score checks, no complicated forms — just a simple conversation about your options.
@@ -233,7 +238,7 @@ export default function LandingPage() {
 
                   
                   <div className="flex flex-wrap justify-center lg:justify-start gap-4 pt-4">
-                     {["Secure", "Fast", "Free"].map(tag => (
+                     {s.tags.map(tag => (
                        <span key={tag} className="px-4 py-2 rounded-xl bg-teal-50 border border-teal-100 text-[10px] font-black uppercase tracking-widest text-[var(--color-teal)]">
                          {tag}
                        </span>
@@ -259,11 +264,11 @@ export default function LandingPage() {
                   <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-teal)]">Bank-Grade Protection</span>
                 </div>
                 <h2 className="text-4xl lg:text-6xl font-black tracking-tighter leading-none" style={{ color: "var(--color-text-primary)" }}>
-                  Your Data is <br />
-                  <span className="text-[var(--color-teal)]">Fortress Protected.</span>
+                  Your Data is <span className="text-[var(--color-teal)]">Safe</span><br />
+                  and <span className="text-[var(--color-teal)]">Confidential.</span> Always.
                 </h2>
                 <p className="text-lg lg:text-xl leading-relaxed text-[var(--color-text-secondary)] opacity-80 max-w-xl">
-                  ExitDebt uses institutional encryption standards to ensure your financial integrity. We protect your dignity as fiercely as your data.
+                  Everything you share with ExitDebt is protected, private, and used for one purpose only — helping you understand your debt. Nothing more. We protect your dignity as fiercely as your data.
                 </p>
               </div>
 
@@ -271,22 +276,18 @@ export default function LandingPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-8">
                 <div className="space-y-3 p-8 rounded-[2.5rem] bg-gray-50/50 border border-gray-100/50 transition-all hover:shadow-xl hover:shadow-gray-200/20 group">
                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-white shadow-sm mb-6 transition-transform">
-                      <svg className="w-6 h-6" fill="var(--color-teal)" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M2.166 4.9L10 1.55l7.834 3.35a1 1 0 01.666.92v3.13a4 4 0 11-8 0V8.5a.5.5 0 011 0v.45a3 3 0 106 0V6.432L10 3.22 2.5 6.432v7.136c0 1.56 1.024 3.037 2.587 3.522L10 18.78l4.913-1.69c.991-.34 1.787-1.113 2.23-2.08a1 1 0 011.814.84a5.986 5.986 0 01-3.573 3.101L10 20.85l-5.384-1.854C2.616 18.358 1.5 16.51 1.5 14.5V6.5a1 1 0 01.666-.9z" clipRule="evenodd" />
-                      </svg>
+                      <Lock className="w-6 h-6 text-[var(--color-teal)]" />
                    </div>
-                   <h4 className="text-xl font-black" style={{ color: "var(--color-text-primary)" }}>AES-256 Bit</h4>
-                   <p className="text-sm text-[var(--color-text-secondary)]">Advanced military-grade encryption standards for all sensitive information.</p>
+                   <h4 className="text-xl font-black" style={{ color: "var(--color-text-primary)" }}>Your Data is Locked</h4>
+                   <p className="text-sm text-[var(--color-text-secondary)]">The same protection your bank uses. No one gets in without your permission.</p>
                 </div>
 
                 <div className="space-y-3 p-8 rounded-[2.5rem] bg-gray-50/50 border border-gray-100/50 transition-all hover:shadow-xl hover:shadow-gray-200/20 group">
                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-white shadow-sm mb-6 transition-transform">
-                      <svg className="w-6 h-6" fill="var(--color-teal)" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z" />
-                      </svg>
+                      <EyeOff className="w-6 h-6 text-[var(--color-teal)]" />
                    </div>
-                   <h4 className="text-xl font-black" style={{ color: "var(--color-text-primary)" }}>SSL/TLS 1.3</h4>
-                   <p className="text-sm text-[var(--color-text-secondary)]">Encrypted communication channels preventing any unauthorized interception.</p>
+                   <h4 className="text-xl font-black" style={{ color: "var(--color-text-primary)" }}>Private Channel</h4>
+                   <p className="text-sm text-[var(--color-text-secondary)]">Everything between you and ExitDebt is private. No one is listening.</p>
                 </div>
               </div>
             </div>
@@ -314,12 +315,70 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ───── TESTIMONIALS SECTION ───── */}
+      <section className="py-20 lg:py-28 border-t border-gray-50 overflow-hidden">
+        <div className="text-center mb-12 px-8">
+          <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "var(--color-teal)" }}>Real Stories</p>
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color: "var(--color-text-primary)" }}>People Who Found Their <span style={{ color: "var(--color-teal)" }}>Way Out</span></h2>
+          <p className="text-base max-w-xl mx-auto" style={{ color: "var(--color-text-secondary)" }}>Thousands of Indians have used ExitDebt to take back control. Here&apos;s what a few of them said.</p>
+        </div>
+
+        {/* Marquee track */}
+        <div className="relative w-full" style={{ maskImage: "linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)" }}>
+          <div className="flex testimonial-marquee gap-6 w-max">
+            {[
+              { name: "Ravi Krishnamurthy", city: "Bengaluru", debt: "₹4.2L credit card debt", quote: "I was paying ₹12,000 a month just in interest and going nowhere. ExitDebt showed me exactly where I was bleeding money. Within 3 months I had a plan and actually saw my balance drop for the first time.", stars: 5 },
+              { name: "Priya Mehta", city: "Mumbai", debt: "₹8.7L personal loan", quote: "I was scared to even open my bank app. The advisor was the first person who didn't make me feel ashamed about my situation. They negotiated my EMI down by 30% — I can breathe again.", stars: 5 },
+              { name: "Anand Subramaniam", city: "Hyderabad", debt: "3 loans + 2 credit cards", quote: "Five different due dates and I kept missing one or the other. ExitDebt consolidated everything into one view and helped me negotiate with two lenders. No more panic at month-end.", stars: 5 },
+              { name: "Deepa Raghavan", city: "Chennai", debt: "₹2.1L overdue EMIs", quote: "The recovery agent calls were unbearable. Shield stopped all of it within a week. I didn't even know I had legal rights until ExitDebt explained them to me.", stars: 5 },
+              { name: "Mohit Gupta", city: "Delhi", debt: "₹11L business + personal", quote: "I thought settlement would ruin my credit forever. ExitDebt told me the truth — a temporary dip that recovered in 8 months. Saved ₹2.3 lakhs. Best decision I made.", stars: 5 },
+              { name: "Sneha Patil", city: "Pune", debt: "₹3.8L credit card rollover", quote: "My Interest Leak Report said I was losing ₹74,000 a year in interest alone. Seeing that number made it real. I upgraded to Lite and sorted it in 4 months.", stars: 5 },
+            ].concat([
+              { name: "Ravi Krishnamurthy", city: "Bengaluru", debt: "₹4.2L credit card debt", quote: "I was paying ₹12,000 a month just in interest and going nowhere. ExitDebt showed me exactly where I was bleeding money. Within 3 months I had a plan and actually saw my balance drop for the first time.", stars: 5 },
+              { name: "Priya Mehta", city: "Mumbai", debt: "₹8.7L personal loan", quote: "I was scared to even open my bank app. The advisor was the first person who didn't make me feel ashamed about my situation. They negotiated my EMI down by 30% — I can breathe again.", stars: 5 },
+              { name: "Anand Subramaniam", city: "Hyderabad", debt: "3 loans + 2 credit cards", quote: "Five different due dates and I kept missing one or the other. ExitDebt consolidated everything into one view and helped me negotiate with two lenders. No more panic at month-end.", stars: 5 },
+              { name: "Deepa Raghavan", city: "Chennai", debt: "₹2.1L overdue EMIs", quote: "The recovery agent calls were unbearable. Shield stopped all of it within a week. I didn't even know I had legal rights until ExitDebt explained them to me.", stars: 5 },
+              { name: "Mohit Gupta", city: "Delhi", debt: "₹11L business + personal", quote: "I thought settlement would ruin my credit forever. ExitDebt told me the truth — a temporary dip that recovered in 8 months. Saved ₹2.3 lakhs. Best decision I made.", stars: 5 },
+              { name: "Sneha Patil", city: "Pune", debt: "₹3.8L credit card rollover", quote: "My Interest Leak Report said I was losing ₹74,000 a year in interest alone. Seeing that number made it real. I upgraded to Lite and sorted it in 4 months.", stars: 5 },
+            ]).map((t, i) => (
+              <div
+                key={i}
+                className="flex-shrink-0 w-80 rounded-2xl p-6 border flex flex-col gap-4"
+                style={{ backgroundColor: "var(--color-bg-card)", borderColor: "var(--color-border)" }}
+              >
+                {/* Stars */}
+                <div className="flex gap-0.5">
+                  {Array.from({ length: t.stars }).map((_, s) => (
+                    <svg key={s} className="w-4 h-4" viewBox="0 0 20 20" fill="#F59E0B"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.368 2.448a1 1 0 00-.364 1.118l1.286 3.957c.3.921-.755 1.591-1.54 1.118L10 14.347l-3.951 2.878c-.784.473-1.838-.197-1.539-1.118l1.286-3.957a1 1 0 00-.364-1.118L2.064 9.384c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69L9.049 2.927z" /></svg>
+                  ))}
+                </div>
+                {/* Quote */}
+                <p className="text-sm leading-relaxed flex-1" style={{ color: "var(--color-text-secondary)" }}>&ldquo;{t.quote}&rdquo;</p>
+                {/* Footer */}
+                <div className="flex items-center gap-3 pt-2 border-t" style={{ borderColor: "var(--color-border)" }}>
+                  <div
+                    className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+                    style={{ backgroundColor: "var(--color-teal)" }}
+                  >
+                    {t.name[0]}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{t.name}</p>
+                    <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>{t.city} · {t.debt}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ───── PRICING SECTION ───── */}
       <section id="pricing" className="max-w-6xl mx-auto px-8 py-20 lg:py-28 border-t border-gray-50">
         <div className="text-center mb-16 animate-fadeIn">
           <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "var(--color-teal)" }}>Pricing</p>
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color: "var(--color-text-primary)" }}>Choose Your Path to Freedom</h2>
-          <p className="text-sm text-gray-500 max-w-xl mx-auto">Flexible plans designed to support you at every stage of your debt recovery journey.</p>
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color: "var(--color-text-primary)" }}>Simple Plans. Real Results. Pick What Fits.</h2>
+          <p className="text-sm text-gray-500 max-w-xl mx-auto">Whether you need smart tools to manage it yourself or expert negotiators in your corner — we have a plan that works for your situation and budget.</p>
         </div>
 
         <div className="flex justify-center mb-16">
@@ -377,8 +436,8 @@ export default function LandingPage() {
                 <h4 className="font-bold mb-1 text-gray-900">Still have questions?</h4>
                 <p className="text-sm text-gray-600">Our team is here to help you navigate your financial journey.</p>
               </div>
-              <Link href="/schedule" className="whitespace-nowrap px-6 py-3 rounded-xl text-sm font-bold text-white bg-[var(--color-teal)] hover:shadow-xl hover:-translate-y-0.5 transition-all outline-none focus-visible:ring-2 focus-visible:ring-offset-2">
-                 Contact Support
+              <Link href="/get-started" className="whitespace-nowrap px-6 py-3 rounded-xl text-sm font-bold text-white bg-[var(--color-teal)] hover:shadow-xl hover:-translate-y-0.5 transition-all outline-none focus-visible:ring-2 focus-visible:ring-offset-2">
+                 Book Consultation
               </Link>
             </div>
           </div>

@@ -27,14 +27,16 @@ const TIER_CONTENT: Record<string, {
     featureTextClass: string;
     buttonClass: string;
     annualPrice?: string;
+    annualMonthlyPrice?: string;
     savePercent?: string;
 }> = {
     lite: {
         name: "LITE",
         price: "499",
         annualPrice: "4,999",
+        annualMonthlyPrice: "416",
         savePercent: "17%",
-        tagline: "Essential tools for independent debt management and tracking.",
+        tagline: "Everything you need to take charge of your debt — on your own terms.",
         features: [
             "Debt health dashboard",
             "7 intelligence tools",
@@ -42,7 +44,7 @@ const TIER_CONTENT: Record<string, {
             "Smart payment prioritizer",
             "Quarterly bureau refresh",
         ],
-        buttonText: "Get Started",
+        buttonText: "Start Managing My Debt",
         cardClass: "bg-white border-2 border-gray-100 hover:border-[#134E4A]/30 shadow-xl shadow-gray-100/50",
         titleClass: "text-[#134E4A]/60",
         priceClass: "text-[#0F172A]",
@@ -57,13 +59,14 @@ const TIER_CONTENT: Record<string, {
         name: "SHIELD",
         price: "1,999",
         annualPrice: "14,999",
+        annualMonthlyPrice: "1,250",
         savePercent: "37%",
-        tagline: "Active protection against harassment and direct bank coordination.",
+        tagline: "Tired of threatening calls? We step in, handle your creditors, and protect your peace of mind.",
         features: [
             "Everything in Lite",
-            "Harassment protection",
-            "Creditor communications",
-            "Legal notice drafting",
+            "Recovery agent harassment shield",
+            "We talk to your creditors so you don't have to",
+            "RBI-compliant legal notices on your behalf",
             "Priority 24/7 support",
         ],
         buttonText: "Protect Me Now",
@@ -82,7 +85,7 @@ const TIER_CONTENT: Record<string, {
         name: "SHIELD+",
         price: "10%",
         priceSuffix: "+ GST",
-        tagline: "End-to-end legal and negotiation support for closing your debts.",
+        tagline: "We negotiate directly with your lenders to reduce what you owe. You pay us only after we save you money.",
         features: [
             "Full debt negotiation",
             "Creditor communications",
@@ -90,7 +93,7 @@ const TIER_CONTENT: Record<string, {
             "Dedicated settlement team",
             "Pay only on success",
         ],
-        buttonText: "Book a Call",
+        buttonText: "Talk to a Negotiator",
         cardClass: "bg-white border-2 border-gray-100 hover:border-[#134E4A] shadow-xl shadow-gray-100/50",
         titleClass: "text-[#134E4A]/60",
         priceClass: "text-[#0F172A]",
@@ -123,7 +126,7 @@ export default function PricingCard({ tier, isAnnual, onSubscribe, onBookCall, i
                 <span className={`text-[11px] font-bold tracking-widest uppercase ${content.titleClass}`}>{content.name}</span>
                 <div className="flex items-baseline gap-1 mt-4 mb-2">
                     <span className={`text-4xl font-extrabold ${content.priceClass}`}>
-                        {isShieldPlus ? "" : "₹"}{content.price}
+                        {isShieldPlus ? "" : "₹"}{isAnnual && content.annualMonthlyPrice ? content.annualMonthlyPrice : content.price}
                     </span>
                     {!isShieldPlus ? (
                         <span className={`font-medium ${content.textClass}`}>/mo</span>
@@ -135,13 +138,13 @@ export default function PricingCard({ tier, isAnnual, onSubscribe, onBookCall, i
                     <p className={`text-[11px] font-bold mb-4 h-4 ${content.saveClass}`}>
                         {isAnnual 
                             ? `₹${content.annualPrice} billed annually — save ~${content.savePercent}`
-                            : `or ₹${content.annualPrice}/year and save`
+                            : `Save ~${content.savePercent} with annual billing`
                         }
                     </p>
                 )}
                 {isShieldPlus && (
                     <p className={`text-[11px] font-bold mb-4 h-4 ${content.saveClass}`}>
-                        on settled amount (Min debt: ₹1L)
+                        of the amount we save you (min. debt ₹1L) — no savings, no fee
                     </p>
                 )}
                 <p className={`text-sm font-medium leading-relaxed ${content.textClass}`}>
