@@ -1351,15 +1351,13 @@ export default function AdminCRMPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "var(--color-text-muted)" }}>Slug</label>
-                    <input
-                      type="text"
-                      value={blogForm.slug}
-                      onChange={(e) => setBlogForm((prev) => ({ ...prev, slug: e.target.value }))}
-                      placeholder="url-friendly-slug"
+                    <label className="block text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "var(--color-text-muted)" }}>Slug <span style={{ fontWeight: 400, textTransform: "none" }}>(auto-generated)</span></label>
+                    <div
                       className="w-full px-3 py-2 rounded-lg text-sm font-mono"
-                      style={{ backgroundColor: "var(--color-bg-soft)", border: "1px solid var(--color-border)", color: "var(--color-text-primary)" }}
-                    />
+                      style={{ backgroundColor: "var(--color-bg-soft)", border: "1px solid var(--color-border)", color: "var(--color-text-secondary)", minHeight: "38px", display: "flex", alignItems: "center", opacity: 0.75 }}
+                    >
+                      {blogForm.slug || "type-a-title-above"}
+                    </div>
                   </div>
                 </div>
 
@@ -1389,14 +1387,17 @@ export default function AdminCRMPage() {
                   </div>
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "var(--color-text-muted)" }}>Read Time</label>
-                    <input
-                      type="text"
+                    <select
+                      aria-label="Read Time"
                       value={blogForm.read_time}
                       onChange={(e) => setBlogForm((prev) => ({ ...prev, read_time: e.target.value }))}
-                      placeholder="5 min read"
                       className="w-full px-3 py-2 rounded-lg text-sm"
                       style={{ backgroundColor: "var(--color-bg-soft)", border: "1px solid var(--color-border)", color: "var(--color-text-primary)" }}
-                    />
+                    >
+                      {Array.from({ length: 10 }, (_, i) => i + 1).map((m) => (
+                        <option key={m} value={`${m} min read`}>{m} min read</option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "var(--color-text-muted)" }}>Author</label>
@@ -1515,8 +1516,8 @@ export default function AdminCRMPage() {
                 <div className="flex items-center gap-3">
                   <button
                     onClick={async () => {
-                      if (!blogForm.title.trim() || !blogForm.slug.trim() || !blogForm.content.trim() || !blogForm.description.trim()) {
-                        alert("Please fill in all required fields: Title, Slug, Description, and Content.");
+                      if (!blogForm.title.trim() || !blogForm.content.trim() || !blogForm.description.trim()) {
+                        alert("Please fill in all required fields: Title, Description, and Content.");
                         return;
                       }
                       setBlogSaving(true);
