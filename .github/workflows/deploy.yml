@@ -53,7 +53,7 @@ jobs:
           target: /tmp/
 
       - name: Deploy on EC2
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
@@ -63,5 +63,5 @@ jobs:
             cd ~/apps/exitdebt-frontend
             tar -xzf /tmp/frontend-build.tar.gz -C .
             rm -f /tmp/frontend-build.tar.gz
-            npm ci --omit=dev --ignore-scripts
+            npm ci --omit=dev --ignore-scripts 2>&1
             pm2 reload exitdebt-web --update-env
