@@ -19,6 +19,9 @@ interface BlogDetail {
   tag: string;
   read_time: string;
   author: string;
+  seo_keywords: string | null;
+  meta_description: string | null;
+  theme_color: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -108,6 +111,9 @@ export default function BlogDetailPage({ params }: { params: Promise<{ slug: str
         tag: staticArticle.category,
         read_time: "5 min read",
         author: "ExitDebt Team",
+        seo_keywords: null,
+        meta_description: null,
+        theme_color: null,
         created_at: "",
         updated_at: "",
       });
@@ -132,6 +138,55 @@ export default function BlogDetailPage({ params }: { params: Promise<{ slug: str
     }
     fetchBlog();
   }, [slug]);
+
+  /* ── Dynamic SEO Meta Tags ── */
+  useEffect(() => {
+    if (!blog) return;
+
+    const originalTitle = document.title;
+
+    // Title
+    document.title = `${blog.title} | ExitDebt`;
+
+    // Helper: set or create a meta tag
+    const setMeta = (name: string, content: string) => {
+      let el = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement | null;
+      if (!el) {
+        el = document.createElement("meta");
+        el.setAttribute("name", name);
+        document.head.appendChild(el);
+      }
+      el.setAttribute("content", content);
+    };
+
+    // Meta description (dedicated SEO field, falls back to card description)
+    const metaDesc = blog.meta_description || blog.description;
+    if (metaDesc) setMeta("description", metaDesc);
+
+    // SEO keywords
+    if (blog.seo_keywords) setMeta("keywords", blog.seo_keywords);
+
+    // Theme color (browser chrome on mobile)
+    if (blog.theme_color) setMeta("theme-color", blog.theme_color);
+
+    // Open Graph tags
+    const setOG = (property: string, content: string) => {
+      let el = document.querySelector(`meta[property="${property}"]`) as HTMLMetaElement | null;
+      if (!el) {
+        el = document.createElement("meta");
+        el.setAttribute("property", property);
+        document.head.appendChild(el);
+      }
+      el.setAttribute("content", content);
+    };
+    setOG("og:title", blog.title);
+    setOG("og:description", metaDesc);
+    setOG("og:type", "article");
+
+    return () => {
+      document.title = originalTitle;
+    };
+  }, [blog]);
 
   if (loading) {
     return (
