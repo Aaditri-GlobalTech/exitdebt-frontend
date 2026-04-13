@@ -18,6 +18,8 @@ interface BlogListItem {
   tag: string;
   read_time: string;
   author: string;
+  seo_keywords?: string | null;
+  meta_description?: string | null;
   created_at: string;
 }
 

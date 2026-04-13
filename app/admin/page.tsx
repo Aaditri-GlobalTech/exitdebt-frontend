@@ -206,6 +206,9 @@ export default function AdminCRMPage() {
     read_time: string;
     is_published: boolean;
     author: string;
+    seo_keywords: string | null;
+    meta_description: string | null;
+    theme_color: string | null;
     created_at: string;
     updated_at: string;
   }
@@ -222,6 +225,9 @@ export default function AdminCRMPage() {
     read_time: "5 min read",
     is_published: true,
     author: "ExitDebt Team",
+    seo_keywords: "",
+    meta_description: "",
+    theme_color: "#0D9488",
   });
   const [blogInputMethod, setBlogInputMethod] = useState<"write" | "markdown" | "upload">("write");
   const [blogSaving, setBlogSaving] = useState(false);
@@ -1307,7 +1313,7 @@ export default function AdminCRMPage() {
               <button
                 onClick={() => {
                   setEditingBlog(null);
-                  setBlogForm({ title: "", slug: "", description: "", content: "", tag: "General", read_time: "5 min read", is_published: true, author: "ExitDebt Team" });
+                  setBlogForm({ title: "", slug: "", description: "", content: "", tag: "General", read_time: "5 min read", is_published: true, author: "ExitDebt Team", seo_keywords: "", meta_description: "", theme_color: "#0D9488" });
                   setBlogInputMethod("write");
                   setBlogFormOpen(true);
                 }}
@@ -1423,6 +1429,71 @@ export default function AdminCRMPage() {
                     </select>
                   </div>
                 </div>
+
+                {/* ── SEO & Theme Settings (collapsible) ── */}
+                <details className="mb-5 rounded-xl" style={{ backgroundColor: "var(--color-bg-soft)", border: "1px solid var(--color-border)" }}>
+                  <summary className="px-4 py-3 cursor-pointer select-none flex items-center gap-2 text-xs font-bold uppercase tracking-wider" style={{ color: "var(--color-teal)" }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    SEO & Theme Settings
+                  </summary>
+                  <div className="px-4 pb-4 pt-2 space-y-4">
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "var(--color-text-muted)" }}>SEO Keywords</label>
+                      <input
+                        type="text"
+                        value={blogForm.seo_keywords}
+                        onChange={(e) => setBlogForm((prev) => ({ ...prev, seo_keywords: e.target.value }))}
+                        placeholder="debt relief, credit card, EMI management, loan settlement"
+                        className="w-full px-3 py-2 rounded-lg text-sm"
+                        style={{ backgroundColor: "var(--color-bg-card)", border: "1px solid var(--color-border)", color: "var(--color-text-primary)" }}
+                      />
+                      <p className="text-[10px] mt-1" style={{ color: "var(--color-text-muted)" }}>Comma-separated keywords for the &lt;meta name=&quot;keywords&quot;&gt; tag.</p>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "var(--color-text-muted)" }}>Meta Description <span style={{ fontWeight: 400, textTransform: "none" }}>(SEO)</span></label>
+                      <textarea
+                        value={blogForm.meta_description}
+                        onChange={(e) => setBlogForm((prev) => ({ ...prev, meta_description: e.target.value }))}
+                        placeholder="A compelling 150-160 character summary for search engine results. Different from the card description."
+                        rows={3}
+                        maxLength={320}
+                        className="w-full px-3 py-2 rounded-lg text-sm resize-y"
+                        style={{ backgroundColor: "var(--color-bg-card)", border: "1px solid var(--color-border)", color: "var(--color-text-primary)" }}
+                      />
+                      <p className="text-[10px] mt-1 flex justify-between" style={{ color: "var(--color-text-muted)" }}>
+                        <span>Shown in Google search results. Falls back to card description if empty.</span>
+                        <span style={{ color: blogForm.meta_description.length > 160 ? "#EF4444" : "var(--color-text-muted)" }}>{blogForm.meta_description.length}/160</span>
+                      </p>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "var(--color-text-muted)" }}>Theme Color</label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="color"
+                          value={blogForm.theme_color || "#0D9488"}
+                          onChange={(e) => setBlogForm((prev) => ({ ...prev, theme_color: e.target.value }))}
+                          className="w-10 h-10 rounded-lg cursor-pointer border-0 p-0"
+                          style={{ backgroundColor: "transparent" }}
+                        />
+                        <input
+                          type="text"
+                          value={blogForm.theme_color}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            if (/^#[0-9A-Fa-f]{0,6}$/.test(v) || v === "") {
+                              setBlogForm((prev) => ({ ...prev, theme_color: v }));
+                            }
+                          }}
+                          placeholder="#0D9488"
+                          maxLength={7}
+                          className="w-28 px-3 py-2 rounded-lg text-sm font-mono"
+                          style={{ backgroundColor: "var(--color-bg-card)", border: "1px solid var(--color-border)", color: "var(--color-text-primary)" }}
+                        />
+                        <span className="text-[10px]" style={{ color: "var(--color-text-muted)" }}>Browser address bar color on mobile</span>
+                      </div>
+                    </div>
+                  </div>
+                </details>
 
                 {/* ── Content Input Method Picker ── */}
                 <div className="mb-3">
@@ -1632,6 +1703,9 @@ export default function AdminCRMPage() {
                                   read_time: post.read_time,
                                   is_published: post.is_published,
                                   author: post.author,
+                                  seo_keywords: post.seo_keywords || "",
+                                  meta_description: post.meta_description || "",
+                                  theme_color: post.theme_color || "#0D9488",
                                 });
                                 setBlogInputMethod("markdown");
                                 setBlogFormOpen(true);
