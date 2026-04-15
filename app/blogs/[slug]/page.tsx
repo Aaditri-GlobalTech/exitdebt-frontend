@@ -79,7 +79,7 @@ const STATIC_ARTICLES: Record<string, { title: string; category: string; descrip
  * Constants
  * ═══════════════════════════════════════════════════════════════════════ */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
 /* ═══════════════════════════════════════════════════════════════════════
  * Component
@@ -182,6 +182,9 @@ export default function BlogDetailPage({ params }: { params: Promise<{ slug: str
     setOG("og:title", blog.title);
     setOG("og:description", metaDesc);
     setOG("og:type", "article");
+    if (blog.featured_image_url) {
+      setOG("og:image", blog.featured_image_url);
+    }
 
     return () => {
       document.title = originalTitle;
@@ -264,6 +267,18 @@ export default function BlogDetailPage({ params }: { params: Promise<{ slug: str
             )}
           </div>
         </div>
+        </div>
+
+        {blog.featured_image_url && (
+          <div className="mb-10 w-full overflow-hidden rounded-2xl" style={{ border: "1px solid var(--color-border)" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img 
+              src={blog.featured_image_url} 
+              alt={blog.title} 
+              className="w-full h-auto object-cover max-h-[400px]" 
+            />
+          </div>
+        )}
 
         {/* Render content as Markdown */}
         <div className="prose prose-lg prose-teal max-w-none blog-content">

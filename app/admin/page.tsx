@@ -209,6 +209,7 @@ export default function AdminCRMPage() {
     seo_keywords: string | null;
     meta_description: string | null;
     theme_color: string | null;
+    featured_image_url: string | null;
     created_at: string;
     updated_at: string;
   }
@@ -228,6 +229,7 @@ export default function AdminCRMPage() {
     seo_keywords: "",
     meta_description: "",
     theme_color: "#0D9488",
+    featured_image_url: "",
   });
   const [blogInputMethod, setBlogInputMethod] = useState<"write" | "markdown" | "upload">("write");
   const [blogSaving, setBlogSaving] = useState(false);
@@ -1492,6 +1494,17 @@ export default function AdminCRMPage() {
                         <span className="text-[10px]" style={{ color: "var(--color-text-muted)" }}>Browser address bar color on mobile</span>
                       </div>
                     </div>
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "var(--color-text-muted)" }}>Featured Image URL</label>
+                      <input
+                        type="url"
+                        value={blogForm.featured_image_url}
+                        onChange={(e) => setBlogForm((prev) => ({ ...prev, featured_image_url: e.target.value }))}
+                        placeholder="https://example.com/image.jpg"
+                        className="w-full px-3 py-2 rounded-lg text-sm flex-1"
+                        style={{ backgroundColor: "var(--color-bg-card)", border: "1px solid var(--color-border)", color: "var(--color-text-primary)" }}
+                      />
+                    </div>
                   </div>
                 </details>
 
@@ -1706,6 +1719,7 @@ export default function AdminCRMPage() {
                                   seo_keywords: post.seo_keywords || "",
                                   meta_description: post.meta_description || "",
                                   theme_color: post.theme_color || "#0D9488",
+                                  featured_image_url: post.featured_image_url || "",
                                 });
                                 setBlogInputMethod("markdown");
                                 setBlogFormOpen(true);

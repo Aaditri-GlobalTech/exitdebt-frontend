@@ -84,7 +84,7 @@ const STATIC_ARTICLES: BlogListItem[] = [
  * Helpers
  * ═══════════════════════════════════════════════════════════════════════ */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
 function isStaticSlug(slug: string): boolean {
   return [
@@ -110,6 +110,7 @@ function getBlogHref(article: BlogListItem): string {
 export default function BlogsListing() {
   const [dynamicBlogs, setDynamicBlogs] = useState<BlogListItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
     async function fetchBlogs() {
@@ -118,9 +119,11 @@ export default function BlogsListing() {
         if (res.ok) {
           const data: BlogListItem[] = await res.json();
           setDynamicBlogs(data);
+        } else {
+          setFetchError(true);
         }
       } catch {
-        // Backend unreachable — show static articles only
+        setFetchError(true);
       } finally {
         setLoading(false);
       }
@@ -160,6 +163,11 @@ export default function BlogsListing() {
         {/* Article Grid */}
         <section className="py-20 sm:py-32">
           <div className="max-w-6xl mx-auto px-8">
+            {fetchError && (
+              <div className="mb-8 px-4 py-3 rounded-xl text-sm text-amber-700 bg-amber-50 border border-amber-200">
+                Could not load latest posts from the server — showing cached articles only. Check that the backend is running and <code>NEXT_PUBLIC_API_URL</code> is set correctly.
+              </div>
+            )}
             {loading ? (
               <div className="flex items-center justify-center py-20">
                 <div className="w-8 h-8 border-[3px] border-teal-200 border-t-teal-500 rounded-full animate-spin" />
@@ -173,6 +181,16 @@ export default function BlogsListing() {
                     className="group flex flex-col p-8 rounded-[2.5rem] border border-[var(--color-border)] hover:border-[var(--color-teal)] hover:shadow-2xl hover:shadow-teal-500/5 transition-all animate-slideUp"
                     style={{ animationDelay: `${i * 100}ms` }}
                   >
+                    {article.featured_image_url && (
+                      <div className="mb-6 w-full h-48 overflow-hidden rounded-2xl bg-[var(--color-bg-soft)] flex-shrink-0" style={{ border: "1px solid var(--color-border)" }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img 
+                          src={article.featured_image_url} 
+                          alt={article.title} 
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                        />
+                      </div>
+                    )}
                     <div className="flex justify-between items-start mb-6">
                       <span className="px-4 py-1.5 rounded-full bg-[var(--color-bg-soft)] text-[var(--color-teal)] text-xs font-bold tracking-widest uppercase">
                         {article.tag}
