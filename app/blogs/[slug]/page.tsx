@@ -267,7 +267,6 @@ export default function BlogDetailPage({ params }: { params: Promise<{ slug: str
             )}
           </div>
         </div>
-        </div>
 
         {blog.featured_image_url && (
           <div className="mb-10 w-full overflow-hidden rounded-2xl" style={{ border: "1px solid var(--color-border)" }}>
