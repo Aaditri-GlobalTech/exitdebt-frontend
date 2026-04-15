@@ -1315,7 +1315,7 @@ export default function AdminCRMPage() {
               <button
                 onClick={() => {
                   setEditingBlog(null);
-                  setBlogForm({ title: "", slug: "", description: "", content: "", tag: "General", read_time: "5 min read", is_published: true, author: "ExitDebt Team", seo_keywords: "", meta_description: "", theme_color: "#0D9488" });
+                  setBlogForm({ title: "", slug: "", description: "", content: "", tag: "General", read_time: "5 min read", is_published: true, author: "ExitDebt Team", seo_keywords: "", meta_description: "", theme_color: "#0D9488", featured_image_url: "" });
                   setBlogInputMethod("write");
                   setBlogFormOpen(true);
                 }}
