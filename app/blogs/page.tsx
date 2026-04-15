@@ -20,6 +20,7 @@ interface BlogListItem {
   author: string;
   seo_keywords?: string | null;
   meta_description?: string | null;
+  featured_image_url?: string | null;
   created_at: string;
 }
 

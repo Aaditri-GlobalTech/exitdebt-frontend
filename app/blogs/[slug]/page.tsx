@@ -22,6 +22,7 @@ interface BlogDetail {
   seo_keywords: string | null;
   meta_description: string | null;
   theme_color: string | null;
+  featured_image_url: string | null;
   created_at: string;
   updated_at: string;
 }
