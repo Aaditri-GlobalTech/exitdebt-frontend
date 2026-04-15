@@ -115,6 +115,7 @@ export default function BlogDetailPage({ params }: { params: Promise<{ slug: str
         seo_keywords: null,
         meta_description: null,
         theme_color: null,
+        featured_image_url: null,
         created_at: "",
         updated_at: "",
       });
