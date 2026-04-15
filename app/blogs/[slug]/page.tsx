@@ -126,7 +126,7 @@ export default function BlogDetailPage({ params }: { params: Promise<{ slug: str
     // Fetch dynamic blog from API
     async function fetchBlog() {
       try {
-        const res = await fetch(`${API_URL}/api/blogs/${slug}`);
+        const res = await fetch(`${API_URL}/api/articles/${slug}`);
         if (res.ok) {
           setBlog(await res.json());
         } else {

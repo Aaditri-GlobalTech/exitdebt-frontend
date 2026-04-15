@@ -18,6 +18,7 @@ interface AuthState {
     panHash: string;      // SHA-256 hash — stored in cookie
     phone: string;
     userId: string;       // Backend UUID — persisted in cookie
+    token: string;        // JWT access token — persisted in cookie
     isReady: boolean;
     consent: ConsentRecord | null;
     onboardingComplete: boolean; // True after PAN verification (Step 2+)
@@ -69,6 +70,7 @@ const AuthContext = createContext<AuthContextType>({
     panHash: "",
     phone: "",
     userId: "",
+    token: "",
     isReady: false,
     consent: null,
     onboardingComplete: false,
@@ -88,6 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [panHash, setPanHash] = useState("");  // SHA-256 — persisted
     const [phone, setPhone] = useState("");
     const [userId, setUserId] = useState("");   // Backend UUID — persisted
+    const [token, setToken] = useState("");     // JWT access token — persisted
     const [consent, setConsent] = useState<ConsentRecord | null>(null);
     const [onboardingComplete, setOnboardingComplete] = useState(false);
     const [isReady, setIsReady] = useState(false);
@@ -146,6 +149,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
             setPanHash(data.panHash as string);
             setPhone(data.phone as string);
+            if (data.userId) setUserId(data.userId as string);
+            if (data.token) setToken(data.token as string);
             if (data.consent) {
                 setConsent(data.consent as ConsentRecord);
             }
@@ -164,6 +169,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 panHash,             // SHA-256 hash only — NEVER store raw PAN
                 phone,
                 userId,              // Backend UUID for API calls
+                token,               // JWT access token for authenticated endpoints
                 name: user.name,     // Persist name for onboarding flow
                 salary: user.salary,
                 salaryDate: user.salaryDate,
@@ -176,7 +182,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } else {
             deleteCookie();
         }
-    }, [user, pan, panHash, phone, userId, consent, onboardingComplete, isReady]);
+    }, [user, pan, panHash, phone, userId, token, consent, onboardingComplete, isReady]);
 
     const login = useCallback((panValue: string, phoneValue: string, backendData?: Record<string, any>) => {
         const normalizedPan = panValue.toUpperCase();
@@ -218,6 +224,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setPan(normalizedPan);
         setPhone(phoneValue);
         if (backendData?.user_id) setUserId(backendData.user_id);
+        if (backendData?.access_token) setToken(backendData.access_token);
 
 
         // Record consent
@@ -305,6 +312,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setPanHash("");
         setPhone("");
         setUserId("");
+        setToken("");
         setConsent(null);
         setOnboardingComplete(false);
         deleteCookie();
@@ -319,6 +327,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 panHash,
                 phone,
                 userId,
+                token,
                 isReady,
                 consent,
                 onboardingComplete,

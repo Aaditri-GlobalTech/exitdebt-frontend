@@ -116,10 +116,10 @@ export default function BlogsListing() {
   useEffect(() => {
     async function fetchBlogs() {
       try {
-        const res = await fetch(`${API_URL}/api/blogs`);
+        const res = await fetch(`${API_URL}/api/articles`);
         if (res.ok) {
-          const data: BlogListItem[] = await res.json();
-          setDynamicBlogs(data);
+          const data = await res.json();
+          setDynamicBlogs(data.articles || data);
         } else {
           setFetchError(true);
         }

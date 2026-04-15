@@ -12,11 +12,10 @@ const nextConfig: NextConfig = {
     ];
   },
   // Soft-launch temporary redirects — bypass old KYC/OTP flows
+  // NOTE: /login and /dashboard are accessible for admin-created clients
   async redirects() {
     return [
       { source: '/onboarding', destination: '/get-started', permanent: false },
-      { source: '/login', destination: '/get-started', permanent: false },
-      { source: '/dashboard', destination: '/get-started', permanent: false },
     ];
   },
   async headers() {
