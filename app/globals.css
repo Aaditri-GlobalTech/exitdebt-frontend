@@ -226,6 +226,195 @@ input[type="number"] {
   animation-play-state: paused;
 }
 
+/* ─── Dashboard Cards ─── */
+.db-card {
+  background: rgba(255, 255, 255, 0.9);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(229, 231, 235, 0.6);
+  border-radius: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.02);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.db-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06), 0 8px 32px rgba(0, 0, 0, 0.03);
+}
+
+.db-card-flat {
+  background: #fff;
+  border: 1px solid #f1f5f9;
+  border-radius: 16px;
+}
+
+/* ─── Score Gauge ─── */
+@keyframes gaugeStroke {
+  from { stroke-dasharray: 0 264; }
+}
+
+@keyframes counterUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.gauge-animate circle:last-child {
+  animation: gaugeStroke 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.counter-reveal {
+  animation: counterUp 0.6s ease-out 0.3s both;
+}
+
+/* Score band colors */
+.score-green { --gauge-color: #059669; }
+.score-yellow { --gauge-color: #ca8a04; }
+.score-orange { --gauge-color: #ea580c; }
+.score-red { --gauge-color: #dc2626; }
+
+/* ─── Interest Leak Bar ─── */
+.interest-bar {
+  height: 12px;
+  border-radius: 6px;
+  background: #f1f5f9;
+  overflow: hidden;
+  position: relative;
+}
+
+.interest-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ─── Cash Flow Meter ─── */
+.cashflow-meter {
+  height: 8px;
+  border-radius: 4px;
+  background: #f1f5f9;
+  overflow: hidden;
+}
+
+.cashflow-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ─── Impact Priority Badges ─── */
+.impact-high { background: #fef2f2; color: #dc2626; border: 1px solid #fee2e2; }
+.impact-medium { background: #fffbeb; color: #d97706; border: 1px solid #fef3c7; }
+.impact-low { background: #f0fdf4; color: #059669; border: 1px solid #dcfce7; }
+
+/* ─── Dashboard Section Headers ─── */
+.db-section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.db-section-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.db-section-title {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.db-section-subtitle {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* ─── FOIR Alert Strip ─── */
+.foir-strip {
+  background: linear-gradient(135deg, rgba(19, 78, 74, 0.04) 0%, rgba(19, 78, 74, 0.08) 100%);
+  border: 1px solid rgba(19, 78, 74, 0.12);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #1a1a2e;
+}
+
+/* ─── Popup Overlay ─── */
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes popupIn {
+  from { opacity: 0; transform: scale(0.95) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(15, 23, 42, 0.5);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: overlayIn 0.2s ease-out;
+}
+
+.popup-content {
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.03);
+  max-width: 480px;
+  width: 100%;
+  animation: popupIn 0.3s ease-out;
+}
+
+/* ─── CTA Gradient Strip ─── */
+.cta-gradient {
+  background: linear-gradient(135deg, #0f172a 0%, #134e4a 100%);
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-gradient::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 80% 20%, rgba(19, 78, 74, 0.3) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* ─── Stat Value Animation ─── */
+@keyframes valueReveal {
+  from { opacity: 0; transform: translateY(6px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.stat-value {
+  animation: valueReveal 0.5s ease-out both;
+}
+
+/* ─── Alert Card ─── */
+.alert-card {
+  background: linear-gradient(135deg, #fef2f2 0%, #fff5f5 100%);
+  border: 1px solid #fecaca;
+  border-radius: 16px;
+  padding: 20px;
+}
+
 /* ─── Print Styles ─── */
 @media print {
   .no-print {
